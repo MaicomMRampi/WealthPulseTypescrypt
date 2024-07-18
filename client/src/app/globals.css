@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* body {
+    width: 100vh;
+    height: 100vh;
+    overflow: hidden;
+} */

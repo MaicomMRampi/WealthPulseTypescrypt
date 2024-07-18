@@ -1,0 +1,185 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id                   Int      @id @default(autoincrement())
+  nome                 String
+  cpf                  String   @unique
+  email                String   @unique
+  senha                String
+  datacadastro         DateTime @default(now())
+  valorOrcamentoMensal Float?
+  imageUrl             String?
+}
+
+model Acao {
+  id               Int    @id @default(autoincrement())
+  nomeInvestimento String
+  valorInvestido   Float
+  banco            String
+  tipoRenda        String
+  dataCompra       String
+  idUser           Int
+  emailUser        String
+}
+
+model Banco {
+  id        Int    @id @default(autoincrement())
+  nomeBanco String @unique
+}
+
+model Categoria {
+  id            Int        @id @default(autoincrement())
+  nomeCategoria String     @unique
+  despesas      Despesas[] // Relação com Despesas
+}
+
+model ControleDeContas {
+  id               Int      @id @default(autoincrement())
+  idUser           Int
+  empresa          String
+  dataGasto        DateTime
+  vencimento       DateTime
+  parcelamento     Int
+  valorConta       Decimal
+  formaDePagamento String
+  pago             Boolean  @default(false)
+  mesAno           String
+  emailUser        String
+}
+
+model DespesaDeBens {
+  id                   Int      @id @default(autoincrement())
+  idPatrimonio         Int
+  observacao           String
+  nomePatrimonio       String
+  kmAntigo             Int
+  kmAtual              Int
+  tipoDespesa          String
+  nomeDespesa          String
+  tipoPatrimonio       String
+  valor                Float
+  responsavel          String
+  dataAquisicao        DateTime
+  compradorPagador     String
+  idUser               Int
+  litros               Float?
+  inativo              Int      @default(0)
+  observacaoInativacao String?
+}
+
+model Despesas {
+  id                 Int      @id @default(autoincrement())
+  idUser             Int
+  dataGasto          DateTime @default(now())
+  local              String?
+  formaDePagamentoId Int
+  valorGasto         Float
+  responsavel        String
+  categoriaId        Int
+  pagante            String
+  emailUser          String
+  fechada            Int      @default(0)
+  observacao         String?
+  mesCorrespondente  String
+
+  categoria        Categoria       @relation(fields: [categoriaId], references: [id])
+  FormaPagamento   FormaPagamento? @relation(fields: [formaDePagamentoId], references: [id])
+  formaPagamentoId Int?
+}
+
+model Dividendo {
+  id                 Int      @id @default(autoincrement())
+  dataInserido       DateTime @default(now()) @map("datainserido")
+  valorDividendo     Float
+  idInvestimento     Int
+  nomeInvestimento   String
+  idUser             Int
+  idNomeInvestimento Int
+}
+
+model FormaPagamento {
+  id                 Int    @id @default(autoincrement())
+  nomeFormaPagamento String @unique
+
+  despesas Despesas[]
+}
+
+model investimento {
+  id                     Int     @id @default(autoincrement())
+  idUser                 Int
+  nomeInvestimento       String
+  dataCompra             String
+  valorInvestido         Float
+  vencimentoAtivo        String
+  emailUser              String
+  diasParaVencimento     Int
+  valorAtualinvestimento Decimal
+  dataSemFormatacao      String
+  banco                  String
+  tipoRenda              String
+}
+
+model InvestimentoFundo {
+  id            Int    @id @default(autoincrement())
+  iduser        Int
+  nomefii       String
+  datacompra    String
+  valorpago     Float
+  quantidade    Int
+  valoratualfii Float
+  valorgasto    Float
+  emailuser     String
+  idnomefundo   Int
+  banco         String
+}
+
+model Nomeacao {
+  id       Int    @id @default(autoincrement())
+  nomeacao String @unique
+  iduser   Int
+}
+
+model NomeFundoImobiliario {
+  id        Int    @id @default(autoincrement())
+  nomefundo String @unique
+}
+
+model Patrimonio {
+  id              Int      @id @default(autoincrement())
+  nomePatrimonio  String
+  tipoPatrimonio  String
+  valorPatrimonio Float
+  dataAquisicao   DateTime
+  idUser          Int
+}
+
+model Proventos {
+  id                 Int      @id @default(autoincrement())
+  datainserido       DateTime @default(now()) @map("datainserido")
+  valorprovento      Float
+  idinvestimento     Int
+  nomeinvestimento   String
+  iduser             Int
+  idnomeinvestimento Int
+}
+
+model TipoDespesa {
+  id          Int    @id @default(autoincrement())
+  nomeDespesa String
+  idUser      Int
+}
+
+model ValorAtual {
+  id             Int      @id @default(autoincrement())
+  idInvestimento Int
+  valor          Decimal
+  data           DateTime @default(now())
+}
