@@ -2,26 +2,25 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
-
+import useToken from './hooks/useToken';
 
 const LayoutAdmin = ({ children }: any) => {
+    const { tokenUsuario } = useToken()
+    const router = useRouter();
     const pathname = usePathname()
+    const [usuarioLogado, setUsuarioLogado] = useState(false);
 
 
     if (pathname != '/pages/register') {
-        const router = useRouter();
-        const [usuarioLogado, setUsuarioLogado] = useState(false);
+
 
         useEffect(() => {
+
             const token = localStorage.getItem('token');
-
-
-            if (token) {
+            if (token && tokenUsuario) {
                 console.log("🚀 ~ useEffect ~ token", token);
                 try {
                     const decodedToken: any = jwtDecode(token);
-                    console.log("🚀 ~ useEffect ~ decodedToken", decodedToken);
-
                     // Verifica se o token está expirado comparando a data atual com a data de expiração do token
                     if (decodedToken.exp * 1000 < Date.now()) {
                         // Token expirado, redirecionar para a página de login
@@ -38,7 +37,8 @@ const LayoutAdmin = ({ children }: any) => {
                 }
             } else {
                 // Token não encontrado, redirecionar para a página de login
-                router.push('/pages/login');
+                router.push('/pages/login')
+
             }
         }, [router]);
 

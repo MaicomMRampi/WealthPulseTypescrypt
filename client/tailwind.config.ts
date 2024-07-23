@@ -32,7 +32,11 @@ const config: Config = {
 
         },
       },
-      light: {},
+      light: {
+        colors: {
+          secondary: '#10b981',
+        }
+      },
     },
   })],
 };

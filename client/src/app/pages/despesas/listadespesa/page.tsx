@@ -7,14 +7,7 @@ import {
     TableRow,
     TableCell,
     Input,
-    Divider,
     Button,
-    DropdownTrigger,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    Chip,
-    User,
     Pagination,
     Tooltip,
     Listbox,
@@ -23,82 +16,76 @@ import {
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import currency from "@/components/Currency";
-import LayoutAdmin from "@/components/LayoutAdmin";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import ModalObservacao from "@/components/despesaComponents/ModalObservacao";
 import columns from "./data";
-import { HiOutlinePlus } from "react-icons/hi";
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale'
+import { ptBR, vi } from 'date-fns/locale'
 import { SearchIcon } from "@/components/SearchIcon";
-import { PlusIcon } from "@/components/PlusIcon";
-// import { useAppContext } from "@/components/EscondeValorContext";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { useMemo } from "react";
 import { useCallback } from "react";
 import { EyeIcon } from "@/components/EyeIcon";
 import { EditIcon } from "@/components/EditIcon";
 import { DeleteIcon } from "@/components/DeleteIcon";
+import useVisibility from "@/components/hooks/useVisibility";
+import { PlusIcon } from "@/components/PlusIcon";
+import useToken from "@/components/hooks/useToken";
+import PdfDespesas from "@/components/PdfDespesas";
 
 export default function MinhasDespesas() {
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
-    const [observacao, setObservacao] = useState(false);
-    // const { visibility } = useAppContext();
+    const { visibility } = useVisibility()
+    const [observacao, setObservacao] = useState<object>(false);
     const [selectedIndex, setSelectedIndex] = useState(0); // Inicia com -1 para nenhum item selecionado
     const [Despesa, setDespesa] = useState();
     const [DespesaSelect, setDespesaSelect] = useState([]);
-    const [filterValue, setFilterValue] = useState("");
-    const [sortDescriptor, setSortDescriptor] = useState({
+    const [filterValue, setFilterValue] = useState<string>("");
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [page, setPage] = useState(1);
+    const [sortDescriptor, setSortDescriptor] = useState<any>({
         column: "dataGasto",
         direction: "ascending",
     });
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [page, setPage] = useState(1);
-
-    const emailUser = "MAICOM.MATEUS@YAHOO.COM.BR"
+    const [modalInfo, setModalInfo] = useState({
+        show: false,
+        objeto: {}
+    })
+    const { tokenUsuario } = useToken()
 
     const buscaDespesaMesAtual = async () => {
-        if (emailUser) {
-            console.log("🚀 ~ buscaDespesaMesAtual ~ emailUser", emailUser)
-            const response = await api.get(`/buscadespesamesatual`, {
-                params: {
-                    email: emailUser,
-                },
-            });
-
-            setDespesaSelect(response.data);
-        }
+        const response = await api.get(`/buscadespesamesatual`, {
+            params: {
+                email: tokenUsuario?.id,
+            },
+        });
+        setDespesaSelect(response.data);
     };
 
     const buscaDespesa = async () => {
-        if (emailUser) {
-            const response = await api.get(`/buscadespesa`, {
-                params: {
-                    email: emailUser,
-                },
-            });
-            setDespesa(response.data);
-            return response.data;
-        }
+        const response = await api.get(`/buscadespesa`, {
+            params: {
+                email: tokenUsuario?.id,
+            },
+        });
+        setDespesa(response.data);
     };
 
-    const getData = useCallback(async () => {
-        const response = await buscaDespesa();
-        if (response) {
-            buscaDespesaMesAtual();
-        }
-    })
+
+
     useEffect(() => {
-        getData();
-    }, [emailUser]);
+        buscaDespesa();
+        buscaDespesaMesAtual();
+    }, []);
 
 
 
-    const handleDataSelect = async (data) => {
+    const handleDataSelect = async (data: string) => {
         const response = await api.post(`/buscadespesadata`, {
             data: data,
-            emailUser,
+            emailUser: tokenUsuario?.id,
         });
         setDespesaSelect(response.data);
     };
@@ -131,16 +118,10 @@ export default function MinhasDespesas() {
 
     console.log("🚀 ~ MinhasDespesas ~ somaValores", somaValores)
 
-    const openObservação = (observacao) => {
+    const openObservação = (observacao: object) => {
         setOpenModalObservacao(true)
-        setObservacao(observacao)
+
     }
-
-
-
-
-
-
     const hasSearchFilter = Boolean(filterValue);
 
     const filteredItems = useMemo(() => {
@@ -148,7 +129,7 @@ export default function MinhasDespesas() {
 
         if (hasSearchFilter) {
             filteredUsers = filteredUsers.filter((item) =>
-                item.categoria.toLowerCase().includes(filterValue.toLowerCase())
+                item.categoria.nomeCategoria.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
 
@@ -174,7 +155,7 @@ export default function MinhasDespesas() {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = useCallback((despesa, columnKey) => {
+    const renderCell = useCallback((despesa: any, columnKey: any) => {
         const cellValue = despesa[columnKey];
         switch (columnKey) {
             case "dataGasto":
@@ -184,7 +165,7 @@ export default function MinhasDespesas() {
             case "valorGasto":
                 return (
                     <p>
-                        {currency(despesa.valorGasto)}
+                        {visibility ? currency(despesa.valorGasto) : '****'}
                     </p>
                 );
             case "local":
@@ -198,18 +179,18 @@ export default function MinhasDespesas() {
             case "actions":
                 return (
                     <div className="relative flex items-center gap-2">
-                        <Tooltip className="text-black" content="Detalhes">
+                        <Tooltip color="secondary" content="Detalhes">
                             <span onClick={() => openObservação(despesa)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EyeIcon />
                             </span>
                         </Tooltip>
-                        <Tooltip className="text-black" content="Editar">
+                        <Tooltip className="" content="Editar">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EditIcon className="text-[#93fad6]" />
                             </span>
                         </Tooltip>
-                        <Tooltip className="text-black" color="danger" content="Deletar">
-                            <span onClick={() => setModalInfo({ show: true, objeto: investimento })} className="text-lg text-danger cursor-pointer active:opacity-50">
+                        <Tooltip className="" color="danger" content="Deletar">
+                            <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <DeleteIcon className="text-red-500" />
                             </span>
                         </Tooltip>
@@ -221,7 +202,7 @@ export default function MinhasDespesas() {
         }
 
 
-    }, [DespesaSelect]);
+    }, [visibility, DespesaSelect]);
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -236,7 +217,7 @@ export default function MinhasDespesas() {
     }, [page]);
 
     const onRowsPerPageChange = useCallback(
-        (e) => {
+        (e: any) => {
             setRowsPerPage(Number(e.target.value));
             setPage(1);
         },
@@ -244,7 +225,7 @@ export default function MinhasDespesas() {
     );
 
     const onSearchChange = useCallback(
-        (value) => {
+        (value: any) => {
             if (value) {
                 setFilterValue(value);
                 setPage(1);
@@ -262,7 +243,7 @@ export default function MinhasDespesas() {
 
     const headerTable = useMemo(() => {
         return (
-            <div className="flex flex-col gap-4  pb-4 p-4" prefetch={true}>
+            <div className="flex flex-col gap-4  pb-4 p-4" >
                 <div className="flex justify-between gap-3 items-end py-4">
                     <Input
                         size="md"
@@ -274,12 +255,21 @@ export default function MinhasDespesas() {
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
+                    {/* <PDFDownloadLink style={{ width: '100%' }} document={<PdfDespesas
+                        despesas={DespesaSelect}
+                        mesano={DespesaSelect}
+                        usuario={tokenUsuario}
+                    />} fileName="Despesas.pdf">
+                        {({ blob, url, loading, error }) =>
+                            loading ? 'Loading document...' : <Button className=" border-white text-white w-full" variant="bordered" fullWidth>Imprimir</Button>
+                        }
+                    </PDFDownloadLink> */}
                     <div className="flex gap-3">
                         <Button
                             fullWidth
                             color="success"
                             variant="solid"
-                            endContent={<PlusIcon size={20} />}
+                            endContent={<PlusIcon />}
                         >
                             <Link href="/financas/novadespesa"> Nova Despesa</Link>
                         </Button>
@@ -338,7 +328,7 @@ export default function MinhasDespesas() {
                     isCompact
                     showControls
                     showShadow
-                    color="success"
+                    className="bg-primaryTable "
                     page={page}
                     total={pages}
                     onChange={setPage}
@@ -350,7 +340,7 @@ export default function MinhasDespesas() {
                         variant="flat"
                         onPress={onPreviousPage}
                     >
-                        Previous
+                        Anterior
                     </Button>
                     <Button
                         isDisabled={pages === 1}
@@ -358,7 +348,7 @@ export default function MinhasDespesas() {
                         variant="flat"
                         onPress={onNextPage}
                     >
-                        Next
+                        Próxima
                     </Button>
                 </div>
             </div>
@@ -367,14 +357,13 @@ export default function MinhasDespesas() {
 
     return (
         <>
-            <div className="w-[95%] m-auto" >
+            <div key={visibility} className="w-[95%] m-auto" >
                 <p className="text-center pt-8">Minhas Despesas</p>
 
                 <div className="w-full grid grid-cols-1 md:grid-cols-12 pt-6">
                     <div className="col-span-2 pt-4">
                         <Listbox
                             aria-label="Example with disabled actions"
-                            onAction={""}
                         >
                             {datasOdenadasMaiorMenor &&
                                 datasOdenadasMaiorMenor.map((item, index) => (
@@ -420,7 +409,7 @@ export default function MinhasDespesas() {
                             </TableHeader>
                             <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
                                 {(item) => (
-                                    <TableRow className="hover:text-primaryTableHover" key={item._id}>
+                                    <TableRow className="hover:text-primaryTableHover" key={item.id}>
                                         {(columnKey) => (
                                             <TableCell>{renderCell(item, columnKey)}</TableCell>
                                         )}

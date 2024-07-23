@@ -153,11 +153,11 @@ model NomeFundoImobiliario {
 }
 
 model Patrimonio {
-  id              Int      @id @default(autoincrement())
+  id              Int    @id @default(autoincrement())
   nomePatrimonio  String
   tipoPatrimonio  String
   valorPatrimonio Float
-  dataAquisicao   DateTime
+  dataAquisicao   String
   idUser          Int
 }
 

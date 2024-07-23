@@ -254,9 +254,9 @@ export default function NovaDespesa() {
                             <div className="pt-3">
                                 <h1 className="text-center" >
 
-                                    {
+                                    {/* {
                                         !messageDespesa ? null : <Alert color={messageTipo}>{messageDespesa}</Alert>
-                                    }
+                                    } */}
                                 </h1>
                             </div>
                             <div className="w-full grid-cols-12 md:grid-cols-3 flex flex-col gap-4 md:flex-row">

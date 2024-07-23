@@ -1,16 +1,18 @@
 "use client"
 import React, { useEffect, useState } from 'react';
+import { UseBoundStore } from 'zustand';
 import Image from 'next/image';
 import { Formik } from 'formik';
 import { initialValues, validationSchema } from './formControl';
 import { useRouter } from 'next/navigation';
 import { cpfMask } from '@/components/Mask';
-import { Avatar, Button, Popover, PopoverContent, PopoverTrigger, Input } from '@nextui-org/react';
+import { Avatar, Button, Popover, PopoverContent, PopoverTrigger, Input, useTooltip } from '@nextui-org/react';
 import { EyeFilledIcon } from "@/components/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "@/components/EyeSlashFilledIcon";
 import Link from 'next/link';
 import { api } from '@/lib/api';
-
+import { jwtDecode } from 'jwt-decode';
+import useToken from '@/components/hooks/useToken';
 function Copyright(props: any) {
     return (
         <h1 {...props}>
@@ -26,6 +28,9 @@ interface FormValues {
 };
 
 export default function SignIn() {
+
+    const { setTokenUsuario, tokenUsuario } = useToken();
+    console.log("🚀 ~ SignIn ~ tokenUsuario", tokenUsuario)
     const [message, setMessage] = useState<string>('');
     const [messageTipo, setMessageTipo] = useState<any>('');
     const router = useRouter();
@@ -37,6 +42,9 @@ export default function SignIn() {
             const response = await api.post('/login', { values });
             if (response.status === 200) {
                 localStorage.setItem("token", response.data.token);
+                const decodedToken: any = jwtDecode(response.data.token);
+                console.log("🚀 ~ handleSubmit ~ decodedToken", decodedToken)
+                setTokenUsuario(decodedToken.userId);
                 setMessageTipo("success");
                 setMessage("Usuario Logado Com Sucesso");
                 router.push("/");

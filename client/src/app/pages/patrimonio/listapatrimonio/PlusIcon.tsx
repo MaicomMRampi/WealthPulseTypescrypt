@@ -1,13 +1,5 @@
 import React from "react";
-
-interface PlusIconProps {
-  size?: number;
-  width?: number;
-  height?: number;
-}
-
-
-export const PlusIcon = ({ size = 24, width, height, ...props }: PlusIconProps) => (
+export const PlusIcon = ({ size = 24, width, height, ...props }) => (
   <svg
     aria-hidden="true"
     fill="none"

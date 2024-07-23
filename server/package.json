@@ -11,7 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@internationalized/date": "^3.5.4",
     "@prisma/client": "^5.16.0",
+    "@react-aria/i18n": "^3.11.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -26,8 +29,10 @@
     "nodemailer": "^6.9.10",
     "nodemon": "^3.0.2",
     "pg": "^8.11.3",
+    "react-hook-form": "^7.52.1",
     "swr": "^2.2.5",
-    "yarn": "^1.22.21"
+    "yarn": "^1.22.21",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "prisma": "^5.15.1"

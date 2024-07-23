@@ -15,10 +15,7 @@ const e = require('express')
 // =====================Login ============
 
 router.post('/api/login', async (req, res) => {
-
     const data = req.body.values; // Ajuste para acessar corretamente os dados do corpo da requisição
-    console.log("🚀 ~ router.post ~ data", data)
-
     try {
         const user = await prisma.usuario.findUnique({
             where: {
@@ -131,17 +128,21 @@ router.post('api/upload', async (req, res) => {
 
 router.post('/api/postpatrimonio', async (req, res) => {
     const dados = req.body;
+    const tipo = typeof req.body.dados.dataaquisicao
+    console.log("🚀 ~ router.post ~ tipo", tipo)
     try {
-        const buscaid = await prisma.usuario.findUnique({ where: { email: dados.email } })
-        const nomeUper = dados.values.nome.toUpperCase()
-        const valorPatr = converteString(dados.values.valor)
+        console.log("🚀 ~ router.post ~ dados", dados)
+        const nomeUper = dados.dados.nome.toUpperCase()
+        console.log("🚀 ~ router.post ~ nomeUper", nomeUper)
+
+        const valorPatr = converteString(dados.dados.valor)
         const patrimonio = await prisma.patrimonio.create({
             data: {
                 nomePatrimonio: nomeUper,
-                tipoPatrimonio: dados.values.tipopatrimonio,
+                tipoPatrimonio: dados.dados.tipopatrimonio,
                 valorPatrimonio: valorPatr,
-                dataAquisicao: dados.values.dataaquisicao,
-                idUser: buscaid.id
+                dataAquisicao: dados.dados.dataaquisicao,
+                idUser: dados.token
             }
         })
         console.log("🚀 ~ router.post ~ patrimonio", patrimonio)
@@ -1120,22 +1121,16 @@ router.post('/api/novadespesa', async (req, res) => {
 
 router.get('/api/buscadespesa', async (req, res) => {
     try {
-        const email = req.query.email
-        const buscaNome = await prisma.usuario.findUnique({ where: { email: email } })
-        if (!buscaNome) {
-            return res.status(404).json({ error: "Usuário não encontrado" });
-        }
-
+        const idUser = req.query.email
         const buscaDespesa = await prisma.Despesas.findMany({
             where: {
-                idUser: buscaNome.id
+                idUser: idUser
             },
             include: {
                 categoria: true,
                 FormaPagamento: true
 
             }
-
         });
         res.json(buscaDespesa);
     } catch (error) {
@@ -1146,24 +1141,16 @@ router.get('/api/buscadespesa', async (req, res) => {
 
 router.get('/api/buscadespesamesatual', async (req, res) => {
     try {
-        const email = req.query.email;
-        console.log("🚀 ~ router.get ~ email chegou no teste", email)
-
-        const user = await prisma.usuario.findUnique({ where: { email: email } });
-        console.log("🚀 ~ router.get ~ user", user)
-        if (!user) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
+        const idUser = req.query.email;
         const mesAtual = new Date();
         let mes = mesAtual.getMonth() + 1;
         const ano = mesAtual.getFullYear();
         mes = mes < 10 ? `0${mes}` : mes;
         const iniciaPadraoData = `${ano}-${mes}`;
 
-        console.log("🚀 ~ router.get ~ iniciaPadraoData", iniciaPadraoData)
 
         const buscaDespesa = await prisma.Despesas.findMany({
-            where: { mesCorrespondente: iniciaPadraoData, idUser: user.id },
+            where: { mesCorrespondente: iniciaPadraoData, idUser: idUser },
             include: {
                 categoria: true,
                 FormaPagamento: true
@@ -1178,50 +1165,44 @@ router.get('/api/buscadespesamesatual', async (req, res) => {
     }
 });
 
-router.get('/api/buscadespesamesatualhome', async (req, res) => {
-    try {
-        const email = req.query.email.email;
+// router.get('/api/buscadespesamesatualhome', async (req, res) => {
+//     try {
+//         const email = req.query.email.email;
 
-        const user = await prisma.usuario.findUnique({ where: { email: email } });
+//         const user = await prisma.usuario.findUnique({ where: { email: email } });
 
-        if (!user) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
+//         if (!user) {
+//             return res.status(404).json({ message: 'Usuário não encontrado' });
+//         }
 
-        const mesAtual = new Date();
-        const mes = mesAtual.getMonth() + 1;
-        const ano = mesAtual.getFullYear();
-        const iniciaPadraoData = `${mes}/${ano}`;
+//         const mesAtual = new Date();
+//         const mes = mesAtual.getMonth() + 1;
+//         const ano = mesAtual.getFullYear();
+//         const iniciaPadraoData = `${mes}/${ano}`;
 
-        const buscaDespesa = await prisma.despesas.findMany({
-            where: { mesAno: iniciaPadraoData, idUser: user.id.toString() },
-        });
+//         const buscaDespesa = await prisma.despesas.findMany({
+//             where: { mesAno: iniciaPadraoData, idUser: user.id.toString() },
+//         });
 
-        res.json(buscaDespesa);
-    } catch (error) {
-        console.error("Erro ao buscar usuário:", error);
-        res.status(500).json({ error: "Erro interno do servidor" });
-    }
-});
+//         res.json(buscaDespesa);
+//     } catch (error) {
+//         console.error("Erro ao buscar usuário:", error);
+//         res.status(500).json({ error: "Erro interno do servidor" });
+//     }
+// });
 
 router.post('/api/buscadespesadata', async (req, res) => {
     try {
         const { data } = req.body;
         console.log("🚀 ~ router.post ~ data", data)
-        const emailUser = req.body.emailUser;
+        const idUser = req.body.emailUser;
 
-        const user = await prisma.usuario.findUnique({ where: { email: emailUser } });
 
-        if (!user) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
 
         const buscaDespesa = await prisma.despesas.findMany({
             where: {
                 mesCorrespondente: data,
-                idUser: user.id,
-
-
+                idUser: idUser,
             },
             include: {
                 categoria: true,
