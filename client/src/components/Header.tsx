@@ -128,7 +128,7 @@ export default function App() {
                         onChange={(e) => teste(e.target.checked)}
                         defaultSelected
                         size="lg"
-                        color="success"
+                        color="primary"
                         startContent={<SunIcon />}
                         endContent={<MoonIcon />}
                     />

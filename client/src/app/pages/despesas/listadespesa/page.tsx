@@ -116,9 +116,8 @@ export default function MinhasDespesas() {
         DespesaSelect &&
         DespesaSelect.reduce((acc, despesa) => acc + despesa.valorGasto, 0);
 
-    console.log("🚀 ~ MinhasDespesas ~ somaValores", somaValores)
-
     const openObservação = (observacao: object) => {
+        setObservacao(observacao)
         setOpenModalObservacao(true)
 
     }
@@ -267,11 +266,11 @@ export default function MinhasDespesas() {
                     <div className="flex gap-3">
                         <Button
                             fullWidth
-                            color="success"
+                            color="primary"
                             variant="solid"
                             endContent={<PlusIcon />}
                         >
-                            <Link href="/financas/novadespesa"> Nova Despesa</Link>
+                            <Link href="/pages/despesas/novadespesa"> Nova Despesa</Link>
                         </Button>
                     </div>
                 </div>
@@ -328,7 +327,7 @@ export default function MinhasDespesas() {
                     isCompact
                     showControls
                     showShadow
-                    className="bg-primaryTable "
+                    color="primary"
                     page={page}
                     total={pages}
                     onChange={setPage}

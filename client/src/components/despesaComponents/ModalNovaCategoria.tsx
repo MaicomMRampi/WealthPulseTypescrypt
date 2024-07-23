@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 // import { Alert } from "@mui/material";
 import { PiPaperPlaneTiltFill } from "react-icons/pi";
+import { Alert } from "@mui/material";
 
 interface ModalNovaCategoriaProps {
     open: boolean;
@@ -78,7 +79,7 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: M
                                             </Button>
                                         </ModalFooter>
 
-                                        {/* {message && <Popover color={'success'} >{message}</Popover>} */}
+                                        {message && <Alert color={'success'} >{message}</Alert>}
                                     </>
                                 )}
                             </ModalContent>

@@ -23,10 +23,12 @@ const config: Config = {
     },
   },
   plugins: [nextui({
+    
     themes: {
       dark: {        
         colors: {
           background: '#0000003b',
+          primary: '#10b981',
           // Customize the light theme here
           
 
@@ -34,7 +36,7 @@ const config: Config = {
       },
       light: {
         colors: {
-          secondary: '#10b981',
+          primary: '#10b981',
         }
       },
     },

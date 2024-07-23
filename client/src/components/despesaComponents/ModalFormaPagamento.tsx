@@ -3,7 +3,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { PiPaperPlaneTiltFill } from "react-icons/pi";
-// import { Alert } from "@mui/material";
+import { Alert } from "@mui/material";
 // import { PiPaperPlaneTiltFill } from "react-icons/pi";
 
 interface ModalFormaPagamentoProps {
@@ -79,9 +79,11 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: M
                                                 Salvar
                                             </Button>
                                         </ModalFooter>
-                                        {message &&
+                                        {message ? (
+                                            <Alert severity={messageTipo}>{message}</Alert>
+
+                                        ) :
                                             null
-                                            // <Alert severity={messageTipo}>{message}</Alert>
                                         }
                                     </>
                                 )}

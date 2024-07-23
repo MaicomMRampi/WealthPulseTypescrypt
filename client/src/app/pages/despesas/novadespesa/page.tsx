@@ -5,44 +5,53 @@ import { useEffect, useState } from 'react'
 import FormadePagamentoNova from '@/components/despesaComponents/ModalFormaPagamento'
 import ModalNovaCategoria from '@/components/despesaComponents/ModalNovaCategoria'
 import { initialValues, validationSchema } from './investimentForm'
-import LayoutAdmin from '@/components/LayoutAdmin'
 import { Formik } from 'formik'
 import ButtonVoltar from '@/components/ButtonVoltar'
 import { valorMask } from '@/components/Mask'
+import { api } from '@/lib/api'
+import useToken from '@/components/hooks/useToken'
 
 export default function NovaDespesa() {
     const [modalOpen, setModalOpen] = useState(false);
     const [ModalOpenForm, setModalOpenForm] = useState(false);
-    const [message, setMessage] = useState<String>()
-    const [messageDespesa, setMessageDespesa] = useState<String>()
-    const [messageForm, setMessageForm] = useState()
+    const [message, setMessage] = useState<string>()
+    const [messageDespesa, setMessageDespesa] = useState<string>()
+    const [messageForm, setMessageForm] = useState<string>()
     const [categoria, setCategoria] = useState()
     const [formaPagamento, setformaPagamento] = useState()
     const [messageTipo, setMessageTipo] = useState<String>()
-
+    const { tokenUsuario } = useToken()
     // ====================Chama valores do Back end===
     const buscaCategoria = async () => {
-        // if (!emailUser) return
-        // const response = await api.get(`/buscacategoria`)
-        // setCategoria(response.data)
+
+        const response = await api.get(`/buscacategoria`, {
+            params: {
+                idUser: tokenUsuario?.id
+            }
+        })
+        setCategoria(response.data)
     }
-    // useEffect(() => {
-    //     buscaCategoria()
-    // }, [emailUser])
+
 
     const buscaFormaPagamento = async () => {
-        // if (!emailUser) return
-        // const response = await api.get(`/buscaformapagamento`)
-        // setformaPagamento(response.data)
+
+        const response = await api.get(`/buscaformapagamento`, {
+            params: {
+                idUser: tokenUsuario?.id
+            }
+        })
+        setformaPagamento(response.data)
     }
-    // useEffect(() => {
-    //     buscaFormaPagamento()
-    // }, [emailUser])
+    useEffect(() => {
+        if (!tokenUsuario) return
+        buscaFormaPagamento()
+        buscaCategoria()
+    }, [])
     // =================================================
 
 
     // ====================Manda os Valores para o Backend=================================
-    const handleSubmit = async (values, { resetForm }: any) => {
+    const handleSubmit = async (values: any) => {
 
         // try {
         //     const response = await api.post(`/novadespesa`, {
@@ -68,10 +77,11 @@ export default function NovaDespesa() {
 
     }
 
-    const handleModalSubmit = async (categoria) => {
+    const handleModalSubmit = async (categoria: any) => {
         try {
             const response = await api.post(`/novacategoria`, {
-                categoria
+                categoria,
+                idUser: tokenUsuario?.id
             })
 
             setMessage(response.data.message)
@@ -102,6 +112,43 @@ export default function NovaDespesa() {
             }, 2000)
         }
     }
+
+    const handleModalSubmitPagamento = async (formaPagamento: any) => {
+        try {
+            const response = await api.post(`/novaformapagamento`, {
+                nome: formaPagamento,
+                idUser: tokenUsuario?.id
+
+            })
+
+            const data = response.data.message
+            if (response.status === 200) {
+                setTimeout(() => {
+                    setModalOpenForm(false)
+                }, 2000)
+                setMessageTipo("success")
+                setMessageForm(response.data.message)
+                setTimeout(() => {
+                    setMessageForm("")
+                    setModalOpenForm(false)
+
+                }, 4000)
+                buscaFormaPagamento()
+            } else {
+
+                setMessageForm("Erro ao Cadastrar Gasto")
+            }
+        } catch (error) {
+            setMessageForm("Erro ao Cadastrar");
+            setMessageTipo("error")
+            setTimeout(() => {
+                setMessageForm("")
+                setModalOpenForm(false)
+            }, 2000)
+
+        }
+    }
+
 
     // ============================================================
 
@@ -200,7 +247,6 @@ export default function NovaDespesa() {
                                     label="Forma de Pagamento"
                                     fullWidth
                                     name="formadepagamento"
-
                                     onChange={handleChange}
                                     value={values.formadepagamento}
                                     errorMessage={touched.formadepagamento && errors.formadepagamento ? errors.formadepagamento : undefined}
@@ -274,7 +320,7 @@ export default function NovaDespesa() {
                             <FormadePagamentoNova
                                 messagemTipo={messageTipo}
                                 message={messageForm}
-                                // onSubmit={handleModalSubmitPagamento}
+                                onSubmit={handleModalSubmitPagamento}
                                 open={ModalOpenForm}
                                 onClose={() => setModalOpenForm(false)}
                             />

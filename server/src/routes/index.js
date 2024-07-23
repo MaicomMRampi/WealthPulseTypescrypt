@@ -1005,9 +1005,11 @@ router.post('/api/getfiihome', async (req, res) => {
 
 // +++++++++++++++++++++++++Categoria+++++++++++++++++++++++++++++++++++++++++
 router.post('/api/novacategoria', async (req, res) => {
-    const nome = req.body.categoria.categoria
-    const nomeUppercase = nome.toUpperCase().trim();
+    const nome = req.body
+    console.log("🚀 ~ router.post ~ nome", nome)
+
     try {
+        const nomeUppercase = nome.categoria.categoria.toUpperCase().trim();
         // Verifica se a categoria já existe
         const verificaNome = await prisma.categoria.findUnique({ where: { nomeCategoria: nomeUppercase } });
         if (verificaNome) {
@@ -1016,6 +1018,7 @@ router.post('/api/novacategoria', async (req, res) => {
         const novaCategoria = await prisma.categoria.create({
             data: {
                 nomeCategoria: nomeUppercase,
+                idUser: parseInt(nome.idUser)
             }
         });
         res.status(200).json({ message: 'Categoria cadastrada com sucesso' });
@@ -1025,7 +1028,14 @@ router.post('/api/novacategoria', async (req, res) => {
     }
 });
 router.get('/api/buscacategoria', async (req, res) => {
-    const buscaCategoria = await prisma.categoria.findMany()
+    const id = req.query.idUser
+    console.log("🚀 ~ router.get ~ id", id)
+
+    const buscaCategoria = await prisma.categoria.findMany({
+        where: {
+            idUser: parseInt(id)
+        }
+    })
     res.json(buscaCategoria)
 });
 router.delete('/api/deletacategoria', async (req, res) => {
@@ -1039,10 +1049,9 @@ router.delete('/api/deletacategoria', async (req, res) => {
 
 // +++++++++++++++++++++++++Forma Pagamento+++++++++++++++++++++++++++++++++++++++++
 router.post('/api/novaformapagamento', async (req, res) => {
-    const nome = req.body.nome.formapagamento;
-
-    const nomeUppercase = nome.toUpperCase().trim();
-
+    const dados = req.body
+    console.log("🚀 ~ router.post ~ Id", typeof dados.idUser)
+    const nomeUppercase = dados.nome.formapagamento.toUpperCase().trim();
     try {
         // Verifica se a categoria já existe
         const verificaNome = await prisma.FormaPagamento.findUnique({ where: { nomeFormaPagamento: nomeUppercase } });
@@ -1055,6 +1064,7 @@ router.post('/api/novaformapagamento', async (req, res) => {
         const novaForma = await prisma.FormaPagamento.create({
             data: {
                 nomeFormaPagamento: nomeUppercase,
+                idUser: dados.idUser
             }
         });
         res.status(200).json({ message: 'Forma de Pagamento cadastrada com sucesso' });
@@ -1064,7 +1074,12 @@ router.post('/api/novaformapagamento', async (req, res) => {
     }
 });
 router.get('/api/buscaformapagamento', async (req, res) => {
-    const buscaFormapagamento = await prisma.FormaPagamento.findMany()
+    const idUser = req.query.idUser
+    console.log("🚀 ~ router.get ~ idUser", idUser)
+
+    const buscaFormapagamento = await prisma.FormaPagamento.findMany({
+        where: { idUser: parseInt(idUser) },
+    })
     res.json(buscaFormapagamento)
 });
 router.delete('/api/deletaformapagamento', async (req, res) => {
@@ -1124,7 +1139,8 @@ router.get('/api/buscadespesa', async (req, res) => {
         const idUser = req.query.email
         const buscaDespesa = await prisma.Despesas.findMany({
             where: {
-                idUser: idUser
+                idUser: parseInt(idUser),
+
             },
             include: {
                 categoria: true,
@@ -1150,13 +1166,12 @@ router.get('/api/buscadespesamesatual', async (req, res) => {
 
 
         const buscaDespesa = await prisma.Despesas.findMany({
-            where: { mesCorrespondente: iniciaPadraoData, idUser: idUser },
+            where: { mesCorrespondente: iniciaPadraoData, idUser: parseInt(idUser) },
             include: {
                 categoria: true,
                 FormaPagamento: true
             }
         });
-        console.log("🚀 ~ router.get ~ buscaDespesa", buscaDespesa)
 
         res.json(buscaDespesa);
     } catch (error) {
