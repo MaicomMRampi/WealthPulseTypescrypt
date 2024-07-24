@@ -7,6 +7,10 @@ import { api } from "@/lib/api";
 import { initialValues, validationSchema } from "./patrimonioForm";
 import { Input, Select, SelectItem } from "@nextui-org/react";
 import useToken from "@/components/hooks/useToken";
+import { DatePicker } from "@nextui-org/date-picker";
+import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
+import { I18nProvider } from '@react-aria/i18n'
+
 
 const patrimonios = [
     { id: '1', nome: 'Imóvel' },
@@ -98,8 +102,18 @@ export default function App() {
                                 value={valorMask(values.valor)}
                                 onChange={handleChange}
                             />
-                            <input type="date" name="dataaquisicao" onChange={e => setFieldValue('dataaquisicao', e.target.value)} />
+                            {/* <input type="date" name="dataaquisicao" onChange={e => setFieldValue('dataaquisicao', e.target.value)} /> */}
 
+                            {/* <DatePicker label="Birth date" className="max-w-[284px]" name="dataaquisicao" isRequired defaultValue={values.dataaquisicao} onChange={setFieldValue} /> */}
+                            <I18nProvider locale="pt-BR">
+                                <DatePicker
+                                    name="dataaquisicao"
+                                    hideTimeZone
+                                    defaultValue={today(getLocalTimeZone())} // Set default value directly
+                                    onChange={(val) => setFieldValue("dataaquisicao", val)}
+                                    label="Data de Aquisição"
+                                />
+                            </I18nProvider>
                             {JSON.stringify(errors)}
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
                             {message && <p className={messageTipo === 'success' ? 'text-green-500' : 'text-red-500'}>{message}</p>}

@@ -22,16 +22,16 @@ import ModalObservacao from "@/components/despesaComponents/ModalObservacao";
 import columns from "./data";
 import { format } from 'date-fns';
 import { ptBR, vi } from 'date-fns/locale'
-import { SearchIcon } from "@/components/SearchIcon";
+import { SearchIcon } from "@/components/iconesCompartilhados/SearchIcon";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { useMemo } from "react";
 import { useCallback } from "react";
-import { EyeIcon } from "@/components/EyeIcon";
-import { EditIcon } from "@/components/EditIcon";
-import { DeleteIcon } from "@/components/DeleteIcon";
+import { EyeIcon } from "@/components/iconesCompartilhados/EyeIcon";
+import { EditIcon } from "@/components/iconesCompartilhados/EditIcon";
+import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 import useVisibility from "@/components/hooks/useVisibility";
-import { PlusIcon } from "@/components/PlusIcon";
+import { PlusIcon } from "@/components/iconesCompartilhados/PlusIcon";
 import useToken from "@/components/hooks/useToken";
 import PdfDespesas from "@/components/PdfDespesas";
 

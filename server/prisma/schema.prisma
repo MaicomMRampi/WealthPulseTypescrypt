@@ -57,9 +57,9 @@ model ControleDeContas {
 }
 
 model DespesaDeBens {
-  id                   Int      @id @default(autoincrement())
+  id                   Int     @id @default(autoincrement())
   idPatrimonio         Int
-  observacao           String
+  observacao           String?
   nomePatrimonio       String
   kmAntigo             Int
   kmAtual              Int
@@ -68,11 +68,11 @@ model DespesaDeBens {
   tipoPatrimonio       String
   valor                Float
   responsavel          String
-  dataAquisicao        DateTime
+  dataAquisicao        String
   compradorPagador     String
   idUser               Int
   litros               Float?
-  inativo              Int      @default(0)
+  inativo              Int     @default(0)
   observacaoInativacao String?
 }
 
@@ -86,7 +86,6 @@ model Despesas {
   responsavel        String
   categoriaId        Int
   pagante            String
-  emailUser          String
   fechada            Int      @default(0)
   observacao         String?
   mesCorrespondente  String

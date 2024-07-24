@@ -19,13 +19,13 @@ import {
     Pagination,
     Tooltip,
 } from "@nextui-org/react";
-import { PlusIcon } from "./PlusIcon";
-import { SearchIcon } from "./SearchIcon";
+import { PlusIcon } from "../../../../components/iconesCompartilhados/PlusIcon";
+import { SearchIcon } from "../../../../components/iconesCompartilhados/SearchIcon";
 // import ModalDeleteAcoes from "@/components/ModalDeleteAcoes";
 import Paper from "@mui/material/Paper";
-import { EditIcon } from "./EditIcon";
-import { DeleteIcon } from "./DeleteIcon";
-import { EyeIcon } from "./EyeIcon";
+import { EditIcon } from "../../../../components/iconesCompartilhados/EditIcon";
+import { DeleteIcon } from "../../../../components/iconesCompartilhados/DeleteIcon";
+import { EyeIcon } from "../../../../components/iconesCompartilhados/EyeIcon";
 import { api } from "@/lib/api";
 import Link from 'next/link';
 import currency from "@/components/Currency";
@@ -211,13 +211,12 @@ export default function App() {
         }
     }, [page]);
 
-    const onRowsPerPageChange = React.useCallback((e) => {
+    const onRowsPerPageChange = React.useCallback((e: any) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
 
-    const onSearchChange = React.useCallback((value) => {
-        console.log("🚀 ~ onSearchChange ~ value", value)
+    const onSearchChange = React.useCallback((value: string) => {
         if (value) {
             setFilterValue(value);
             setPage(1);
@@ -311,44 +310,45 @@ export default function App() {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
-        <div className="px-4">
-            <p className="pt-2 text-center font-bold">Meus Patrimônios</p>
-            <Table
-                aria-label="Example table with custom cells, pagination and sorting"
-                isHeaderSticky
-                bottomContent={bottomContent}
-                bottomContentPlacement="outside"
-                classNames={{
-                    wrapper: "max-h-[382px] bg-primaryTable",
-                }}
-                selectedKeys={selectedKeys}
-                selectionMode="none"
-                sortDescriptor={sortDescriptor}
-                topContent={headerTable}
-                topContentPlacement="outside"
-                onSelectionChange={setSelectedKeys}
-                onSortChange={setSortDescriptor}
-            >
-                <TableHeader columns={columns}>
-                    {(column) => (
-                        <TableColumn
-                            className="text-primaryTableText font-bold "
-                            key={column.uid}
-                            align={column.uid === "actions" ? "center" : "start"}
-                        >
-                            {column.name}
-                        </TableColumn>
-                    )}
-                </TableHeader>
-                <TableBody emptyContent={"Não há patrimônios"} items={sortedItems}>
-                    {(item) => (
-                        <TableRow className="hover:text-primaryTableText" key={item._id}>
-                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-            {/* <ModalDeleteAcoes
+        <div className="px-4 rounded-lg">
+            <div className=" bg-primaryTable mt-12 ">
+                <p className="pt-2 text-center font-bold">Meus Patrimônios</p>
+                <Table
+                    aria-label="Example table with custom cells, pagination and sorting"
+                    isHeaderSticky
+                    bottomContent={bottomContent}
+                    bottomContentPlacement="outside"
+                    classNames={{
+                        wrapper: "max-h-[382px] bg-primaryTable",
+                    }}
+                    selectedKeys={selectedKeys}
+                    selectionMode="none"
+                    sortDescriptor={sortDescriptor}
+                    topContent={headerTable}
+                    topContentPlacement="outside"
+                    onSelectionChange={setSelectedKeys}
+                    onSortChange={setSortDescriptor}
+                >
+                    <TableHeader columns={columns}>
+                        {(column) => (
+                            <TableColumn
+                                className="text-primaryTableText font-bold "
+                                key={column.uid}
+                                align={column.uid === "actions" ? "center" : "start"}
+                            >
+                                {column.name}
+                            </TableColumn>
+                        )}
+                    </TableHeader>
+                    <TableBody emptyContent={"Não há patrimônios"} items={sortedItems}>
+                        {(item) => (
+                            <TableRow className="hover:text-primaryTableText" key={item._id}>
+                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+                {/* <ModalDeleteAcoes
                 message={message}
                 confirmaEsclusao={deleteInvestimento}
                 objetoInvestimento={modalInfo.objeto}
@@ -361,6 +361,7 @@ export default function App() {
                 onClose={() => setOpenModalProventos(false)}
             /> */}
 
+            </div>
         </div>
     );
 }

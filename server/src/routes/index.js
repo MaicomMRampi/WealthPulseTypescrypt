@@ -8,6 +8,7 @@ const DividendosSchema = require('../models/dividendos OK')
 const { crypto } = require('../utils/password')
 const { converteString } = require('../utils/converteString')
 const bcrypt = require('bcryptjs')
+const formatDate = require('../utils/convertData')
 const prisma = require('../utils/dbConnect')
 const jwt = require('jsonwebtoken');
 const e = require('express')
@@ -169,47 +170,45 @@ router.get('/api/buscabem', async (req, res) => {
 
 router.post('/api/despesadeconsumo', async (req, res) => {
     const dados = req.body;
-    console.log("🚀 ~ router.post ~ dados", dados);
+    console.log("🚀 ~ router.post ~ dados", dados)
+    const convertDatauser = formatDate(dados.values.dataaquisicao)
+    console.log("🚀 ~ router.post ~ convertData", convertDatauser)
 
-    try {
-        const buscaId = await prisma.usuario.findUnique({ where: { email: dados.email } });
+    // try {
 
-        if (!buscaId) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
 
-        const converteString = (valor) => {
-            // Remove caracteres não numéricos e converte para número
-            return parseFloat(valor.replace(/[^0-9,-]/g, '').replace(',', '.'));
-        };
+    //     const converteString = (valor) => {
+    //         // Remove caracteres não numéricos e converte para número
+    //         return parseFloat(valor.replace(/[^0-9,-]/g, '').replace(',', '.'));
+    //     };
 
-        const novaDespesaDeBem = await prisma.despesaDeBens.create({
-            data: {
-                idPatrimonio: dados.values.nomepatrimonio.id, // Garantido que é um Int
-                nomePatrimonio: dados.values.nomepatrimonio.nomePatrimonio,
-                tipoPatrimonio: dados.values.nomepatrimonio.tipoPatrimonio,
-                kmAntigo: dados.values.kmantigo === '' ? 0 : converteString(dados.values.kmantigo),
-                kmAtual: dados.values.kmatual === '' ? 0 : converteString(dados.values.kmatual),
-                nomeDespesa: dados.values.tipodespesa.toUpperCase(),
-                valor: converteString(dados.values.valorgasto),
-                responsavel: dados.values.responsavel,
-                dataAquisicao: new Date(dados.values.dataaquisicao),
-                compradorPagador: dados.values.compradorpagador,
-                tipoDespesa: dados.values.nomepatrimonio.tipoPatrimonio,
-                observacao: dados.values.observacao,
-                idUser: buscaId.id, // Certifique-se de que é buscaId.id
-                litros: dados.values.litros === '' ? 0.00 : dados.values.litros,
-                inativo: 0,
-                observacaoInativacao: ''
-            },
-        });
+    //     const novaDespesaDeBem = await prisma.despesaDeBens.create({
+    //         data: {
+    //             idPatrimonio: parseInt(dados.valuesNomepatrimonio.id), 
+    //             nomePatrimonio: dados.values.nomepatrimonio.nomePatrimonio,
+    //             tipoPatrimonio: dados.values.nomepatrimonio.tipoPatrimonio,
+    //             kmAntigo: dados.values.kmantigo === '' ? 0 : converteString(dados.values.kmantigo),
+    //             kmAtual: dados.values.kmatual === '' ? 0 : converteString(dados.values.kmatual),
+    //             nomeDespesa: dados.values.tipodespesa.toUpperCase(),
+    //             valor: converteString(dados.values.valorgasto),
+    //             responsavel: dados.values.responsavel,
+    //             dataAquisicao: new Date(dados.values.dataaquisicao),
+    //             compradorPagador: dados.values.compradorpagador,
+    //             tipoDespesa: dados.values.nomepatrimonio.tipoPatrimonio,
+    //             observacao: dados.values.observacao,
+    //             idUser: buscaId.id, // Certifique-se de que é buscaId.id
+    //             litros: dados.values.litros === '' ? 0.00 : dados.values.litros,
+    //             inativo: 0,
+    //             observacaoInativacao: ''
+    //         },
+    //     });
 
-        console.log("🚀 ~ router.post ~ novaDespesaDeBem", novaDespesaDeBem);
-        return res.status(200).json({ message: 'Despesa de Bem Cadastrada com Sucesso' });
-    } catch (error) {
-        console.error('Erro ao Cadastrar Despesa de Bem:', error);
-        return res.status(500).json({ message: 'Erro ao Cadastrar Despesa de Bem', error });
-    }
+    //     console.log("🚀 ~ router.post ~ novaDespesaDeBem", novaDespesaDeBem);
+    //     return res.status(200).json({ message: 'Despesa de Bem Cadastrada com Sucesso' });
+    // } catch (error) {
+    //     console.error('Erro ao Cadastrar Despesa de Bem:', error);
+    //     return res.status(500).json({ message: 'Erro ao Cadastrar Despesa de Bem', error });
+    // }
 });
 
 router.put('/api/inativarpatrimonio', async (req, res) => {
@@ -1098,29 +1097,22 @@ router.post('/api/novadespesa', async (req, res) => {
     try {
         const { datagasto, local, valorgasto, formadepagamento, responsavel, categoria, pagante, observacao, mescorrespondente } = req.body.values;
         console.log("🚀 ~ router.post ~ categoria", categoria)
-        const emailUser = req.body.emailUser;
+        const idUser = req.body.id;
+        console.log("🚀 ~ router.post ~ idUser", idUser)
 
         const valorNumber = converteString(valorgasto);
         const nomeUppercase = responsavel ? responsavel.toUpperCase().trim() : "";
         const paganteUpercase = pagante ? pagante.toUpperCase().trim() : "";
 
-        // Buscar o ID do usuário pelo email
-        const user = await prisma.usuario.findUnique({ where: { email: emailUser } });
-
-        if (!user) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-
         const novaDespesa = await prisma.Despesas.create({
             data: {
-                idUser: user.id,
+                idUser: parseInt(idUser),
                 dataGasto: datagasto,
                 local,
                 valorGasto: valorNumber,
                 formaDePagamentoId: parseInt(formadepagamento),
                 responsavel: nomeUppercase,
                 categoriaId: parseInt(categoria),
-                emailUser,
                 pagante: paganteUpercase,
                 observacao,
                 mesCorrespondente: mescorrespondente

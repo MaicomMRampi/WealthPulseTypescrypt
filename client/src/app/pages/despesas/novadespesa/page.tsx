@@ -10,6 +10,7 @@ import ButtonVoltar from '@/components/ButtonVoltar'
 import { valorMask } from '@/components/Mask'
 import { api } from '@/lib/api'
 import useToken from '@/components/hooks/useToken'
+import { Alert } from '@mui/material'
 
 export default function NovaDespesa() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -53,27 +54,27 @@ export default function NovaDespesa() {
     // ====================Manda os Valores para o Backend=================================
     const handleSubmit = async (values: any) => {
 
-        // try {
-        //     const response = await api.post(`/novadespesa`, {
-        //         values,
-        //         emailUser
-        //     })
+        try {
+            const response = await api.post(`/novadespesa`, {
+                values,
+                id: tokenUsuario?.id
+            })
 
-        //     setMessageDespesa(response.data.message)
+            setMessageDespesa(response.data.message)
 
-        //     if (response.status === 200) {
-        //         setMessageTipo("success")
-        //         setMessageDespesa(response.data.message)
-        //         setTimeout(() => {
-        //             setMessageDespesa("")
-        //         }, 4000)
-        //         // buscaCategoria()
-        //     } else {
-        //         setMessageDespesa("Erro ao Cadastrar Gasto")
-        //     }
-        // } catch (error) {
-        //     setMessageTipo("error")
-        // }
+            if (response.status === 200) {
+                setMessageTipo("success")
+                setMessageDespesa(response.data.message)
+                setTimeout(() => {
+                    setMessageDespesa("")
+                }, 4000)
+                // buscaCategoria()
+            } else {
+                setMessageDespesa("Erro ao Cadastrar Gasto")
+            }
+        } catch (error) {
+            setMessageTipo("error")
+        }
 
     }
 
@@ -222,25 +223,26 @@ export default function NovaDespesa() {
                                     label="Categoria"
                                     fullWidth
                                     name="categoria"
-
                                     onChange={handleChange}
                                     value={values.categoria}
                                     errorMessage={touched.categoria && errors.categoria ? errors.categoria : undefined}
                                     isInvalid={touched.categoria && errors.categoria ? true : false}
                                 >
-                                    {categoria && categoria.map((row) => (
-                                        <SelectItem
-
-                                            classNames={{
-
-                                                wrapper: "w-full sm:max-w-[44%]  rounded-lg bg-default-100 text-default-400",
-                                            }}
-                                            value={row.nomeCategoria} key={row.id}
-
-                                        >
-                                            {row.nomeCategoria}
-                                        </SelectItem>
-                                    ))}
+                                    {categoria && categoria.length > 0 ? (
+                                        categoria.map((row) => (
+                                            <SelectItem
+                                                classNames={{
+                                                    wrapper: "w-full sm:max-w-[44%] rounded-lg bg-default-100 text-default-400",
+                                                }}
+                                                value={row.nomeCategoria}
+                                                key={row.id}
+                                            >
+                                                {row.nomeCategoria}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem key={'no-options'} >Nenhuma categoria disponível</SelectItem>
+                                    )}
                                 </Select>
 
                                 <Select
@@ -252,16 +254,25 @@ export default function NovaDespesa() {
                                     errorMessage={touched.formadepagamento && errors.formadepagamento ? errors.formadepagamento : undefined}
                                     isInvalid={touched.formadepagamento && errors.formadepagamento ? true : false}
                                 >
-                                    {formaPagamento && formaPagamento.map((row) => (
-                                        <SelectItem
-                                            classNames={{
-                                                wrapper: "w-full sm:max-w-[44%]  rounded-lg bg-default-100 text-default-400",
-                                            }}
-                                            value={row.nomeFormaPagamento} key={row.id}>
-                                            {row.nomeFormaPagamento}
+                                    {formaPagamento && formaPagamento.length > 0 ? (
+                                        formaPagamento.map((row) => (
+                                            <SelectItem
+                                                classNames={{
+                                                    wrapper: "w-full sm:max-w-[44%] rounded-lg bg-default-100 text-default-400",
+                                                }}
+                                                value={row.nomeFormaPagamento}
+                                                key={row.id}
+                                            >
+                                                {row.nomeFormaPagamento}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem disabled key="no-options">
+                                            Nenhuma forma de pagamento disponível
                                         </SelectItem>
-                                    ))}
+                                    )}
                                 </Select>
+
                                 <Input
                                     fullWidth
                                     isInvalid={errors && errors.valorgasto ? true : false}
@@ -297,15 +308,8 @@ export default function NovaDespesa() {
                                 />
 
                             </div>
-                            <div className="pt-3">
-                                <h1 className="text-center" >
 
-                                    {/* {
-                                        !messageDespesa ? null : <Alert color={messageTipo}>{messageDespesa}</Alert>
-                                    } */}
-                                </h1>
-                            </div>
-                            <div className="w-full grid-cols-12 md:grid-cols-3 flex flex-col gap-4 md:flex-row">
+                            <div className="w-full grid-cols-12 md:grid-cols-3 flex flex-col gap-4 md:flex-row p-4 ">
                                 <Button
                                     type="submit"
                                     fullWidth
@@ -317,6 +321,8 @@ export default function NovaDespesa() {
                                 <Button className="bg-blue-400 text-white" fullWidth onClick={() => opemModalCategoriaForma()} >Nova Forma de Pagamento</Button>
                                 <ButtonVoltar className="md:w-full bg-slate-100" />
                             </div>
+
+                            <h1 className='text-center py-5'>{messageDespesa ? <Alert color={messageTipo}>{messageDespesa}</Alert> : null} </h1>
                             <FormadePagamentoNova
                                 messagemTipo={messageTipo}
                                 message={messageForm}
