@@ -19,6 +19,9 @@ const config: Config = {
         'primaryTable': '#3F3F46',
         'primaryTableHover': '#10b981',
         'primaryTableText': '#10b981',
+        'buttonAzulClaro':'#0284c7',
+        'buttonAzulEscuro':'rgb(30,58,138)'
+
       }
     },
   },
@@ -29,6 +32,7 @@ const config: Config = {
         colors: {
           background: '#0000003b',
           primary: '#10b981',
+          
           // Customize the light theme here
           
 

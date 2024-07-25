@@ -13,6 +13,8 @@ import { Button, Input, MenuItem, Select, Textarea } from "@nextui-org/react";
 import ModalAddTipoDespesa from "@/components/ModalAddTipoDespesa";
 import { initialValues, validationSchema } from "./novaDespesaPatrForm";
 import useToken from "@/components/hooks/useToken";
+import ButtonVoltar from "@/components/ButtonVoltar";
+import Link from "next/link";
 
 
 export default function App() {
@@ -148,7 +150,7 @@ export default function App() {
                                     {dados.map(item => (
                                         <MenuItem
 
-                                            onClick={() => setTipoBem(item)} value={item} key={item.id}>
+                                            onClick={() => setTipoBem(item)} value={tipobem} key={item.id}>
                                             {item.nomePatrimonio}
                                         </MenuItem>
                                     ))}
@@ -212,6 +214,11 @@ export default function App() {
                                     isInvalid={touched.valorgasto && Boolean(errors.valorgasto)}
                                     name="valorgasto"
                                     value={values.valorgasto}
+                                    startContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-white text-small">R$</span>
+                                        </div>
+                                    }
                                     onBlur={handleChange}
                                     onChange={(event) => {
                                         const { name, value } = event.target;
@@ -225,6 +232,7 @@ export default function App() {
                                 />
                                 <I18nProvider locale="pt-BR">
                                     <DatePicker
+                                        isInvalid={touched.dataaquisicao && Boolean(errors.dataaquisicao)}
                                         name="dataaquisicao"
                                         hideTimeZone
                                         defaultValue={today(getLocalTimeZone())} // Set default value directly
@@ -257,24 +265,30 @@ export default function App() {
                                 <ButtonEnviarDadosPadrao
                                     onSubmit={handleSubmit}
                                 />
-                                <Button className="p-6" onClick={() => setOpenModal(true)} color="warning">
+                                <Button className="p-6 bg-buttonAzulClaro text-white " onClick={() => setOpenModal(true)} color="warning">
                                     Novo tipo de despesa e/ou investimento
                                 </Button>
+                                <Button className="bg-buttonAzulEscuro text-white" size="lg">
+                                    <Link href={'/pages/patrimonio/novadespesapatrimonio'}>Novo Patrimônio</Link>
+                                </Button>
+                                <ButtonVoltar
+                                    size="lg"
+                                />
                             </div>
 
                         </div>
                         {message ?
                             (
-                                <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
-                                    <Alert
-                                        onClose={() => setOpen(false)}
-                                        severity="success"
-                                        variant="filled"
-                                        sx={{ width: '100%' }}
-                                    >
-                                        {message}
-                                    </Alert>
-                                </Snackbar>
+
+                                <Alert
+                                    onClose={() => setOpen(false)}
+                                    severity="success"
+                                    variant="filled"
+                                    sx={{ width: '100%' }}
+                                >
+                                    {message}
+                                </Alert>
+
                             ) : null}
                     </form>
                 )}

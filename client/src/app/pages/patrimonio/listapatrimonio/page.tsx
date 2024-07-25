@@ -8,16 +8,10 @@ import {
     TableRow,
     TableCell,
     Input,
-    Divider,
     Button,
-    DropdownTrigger,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    Chip,
-    User,
     Pagination,
     Tooltip,
+    Navbar,
 } from "@nextui-org/react";
 import { PlusIcon } from "../../../../components/iconesCompartilhados/PlusIcon";
 import { SearchIcon } from "../../../../components/iconesCompartilhados/SearchIcon";
@@ -32,6 +26,7 @@ import currency from "@/components/Currency";
 
 // import DividendosModal from '@/components/dividendosModal'
 import { useRouter } from "next/navigation";
+import useVisibility from "@/components/hooks/useVisibility";
 const statusColorMap = {
     active: "success",
     paused: "danger",
@@ -60,7 +55,7 @@ export default function App() {
     });
     const [message, setMessage] = useState("");
     const [modalInfo, setModalInfo] = useState<Modal>({ show: false, objeto: null })
-
+    const { visibility } = useVisibility()
     const [dados, setDados] = useState([]);
     const emailUser = 'MAICOM.MATEUS@YAHOO.COM.BR'
 
@@ -146,8 +141,8 @@ export default function App() {
     }, [sortDescriptor, items]);
 
     const renderCell = React.useCallback((patrimonio, columnKey) => {
-        const mandaRota = (id) => {
-            Router.push(`/gastoscompatrimonio/${id}`)
+        const mandaRota = (id: number) => {
+            Router.push(`/pages/patrimonio/detalhes/${id}`)
         }
         const cellValue = patrimonio[columnKey];
         console.log("🚀 ~ renderCell ~ cellValue", cellValue)
@@ -159,7 +154,7 @@ export default function App() {
                 );
             case "actions":
                 return (
-                    <div className="relative flex items-center gap-2">
+                    <div className="relative flex items-end gap-2 ">
                         <Tooltip className="" content="Detalhes">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EyeIcon onClick={() => mandaRota(patrimonio.id)} />
@@ -179,7 +174,7 @@ export default function App() {
                 );
             case "valorPatrimonio":
                 return (
-                    <p>{currency(patrimonio.valorPatrimonio)}</p>
+                    <p>{visibility ? currency(patrimonio.valorPatrimonio) : "****"}</p>
                 );
 
             case "id":
@@ -192,12 +187,12 @@ export default function App() {
                 );
             case "dataAquisicao":
                 return (
-                    <p>{new Date(patrimonio.dataAquisicao).toLocaleDateString()}</p>
+                    <p>{patrimonio.dataAquisicao}</p>
                 );
             default:
                 return cellValue;
         }
-    }, []);
+    }, [visibility]);
 
     const onNextPage = React.useCallback(() => {
         if (page < pages) {
@@ -237,7 +232,7 @@ export default function App() {
     const headerTable = React.useMemo(() => {
         return (
             <div className="flex flex-col gap-4 border-b-2 border-gray-300 pb-4 p-4">
-                <div className="flex justify-between gap-3 items-end py-4">
+                <div className="flex justify-between  gap-3 items-end py-4">
                     <Input
                         size="md"
                         fullWidth
@@ -310,8 +305,9 @@ export default function App() {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
-        <div className="px-4 rounded-lg">
-            <div className=" bg-primaryTable mt-12 ">
+
+        <div key={visibility} className="px-4 w-full">
+            <div className="rounded-lg bg-primaryTable   mt-12 ">
                 <p className="pt-2 text-center font-bold">Meus Patrimônios</p>
                 <Table
                     aria-label="Example table with custom cells, pagination and sorting"

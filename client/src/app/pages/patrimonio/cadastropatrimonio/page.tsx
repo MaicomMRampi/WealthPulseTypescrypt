@@ -10,6 +10,7 @@ import useToken from "@/components/hooks/useToken";
 import { DatePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
 import { I18nProvider } from '@react-aria/i18n'
+import { Alert } from "@mui/material";
 
 
 const patrimonios = [
@@ -66,13 +67,13 @@ export default function App() {
                 }: any) => (
                     <form onSubmit={handleSubmit}>
                         <div className="pt-8 flex flex-col gap-3   md:w-[60%] xs:w-full px-4 mx-auto">
-                            <h2 className="text-3xl text-center font-bold">Cadastro de Bens</h2>
+                            <h2 className="text-3xl text-center font-bold">Cadastro de Patrimônio</h2>
                             <Input
                                 fullWidth
                                 name="nome"
                                 isInvalid={errors.nome && touched.nome}
                                 label="Nome do bem"
-                                autoComplete="nome"
+                                autoComplete="none"
                                 value={values.nome}
                                 onChange={handleChange}
                             />
@@ -101,6 +102,11 @@ export default function App() {
                                 isInvalid={errors.valor && touched.valor}
                                 value={valorMask(values.valor)}
                                 onChange={handleChange}
+                                startContent={
+                                    <div className="pointer-events-none flex items-center">
+                                        <span className="text-white text-small">R$</span>
+                                    </div>
+                                }
                             />
                             {/* <input type="date" name="dataaquisicao" onChange={e => setFieldValue('dataaquisicao', e.target.value)} /> */}
 
@@ -114,9 +120,18 @@ export default function App() {
                                     label="Data de Aquisição"
                                 />
                             </I18nProvider>
-                            {JSON.stringify(errors)}
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
-                            {message && <p className={messageTipo === 'success' ? 'text-green-500' : 'text-red-500'}>{message}</p>}
+                            {message ?
+                                (
+                                    <Alert
+                                        severity="success"
+                                        variant="filled"
+
+                                    >
+                                        {message}
+                                    </Alert>
+
+                                ) : null}
                         </div>
                     </form>
                 )}

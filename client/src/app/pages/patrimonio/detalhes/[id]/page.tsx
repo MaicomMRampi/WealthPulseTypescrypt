@@ -4,32 +4,34 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Divider, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Tooltip, Select, SelectItem, } from "@nextui-org/react";
-import { PlusIcon } from './PlusIcon';
-import { SearchIcon } from './SearchIcon';
-import { EditIcon } from './EditIcon';
-import { DeleteIcon } from './DeleteIcon';
-import { EyeIcon } from './EyeIcon';
+import { PlusIcon } from '@/components/iconesCompartilhados/PlusIcon';
+import { SearchIcon } from '@/components/iconesCompartilhados/SearchIcon';
+import { EditIcon } from '@/components/iconesCompartilhados/EditIcon';
+import { DeleteIcon } from '@/components/iconesCompartilhados/DeleteIcon';
+import { EyeIcon } from '@/components/iconesCompartilhados/EyeIcon';
 import Paper from '@mui/material/Paper';
-// import { useAppContext } from '@/components/EscondeValorContext';
 import currency from '@/components/Currency';
-// import Tema from '@/components/Tema';
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
-// import ModalObservacao from '@/components/ModalObservacaoGastos';
-// import ModalObservacaoInativacao from '@/components/ModalObservacaoInativacao';
+import ModalObservacao from '@/components/ModalObservacaoGastos';
+import ModalObservacaoInativacao from '@/components/ModalObservacaoInativacao';
+
 import { useMemo } from 'react';
 import { useCallback } from 'react';
-import LayoutAdmin from '@/components/LayoutAdmin';
+import columns from './colunas';
 import { differenceInDays, differenceInMonths, differenceInYears } from 'date-fns';
 import ButtonVoltar from '@/components/ButtonVoltar';
+import useVisibility from '@/components/hooks/useVisibility';
+import useToken from '@/components/hooks/useToken';
 
 export default function DetalhesDosGastos({ params }) {
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
+    const { visibility } = useVisibility()
+    const { tokenUsuario } = useToken()
     const Router = useRouter();
     const [dados, setDados] = useState([]);
+    console.log("🚀 ~ DetalhesDosGastos ~ dados", dados)
     const [nome, setNome] = useState([]);
-    const { data: session } = useSession();
-    const email = session?.user?.email;
     const [filterValue, setFilterValue] = useState("");
     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = useState(new Set(["nomepatrimonio", "nomedespesa", "tipopatrimonio", "valor", "dataaquisicao", "actions"]));
@@ -41,16 +43,19 @@ export default function DetalhesDosGastos({ params }) {
         column: "age",
         direction: "ascending",
     });
+
     const [message, setMessage] = useState("");
     const [modalInfo, setModalInfo] = useState({ show: false, objeto: null });
-    // const { visibility } = useAppContext();
+
     const [tempoPatrimonio, setTempoPatrimonio] = useState({
         anos: 0,
         meses: 0,
         dias: 0,
     });
 
-    const calculaTempo = (dataAquisicao) => {
+
+
+    const calculaTempo = (dataAquisicao: string) => {
         if (!dataAquisicao) return;
 
         const dataAquisicaoDate = new Date(dataAquisicao);
@@ -63,36 +68,39 @@ export default function DetalhesDosGastos({ params }) {
         setTempoPatrimonio({ anos, meses, dias });
     };
 
+
     const buscaPatrimonios = async () => {
-        if (!email) return;
-        const response = await api.get('/buscadespesasdetalhes', {
+
+        const response = await api.get('/detalhespatrimonio', {
             params,
+
         });
         setDados(response.data);
     };
 
-    const buscaPatrimonioNome = async () => {
-        if (!email) return;
-        const response = await api.get('/buscadespesasdetalhesnome', {
-            params,
-        });
-        setNome(response.data);
-        // Calcula o tempo quando o nome do patrimônio for carregado
-        if (response.data.length > 0) {
-            calculaTempo(response.data[0].dataAquisicao);
-        }
-    };
+
+
+    // const buscaPatrimonioNome = async () => {
+    //     if (!email) return;
+    //     const response = await api.get('/buscadespesasdetalhesnome', {
+    //         params,
+    //     });
+    //     setNome(response.data);
+    //     // Calcula o tempo quando o nome do patrimônio for carregado
+    //     if (response.data.length > 0) {
+    //         calculaTempo(response.data[0].dataAquisicao);
+    //     }
+    // };
 
     useEffect(() => {
         buscaPatrimonios();
-        buscaPatrimonioNome();
-    }, [email, visibility, nome, filtroInativo]);
+    }, [email, nome, filtroInativo]);
 
     const somaDeDespesasPatrimonio = dados && dados.length > 0
         ? dados.reduce((acc, item) => acc + item.valor, 0)
         : 0;
 
-    const deleteDespesa = async (idDespesa) => {
+    const deleteDespesa = async (idDespesa: number) => {
         const response = await api.delete('/deletedespesas', {
             params: {
                 id: idDespesa,
@@ -159,6 +167,8 @@ export default function DetalhesDosGastos({ params }) {
         const response = await api.put('/inativarpatrimonio', {
             dados: modalInfo.objeto
         })
+        buscaPatrimonios();
+
     }
 
     const renderCell = useCallback((despesa, columnKey) => {
@@ -192,22 +202,22 @@ export default function DetalhesDosGastos({ params }) {
 
                     </div>
                 );
-            case "valor":
-                return <p>{visibility ? currency(despesa.valor) : '****'}</p>;
-            case "nomepatrimonio":
+            case "valorPatrimonio":
+                return <p>{currency(despesa.valor)} </p>;
+            case "nomePatrimonio":
                 return <p>{despesa.nomepatrimonio}</p>;
             case "tempo":
                 return <p>Aqui vai o tempo</p>;
-            case "nomedespesa":
-                return <p>{despesa.nomedespesa}</p>;
+            case "despesa.TipoDespesa.nomeDespesa":
+                return <p>{despesa.TipoDespesa.nomeDespesa}</p>;
             case "tipopatrimonio":
                 return <p>{despesa.tipopatrimonio}</p>;
             case "dataAquisicao":
-                return <p>{new Date(despesa.dataAquisicao).toLocaleDateString()}</p>;
+                return <p>{despesa.dataAquisicao}</p>;
             default:
                 return cellValue;
         }
-    }, [visibility]);
+    }, []);
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -310,7 +320,6 @@ export default function DetalhesDosGastos({ params }) {
         dados.length,
         onSearchChange,
         hasSearchFilter,
-        visibility,
         tempoPatrimonio // Adicione tempoPatrimonio às dependências
     ]);
 
@@ -345,10 +354,9 @@ export default function DetalhesDosGastos({ params }) {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
-        <div>
-            <LayoutAdmin />
-            <Paper elevation={16} className={`p-4 bg-[#3e3b3b] text-white`} >
-                <p className="pt-2 text-center font-bold">{nome && nome[0]?.nomePatrimonio}</p>
+        <div className="w-full px-4 py-12 ">
+            <Paper elevation={16} className={`p-4 bg-primaryTable text-white`} >
+                <p className="pt-2 text-center font-bold">Detalhes do Patrimômio: <span className='text-buttonAzulClaro'>{dados.length > 0 && dados && dados[0].Patrimonio.nomePatrimonio}</span></p>
                 <Table
                     aria-label="Example table with custom cells, pagination and sorting"
                     isHeaderSticky
@@ -368,7 +376,7 @@ export default function DetalhesDosGastos({ params }) {
                     <TableHeader columns={columns}>
                         {(column) => (
                             <TableColumn
-                                className="text-red-500 font-bold "
+                                className="text-primaryTableText font-bold "
                                 key={column.uid}
                                 align={column.uid === "actions" ? "center" : "start"}
                             >
@@ -385,50 +393,18 @@ export default function DetalhesDosGastos({ params }) {
                     </TableBody>
                 </Table>
             </Paper>
-            {/* <ModalObservacao
+            <ModalObservacao
                 open={openModalObservacao}
                 onClose={() => setOpenModalObservacao(false)}
                 observacao={observacao}
-            /> */}
-            {/* <ModalObservacaoInativacao
+            />
+            <ModalObservacaoInativacao
                 open={modalInfo.show}
                 onClose={() => setModalInfo({ ...modalInfo, show: false })}
                 observacao={modalInfo.objeto}
                 onSubmit={confirmaInativacao}
-            /> */}
+            />
         </div>
     );
 }
 
-const columns = [
-    {
-        name: "Id",
-        uid: "id",
-        sortable: true,
-    },
-    {
-        name: "Nome da Despesa",
-        uid: "nomeDespesa",
-        sortable: true,
-    },
-    {
-        name: "Valor",
-        uid: "valor",
-        sortable: true,
-    },
-    {
-        name: "Data de Aquisição",
-        uid: "dataAquisicao",
-        sortable: true,
-    },
-    {
-        name: "Tempo",
-        uid: "tempo",
-        sortable: true,
-    },
-    {
-        name: "Ações",
-        uid: "actions",
-        align: "center",
-    },
-];

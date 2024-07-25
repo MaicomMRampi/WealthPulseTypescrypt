@@ -60,20 +60,19 @@ model DespesaDeBens {
   id                   Int     @id @default(autoincrement())
   idPatrimonio         Int
   observacao           String?
-  nomePatrimonio       String
-  kmAntigo             Int
-  kmAtual              Int
-  tipoDespesa          String
-  nomeDespesa          String
-  tipoPatrimonio       String
+  kmAntigo             Int?
+  kmAtual              Int?
   valor                Float
-  responsavel          String
+  responsavel          String?
   dataAquisicao        String
-  compradorPagador     String
+  compradorPagador     String?
   idUser               Int
-  litros               Float?
-  inativo              Int     @default(0)
   observacaoInativacao String?
+  inativo              Int     @default(0)
+  tipoDespesaId        Int
+
+  TipoDespesa TipoDespesa @relation(fields: [tipoDespesaId], references: [id])
+  Patrimonio  Patrimonio  @relation(fields: [idPatrimonio], references: [id])
 }
 
 model Despesas {
@@ -154,12 +153,13 @@ model NomeFundoImobiliario {
 }
 
 model Patrimonio {
-  id              Int    @id @default(autoincrement())
+  id              Int             @id @default(autoincrement())
   nomePatrimonio  String
   tipoPatrimonio  String
   valorPatrimonio Float
   dataAquisicao   String
   idUser          Int
+  DespesaDeBens   DespesaDeBens[]
 }
 
 model Proventos {
@@ -176,6 +176,8 @@ model TipoDespesa {
   id          Int    @id @default(autoincrement())
   nomeDespesa String
   idUser      Int
+
+  despesadebens DespesaDeBens[]
 }
 
 model ValorAtual {

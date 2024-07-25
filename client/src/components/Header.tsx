@@ -80,7 +80,7 @@ export default function App() {
 
     return (
         <Navbar className="bg-primaryTable"
-            maxWidth="xl"
+            maxWidth="2xl"
             shouldHideOnScroll
             isMenuOpen={isMenuOpen}
             onMenuOpenChange={setIsMenuOpen}

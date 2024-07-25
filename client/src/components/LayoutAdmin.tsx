@@ -5,17 +5,13 @@ import { jwtDecode } from 'jwt-decode';
 import useToken from './hooks/useToken';
 
 const LayoutAdmin = ({ children }: any) => {
-    const { tokenUsuario } = useToken()
+    const { tokenUsuario } = useToken();
     const router = useRouter();
-    const pathname = usePathname()
+    const pathname = usePathname();
     const [usuarioLogado, setUsuarioLogado] = useState(false);
 
-
-    if (pathname != '/pages/register') {
-
-
-        useEffect(() => {
-
+    useEffect(() => {
+        if (pathname !== '/pages/register') {
             const token = localStorage.getItem('token');
             if (token && tokenUsuario) {
                 console.log("🚀 ~ useEffect ~ token", token);
@@ -37,19 +33,21 @@ const LayoutAdmin = ({ children }: any) => {
                 }
             } else {
                 // Token não encontrado, redirecionar para a página de login
-                router.push('/pages/login')
-
+                router.push('/pages/login');
             }
-        }, [router]);
-
-        // Renderização condicional com base no estado de usuário logado
-        if (!usuarioLogado) {
-            return null; // ou uma mensagem de carregamento, etc.
         }
+    }, [pathname, router, tokenUsuario]);
+
+    // Renderização condicional com base no estado de usuário logado
+    if (!usuarioLogado && pathname !== '/pages/register') {
+        return null; // ou uma mensagem de carregamento, etc.
     }
 
-
-
+    return (
+        <div>
+            {children}
+        </div>
+    );
 };
 
 export default LayoutAdmin;

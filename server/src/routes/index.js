@@ -129,8 +129,6 @@ router.post('api/upload', async (req, res) => {
 
 router.post('/api/postpatrimonio', async (req, res) => {
     const dados = req.body;
-    const tipo = typeof req.body.dados.dataaquisicao
-    console.log("🚀 ~ router.post ~ tipo", tipo)
     try {
         console.log("🚀 ~ router.post ~ dados", dados)
         const nomeUper = dados.dados.nome.toUpperCase()
@@ -142,7 +140,7 @@ router.post('/api/postpatrimonio', async (req, res) => {
                 nomePatrimonio: nomeUper,
                 tipoPatrimonio: dados.dados.tipopatrimonio,
                 valorPatrimonio: valorPatr,
-                dataAquisicao: dados.dados.dataaquisicao,
+                dataAquisicao: formatDate(dados.dados.dataaquisicao),
                 idUser: dados.token
             }
         })
@@ -160,7 +158,6 @@ router.get('/api/buscabem', async (req, res) => {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
         const buscaPatrimonio = await prisma.patrimonio.findMany({ where: { idUser: buscaId.id } })
-        console.log("🚀 ~ router.get ~ buscaPatrimonio", buscaPatrimonio);
         res.status(200).json(buscaPatrimonio);
     } catch (error) {
         console.error("🚀 ~ router.get ~ error", error); // Loga o erro no console
@@ -169,46 +166,35 @@ router.get('/api/buscabem', async (req, res) => {
 });
 
 router.post('/api/despesadeconsumo', async (req, res) => {
-    const dados = req.body;
-    console.log("🚀 ~ router.post ~ dados", dados)
-    const convertDatauser = formatDate(dados.values.dataaquisicao)
-    console.log("🚀 ~ router.post ~ convertData", convertDatauser)
 
-    // try {
+    try {
 
+        const dados = req.body;
+        console.log("🚀 ~ router.post ~ dados", dados)
 
-    //     const converteString = (valor) => {
-    //         // Remove caracteres não numéricos e converte para número
-    //         return parseFloat(valor.replace(/[^0-9,-]/g, '').replace(',', '.'));
-    //     };
+        const novaDespesaDeBem = await prisma.despesaDeBens.create({
+            data: {
+                idPatrimonio: parseInt(dados.values.nomepatrimonio),
+                observacao: dados.values.observacao,
+                kmAntigo: dados.values.kmAntigo,
+                kmAtual: dados.values.kmAtual,
+                tipoDespesaId: parseInt(dados.values.tipodespesa),
+                valor: converteString(dados.values.valorgasto),
+                responsavel: dados.values.responsavel,
+                dataAquisicao: formatDate(dados.values.dataaquisicao),
+                compradorPagador: dados.values.compradorPagador,
+                idUser: parseInt(dados.id),
+                observacaoInativacao: '',
+                inativo: 0
+            },
+        });
 
-    //     const novaDespesaDeBem = await prisma.despesaDeBens.create({
-    //         data: {
-    //             idPatrimonio: parseInt(dados.valuesNomepatrimonio.id), 
-    //             nomePatrimonio: dados.values.nomepatrimonio.nomePatrimonio,
-    //             tipoPatrimonio: dados.values.nomepatrimonio.tipoPatrimonio,
-    //             kmAntigo: dados.values.kmantigo === '' ? 0 : converteString(dados.values.kmantigo),
-    //             kmAtual: dados.values.kmatual === '' ? 0 : converteString(dados.values.kmatual),
-    //             nomeDespesa: dados.values.tipodespesa.toUpperCase(),
-    //             valor: converteString(dados.values.valorgasto),
-    //             responsavel: dados.values.responsavel,
-    //             dataAquisicao: new Date(dados.values.dataaquisicao),
-    //             compradorPagador: dados.values.compradorpagador,
-    //             tipoDespesa: dados.values.nomepatrimonio.tipoPatrimonio,
-    //             observacao: dados.values.observacao,
-    //             idUser: buscaId.id, // Certifique-se de que é buscaId.id
-    //             litros: dados.values.litros === '' ? 0.00 : dados.values.litros,
-    //             inativo: 0,
-    //             observacaoInativacao: ''
-    //         },
-    //     });
-
-    //     console.log("🚀 ~ router.post ~ novaDespesaDeBem", novaDespesaDeBem);
-    //     return res.status(200).json({ message: 'Despesa de Bem Cadastrada com Sucesso' });
-    // } catch (error) {
-    //     console.error('Erro ao Cadastrar Despesa de Bem:', error);
-    //     return res.status(500).json({ message: 'Erro ao Cadastrar Despesa de Bem', error });
-    // }
+        console.log("🚀 ~ router.post ~ novaDespesaDeBem", novaDespesaDeBem);
+        return res.status(200).json({ message: 'Despesa de Bem Cadastrada com Sucesso' });
+    } catch (error) {
+        console.error('Erro ao Cadastrar Despesa de Bem:', error);
+        return res.status(500).json({ message: 'Erro ao Cadastrar Despesa de Bem', error });
+    }
 });
 
 router.put('/api/inativarpatrimonio', async (req, res) => {
@@ -244,19 +230,27 @@ router.put('/api/inativarpatrimonio', async (req, res) => {
 
 
 
-router.get('/api/buscadespesasdetalhes', async (req, res) => {
+router.get('/api/detalhespatrimonio', async (req, res) => {
     try {
         const dados = req.query.id;
 
-        const despesasPatrimonio = await prisma.DespesaDeBens.findMany({ where: { idPatrimonio: parseInt(dados) } })
+        const despesasPatrimonio = await prisma.DespesaDeBens.findMany({
+            where: {
+                idPatrimonio: parseInt(dados),
+            },
+            include: {
+                TipoDespesa: true,
+                Patrimonio: true
+            }
+        });
 
         res.status(200).json(despesasPatrimonio);
-    }
-    catch (error) {
-        console.error('Erro ao Cadastrar Despesa de Bem:', error);
-        res.status(500).json({ message: 'Despesas não encontradas' })
+    } catch (error) {
+        console.error('Erro ao buscar despesas do patrimônio:', error);
+        res.status(500).json({ message: 'Despesas não encontradas' });
     }
 });
+
 router.get('/api/buscadespesasdetalhesnome', async (req, res) => {
     try {
         const dados = req.query.id;
