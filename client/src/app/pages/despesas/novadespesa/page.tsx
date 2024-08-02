@@ -1,6 +1,9 @@
 "use client"
 import { Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react'
 import React from 'react'
+import { DatePicker } from "@nextui-org/date-picker";
+import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
+import { I18nProvider } from '@react-aria/i18n'
 import { useEffect, useState } from 'react'
 import FormadePagamentoNova from '@/components/despesaComponents/ModalFormaPagamento'
 import ModalNovaCategoria from '@/components/despesaComponents/ModalNovaCategoria'
@@ -11,8 +14,11 @@ import { valorMask } from '@/components/Mask'
 import { api } from '@/lib/api'
 import useToken from '@/components/hooks/useToken'
 import { Alert } from '@mui/material'
-
+import TitlePage from '@/components/tituloPaginas'
+import useVisibilityCampo from '@/components/hooks/useVisibilityCampos';
 export default function NovaDespesa() {
+    const { visibilityCampo } = useVisibilityCampo()
+    console.log("🚀 ~ NovaDespesa ~ visibilityCampo", visibilityCampo)
     const [modalOpen, setModalOpen] = useState(false);
     const [ModalOpenForm, setModalOpenForm] = useState(false);
     const [message, setMessage] = useState<string>()
@@ -184,14 +190,11 @@ export default function NovaDespesa() {
                 }) => (
                     <div className="w-full">
                         <form onSubmit={handleSubmit}>
-                            <h4 className="text-2xl text-center py-5">
-                                Insira uma nova despesa
-                            </h4>
+                            <TitlePage title="Nova Despesa" />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
                                 <Input
                                     className=""
                                     isInvalid={touched.responsavel && errors.responsavel ? true : false}
-                                    errorMessage={touched.responsavel && errors.responsavel ? errors.responsavel : undefined}
                                     onChange={handleChange}
                                     fullWidth
                                     label="Comprador"
@@ -202,7 +205,7 @@ export default function NovaDespesa() {
                                 <Input
                                     onChange={handleChange}
                                     fullWidth
-                                    label="Pagante"
+                                    label="Pagador(es)"
                                     name="pagante"
                                     autoComplete="pagante"
 
@@ -211,7 +214,16 @@ export default function NovaDespesa() {
                                     <input
                                         value={values.mescorrespondente}
                                         placeholder={errors.mescorrespondente ? "Mês Correspondente da Fatura (Erro)" : "Mês Correspondente da Fatura"}
-                                        className={`w-full rounded-xl h-[54px] placeholder-red-500 text-gray-700 ${errors.mescorrespondente ? "bg-red-100" : ""}`}
+                                        className={`w-full rounded-xl h-[54px] 
+                                            ${errors.mescorrespondente
+                                                ? !visibilityCampo
+                                                    ? "bg-[#310413] text-[#f31260]"
+                                                    : "bg-[#fee7ef] text-[#f31260]"
+                                                : !visibilityCampo
+                                                    ? 'bg-[#27272a]'
+                                                    : 'bg-[#f4f4f5]'
+                                            }`}
+
                                         type="month"
                                         name="mescorrespondente"
                                         onChange={handleChange}
@@ -219,13 +231,23 @@ export default function NovaDespesa() {
                                     {errors.mescorrespondente ? <p className="text-red-500 text-xs pt-1">{errors.mescorrespondente}</p> : null}
                                 </div>
 
+                                <I18nProvider locale="pt-BR">
+                                    <DatePicker
+                                        name="dataaquisicao"
+                                        hideTimeZone
+                                        defaultValue={today(getLocalTimeZone())} // Set default value directly
+                                        onChange={(val) => setFieldValue("dataaquisicao", val)}
+                                        label="Data Despesa"
+                                        isInvalid={touched.dataaquisicao && errors.dataaquisicao ? true : false}
+                                    />
+                                </I18nProvider>
+
                                 <Select
                                     label="Categoria"
                                     fullWidth
                                     name="categoria"
                                     onChange={handleChange}
                                     value={values.categoria}
-                                    errorMessage={touched.categoria && errors.categoria ? errors.categoria : undefined}
                                     isInvalid={touched.categoria && errors.categoria ? true : false}
                                 >
                                     {categoria && categoria.length > 0 ? (

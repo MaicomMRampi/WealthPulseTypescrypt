@@ -13,20 +13,26 @@ import {
     Tooltip,
     Navbar,
 } from "@nextui-org/react";
+
 import { PlusIcon } from "../../../../components/iconesCompartilhados/PlusIcon";
 import { SearchIcon } from "../../../../components/iconesCompartilhados/SearchIcon";
 // import ModalDeleteAcoes from "@/components/ModalDeleteAcoes";
-import Paper from "@mui/material/Paper";
+import columns from "./columns"
+import TitlePage from "@/components/tituloPaginas";
 import { EditIcon } from "../../../../components/iconesCompartilhados/EditIcon";
 import { DeleteIcon } from "../../../../components/iconesCompartilhados/DeleteIcon";
 import { EyeIcon } from "../../../../components/iconesCompartilhados/EyeIcon";
 import { api } from "@/lib/api";
 import Link from 'next/link';
 import currency from "@/components/Currency";
-
+import { MdRemoveRedEye } from "react-icons/md";
 // import DividendosModal from '@/components/dividendosModal'
 import { useRouter } from "next/navigation";
 import useVisibility from "@/components/hooks/useVisibility";
+import ButtonVoltar from "@/components/ButtonVoltar";
+import useToken from "@/components/hooks/useToken";
+import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData";
+import ModalDelete from "@/components/ModalDelete";
 const statusColorMap = {
     active: "success",
     paused: "danger",
@@ -42,12 +48,14 @@ interface Modal {
 
 
 export default function App() {
+    const { tokenUsuario } = useToken()
     const Router = useRouter()
     const [filterValue, setFilterValue] = useState("");
     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-    const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [visibleColumns, setVisibleColumns] = useState<string>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [openModalProventos, setOpenModalProventos] = useState(false)
     const [statusFilter, setStatusFilter] = useState("all");
+    const [modalDelete, setModalDelete] = useState({ openClose: false, objeto: null });
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState({
         column: "age",
@@ -57,40 +65,39 @@ export default function App() {
     const [modalInfo, setModalInfo] = useState<Modal>({ show: false, objeto: null })
     const { visibility } = useVisibility()
     const [dados, setDados] = useState([]);
-    const emailUser = 'MAICOM.MATEUS@YAHOO.COM.BR'
+
 
     const buscaPatrimonios = async () => {
-        if (emailUser) {
-            const response = await api.get('/buscabem', {
-                params: {
-                    email: emailUser
-                }
-            });
-            setDados(response.data);
-
-        }
+        const response = await api.get('/buscabem', {
+            params: {
+                id: tokenUsuario?.id
+            }
+        });
+        setDados(response.data);
     }
 
     useEffect(() => {
         buscaPatrimonios();
-    }, [emailUser]);
+    }, []);
 
-    const deleteInvestimento = async () => {
-        const response = await api.delete('/deletainvestimentoacao', {
+
+
+    const deletaPatrimonio = async () => {
+        const response = await api.delete('/deletedespesas', {
             params: {
-                id: modalInfo.objeto._id
-            }
-        })
+                id: modalDelete.objeto.id,
+            },
+        });
         if (response.status === 200) {
-            setMessage(response.data.message)
-
+            setMessage(response.data.message);
+            buscaPatrimonios();
             setTimeout(() => {
-                setModalInfo({ show: false, objeto: null })
-                setMessage("")
-            }, 2000)
+                setModalInfo({ show: false, objeto: null });
+                setMessage("");
+            }, 2000);
         }
-        console.log(modalInfo.objeto._id)
-    }
+    };
+
 
 
     const [page, setPage] = React.useState(1);
@@ -154,10 +161,10 @@ export default function App() {
                 );
             case "actions":
                 return (
-                    <div className="relative flex items-end gap-2 ">
-                        <Tooltip className="" content="Detalhes">
+                    <div className="relative flex gap-6 items-end justify-center">
+                        <Tooltip className="" content="Despesas com o Patrimônio">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <EyeIcon onClick={() => mandaRota(patrimonio.id)} />
+                                <MdRemoveRedEye className="text-[#93fad6]" onClick={() => mandaRota(patrimonio.id)} />
                             </span>
                         </Tooltip>
                         <Tooltip className="" content="Editar">
@@ -166,7 +173,7 @@ export default function App() {
                             </span>
                         </Tooltip>
                         <Tooltip className="" color="danger" content="Deletar">
-                            <span onClick={() => setModalInfo({ show: true, objeto: patrimonio })} className="text-lg text-danger cursor-pointer active:opacity-50">
+                            <span onClick={() => setModalDelete({ openClose: true, objeto: patrimonio })} className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <DeleteIcon className="text-red-500" />
                             </span>
                         </Tooltip>
@@ -187,7 +194,7 @@ export default function App() {
                 );
             case "dataAquisicao":
                 return (
-                    <p>{patrimonio.dataAquisicao}</p>
+                    <p>{AlteraVisualizacaoData(patrimonio.dataAquisicao)}</p>
                 );
             default:
                 return cellValue;
@@ -245,7 +252,7 @@ export default function App() {
                     />
                     <div className="flex gap-3">
                         <Button fullWidth color="success" variant="solid" endContent={<PlusIcon size={20} />}>
-                            <Link href="/gastosdebens/cadastrodepatrimonio"> Novo patrimônio</Link>
+                            <Link href="/pages/patrimonio/cadastropatrimonio"> Novo patrimônio</Link>
                         </Button>
                     </div>
                 </div>
@@ -299,6 +306,7 @@ export default function App() {
                     <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
                         Next
                     </Button>
+                    <ButtonVoltar size='sm' />
                 </div>
             </div>
         );
@@ -306,9 +314,9 @@ export default function App() {
 
     return (
 
-        <div key={visibility} className="px-4 w-full">
-            <div className="rounded-lg bg-primaryTable   mt-12 ">
-                <p className="pt-2 text-center font-bold">Meus Patrimônios</p>
+        <div key={visibility} className="px-4 w-full" prefech={true}>
+            <TitlePage title="Meus patrimônios" />
+            <div className="rounded-lg bg-primaryTable    mt-12 ">
                 <Table
                     aria-label="Example table with custom cells, pagination and sorting"
                     isHeaderSticky
@@ -344,48 +352,15 @@ export default function App() {
                         )}
                     </TableBody>
                 </Table>
-                {/* <ModalDeleteAcoes
-                message={message}
-                confirmaEsclusao={deleteInvestimento}
-                objetoInvestimento={modalInfo.objeto}
-                isOpen={modalInfo.show}
-                onClose={() => setModalInfo({ ...modalInfo, show: false })}
-            />
-            <DividendosModal
-                emailUser={emailUser}
-                open={openModalProventos}
-                onClose={() => setOpenModalProventos(false)}
-            /> */}
+                <ModalDelete
+                    isOpen={modalDelete.openClose}
+                    onClose={() => setModalDelete({ ...modalDelete, openClose: false })}
+                    objeto={modalDelete.objeto}
+                    confirmaEsclusao={deletaPatrimonio}
+                />
 
             </div>
         </div>
     );
 }
 
-const columns = [
-    {
-        name: "id",
-        uid: "id",
-        sortable: true,
-    },
-    {
-        name: "Nome do Patrimônio",
-        uid: "nomePatrimonio",
-        sortable: true,
-    },
-    {
-        name: "Valor Pago",
-        uid: "valorPatrimonio",
-        sortable: true,
-    },
-    {
-        name: "Data de Aquisição",
-        uid: "dataAquisicao",
-        sortable: true,
-    },
-    {
-        name: "Ações",
-        uid: "actions",
-        align: "center",
-    },
-];

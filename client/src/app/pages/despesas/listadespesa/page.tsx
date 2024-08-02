@@ -18,13 +18,13 @@ import { useEffect, useState } from "react";
 import currency from "@/components/Currency";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import PdfDespesas from "@/components/PdfDespesas";
 import ModalObservacao from "@/components/despesaComponents/ModalObservacao";
 import columns from "./data";
 import { format } from 'date-fns';
 import { ptBR, vi } from 'date-fns/locale'
 import { SearchIcon } from "@/components/iconesCompartilhados/SearchIcon";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-
 import { useMemo } from "react";
 import { useCallback } from "react";
 import { EyeIcon } from "@/components/iconesCompartilhados/EyeIcon";
@@ -33,15 +33,21 @@ import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 import useVisibility from "@/components/hooks/useVisibility";
 import { PlusIcon } from "@/components/iconesCompartilhados/PlusIcon";
 import useToken from "@/components/hooks/useToken";
-import PdfDespesas from "@/components/PdfDespesas";
-
+import TitlePage from "@/components/tituloPaginas";
+import AlteraVisualizacaoDataYYYYMM from "@/components/funcoes/alteraVisualizacaoDataYYYMM";
+import ButtonVoltar from "@/components/ButtonVoltar";
+import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
 export default function MinhasDespesas() {
+    const [message, setMessage] = useState()
+    const [mesFatura, setMesFatura] = useState<string>();
+    const [opemModalFatura, setOpenModalFatura] = useState(false);
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
     const { visibility } = useVisibility()
     const [observacao, setObservacao] = useState<object>(false);
     const [selectedIndex, setSelectedIndex] = useState(0); // Inicia com -1 para nenhum item selecionado
     const [Despesa, setDespesa] = useState();
     const [DespesaSelect, setDespesaSelect] = useState([]);
+    console.log("🚀 ~ MinhasDespesas ~ DespesaSelect", DespesaSelect)
     const [filterValue, setFilterValue] = useState<string>("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(1);
@@ -79,6 +85,32 @@ export default function MinhasDespesas() {
         buscaDespesa();
         buscaDespesaMesAtual();
     }, []);
+
+
+    const opemModalFechaFatura = (mes: string) => {
+        console.log("🚀 ~ opemModalFechaFatura ~ mes", mes)
+        setMesFatura(mes)
+        setOpenModalFatura(true)
+    }
+
+    const pagFatura = async () => {
+        console.log('MEs fatura apor confirmare', mesFatura)
+        const response = await api.post(`/fecharfatura`, {
+            idUsuario: tokenUsuario?.id,
+            fatura: mesFatura
+        });
+        if (response.status == 200) {
+            buscaDespesa();
+            buscaDespesaMesAtual();
+            setMessage(response.data.message)
+            setTimeout(() => {
+                setMesFatura('')
+                setOpenModalFatura(false)
+            }, 3000)
+        } else {
+            setOpenModalFatura(false)
+        }
+    }
 
 
 
@@ -157,8 +189,8 @@ export default function MinhasDespesas() {
     const renderCell = useCallback((despesa: any, columnKey: any) => {
         const cellValue = despesa[columnKey];
         switch (columnKey) {
-            case "dataGasto":
-                return <p>{despesa.dataGasto}</p>;
+            case "mesCorrespondente":
+                return <p>{AlteraVisualizacaoDataYYYYMM(despesa.mesCorrespondente)}</p>;
             case "categoria":
                 return <p>{despesa.categoria && despesa.categoria.nomeCategoria}</p>;
             case "valorGasto":
@@ -177,7 +209,7 @@ export default function MinhasDespesas() {
                 return <p>{despesa.responsavel}</p>;
             case "actions":
                 return (
-                    <div className="relative flex items-center gap-2">
+                    <div className="relative flex items-center gap-12 ">
                         <Tooltip color="secondary" content="Detalhes">
                             <span onClick={() => openObservação(despesa)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EyeIcon />
@@ -188,11 +220,14 @@ export default function MinhasDespesas() {
                                 <EditIcon className="text-[#93fad6]" />
                             </span>
                         </Tooltip>
-                        <Tooltip className="" color="danger" content="Deletar">
-                            <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                <DeleteIcon className="text-red-500" />
-                            </span>
-                        </Tooltip>
+                        {despesa.fechada === 0 ? (
+                            <Tooltip className="" color="danger" content="Deletar">
+                                <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                    <DeleteIcon className="text-red-500" />
+                                </span>
+                            </Tooltip>
+                        ) : (null)}
+
                     </div>
                 );
 
@@ -254,16 +289,14 @@ export default function MinhasDespesas() {
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
-                    {/* <PDFDownloadLink style={{ width: '100%' }} document={<PdfDespesas
-                        despesas={DespesaSelect}
-                        mesano={DespesaSelect}
-                        usuario={tokenUsuario}
-                    />} fileName="Despesas.pdf">
-                        {({ blob, url, loading, error }) =>
-                            loading ? 'Loading document...' : <Button className=" border-white text-white w-full" variant="bordered" fullWidth>Imprimir</Button>
-                        }
-                    </PDFDownloadLink> */}
+
                     <div className="flex gap-3">
+                        <PDFDownloadLink document={<PdfDespesas despesas={DespesaSelect} totalFatura={currency(somaValores)} usuario={tokenUsuario} />} fileName="Despesas Patrimônio " >
+                            {({ blob, url, loading, error }) =>
+                                loading ? 'Loading document...' : <Button className=" bg-buttonAzulClaro text-white" variant="flat" fullWidth>Imprimir</Button>
+                            }
+                        </PDFDownloadLink>
+                        <Button className=" border-orange-500 text-white bg-orange-500" variant="solid" fullWidth onClick={() => opemModalFechaFatura(DespesaSelect[0].mesCorrespondente)}>Fechar mês</Button>
                         <Button
                             fullWidth
                             color="primary"
@@ -349,6 +382,7 @@ export default function MinhasDespesas() {
                     >
                         Próxima
                     </Button>
+                    <ButtonVoltar size="sm" />
                 </div>
             </div>
         );
@@ -357,10 +391,9 @@ export default function MinhasDespesas() {
     return (
         <>
             <div key={visibility} className="w-[95%] m-auto" >
-                <p className="text-center pt-8">Minhas Despesas</p>
-
+                <TitlePage title="Minhas Despesas" />
                 <div className="w-full grid grid-cols-1 md:grid-cols-12 pt-6">
-                    <div className="col-span-2 pt-4">
+                    <div className="col-span-2 ">
                         <Listbox
                             aria-label="Example with disabled actions"
                         >
@@ -401,6 +434,7 @@ export default function MinhasDespesas() {
                                         className="text-primaryTableText font-bold "
                                         key={column.uid}
                                         allowsSorting={column.sortable}
+                                        align={column.uid === "actions" ? "center" : "start"}
                                     >
                                         {column.name}
                                     </TableColumn>
@@ -408,7 +442,7 @@ export default function MinhasDespesas() {
                             </TableHeader>
                             <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
                                 {(item) => (
-                                    <TableRow className="hover:text-primaryTableHover" key={item.id}>
+                                    <TableRow className={` ${item.fechada === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText text-white'}`} key={item.id}>
                                         {(columnKey) => (
                                             <TableCell>{renderCell(item, columnKey)}</TableCell>
                                         )}
@@ -424,6 +458,13 @@ export default function MinhasDespesas() {
                 open={openModalObservacao}
                 onClose={() => setOpenModalObservacao(false)}
                 observacao={observacao}
+            />
+            <ModalFechaFatura
+                open={opemModalFatura}
+                mes={mesFatura}
+                onClose={() => setOpenModalFatura(false)}
+                onSubmit={() => pagFatura()}
+                mensagem={message}
             />
         </>
 

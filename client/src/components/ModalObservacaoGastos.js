@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Textarea } from "@nextui-org/react";
 
 export default function App({ open, onClose, observacao }) {
 
@@ -18,17 +18,25 @@ export default function App({ open, onClose, observacao }) {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="text-center">Observação</ModalHeader>
+                            <ModalHeader className="text-center">{observacao.valorOpenModal == 1 ? 'Motivo da Inativação' : 'Observação da Despesa ou Investimento'}</ModalHeader>
                             <ModalBody className="text-white bg-black">
-                                <p>
-                                    {/* Se observacao for um objeto, você pode usar JSON.stringify() para exibir */}
-                                    {JSON.stringify(observacao)}
-                                </p>
-                                <div className="flex flex-col">
-                                    <p>Responsavel: {observacao.responsavel}</p>
-                                    <p>Pagador: {observacao.compradorpagador} </p>
-                                </div>
-
+                                {observacao.valorOpenModal == 1 ?
+                                    <Textarea
+                                        label='Motivo da Inativação'
+                                        value={observacao.observacaoInativacao}
+                                    />
+                                    :
+                                    <div className="flex flex-col gap-4">
+                                        <Input
+                                            label="Responsavel pela Despesa"
+                                            value={observacao.responsavel}
+                                        />
+                                        <Input
+                                            label="Pagador"
+                                            value={observacao.compradorPagador}
+                                        />
+                                    </div>
+                                }
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="light" onPress={onClose}>

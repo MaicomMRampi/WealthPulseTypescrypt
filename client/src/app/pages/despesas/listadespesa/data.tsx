@@ -1,6 +1,6 @@
 const columns = [
     {
-        name: "Data",
+        name: "Mês Fatura",
         uid: "mesCorrespondente",
         sortable: true,
     },
@@ -25,7 +25,7 @@ const columns = [
         sortable: true,
     },
     {
-        name: "Pagante",
+        name: "Pagador(es)",
         uid: "pagante",
         sortable: true,
     },

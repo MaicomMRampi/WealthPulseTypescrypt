@@ -11,7 +11,9 @@ import { DatePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
 import { I18nProvider } from '@react-aria/i18n'
 import { Alert } from "@mui/material";
-
+import TitlePage from "@/components/tituloPaginas";
+import { useRouter } from "next/navigation";
+import formatarParaBackend from "@/components/funcoes/formataValorParaBack";
 
 const patrimonios = [
     { id: '1', nome: 'Imóvel' },
@@ -19,15 +21,14 @@ const patrimonios = [
     { id: '4', nome: 'Outros' },
 ];
 
-
-
-
 export default function App() {
+    const router = useRouter()
     const { tokenUsuario } = useToken()
     const [message, setMessage] = useState('');
     const [messageTipo, setMessageTipo] = useState('');
 
-    const handleSubmit = async (values: object) => {
+    const handleSubmit = async (values: any) => {
+
         const response = await api.post('/postpatrimonio', {
             dados: values,
             token: tokenUsuario?.id,
@@ -36,6 +37,10 @@ export default function App() {
         if (response.status === 200) {
             setMessage('Patrimônio Cadastrado com Sucesso');
             setMessageTipo('success');
+            setTimeout(() => {
+                router.push('/pages/patrimonio/listapatrimonio');
+
+            }, 2000);
         } else {
             setMessage('Erro ao Cadastrar Patrimônio');
             setMessageTipo('error');
@@ -43,8 +48,9 @@ export default function App() {
         setTimeout(() => {
             setMessage('');
             setMessageTipo('');
+
         }, 2000);
-        console.log(response);
+
     };
 
 
@@ -67,7 +73,7 @@ export default function App() {
                 }: any) => (
                     <form onSubmit={handleSubmit}>
                         <div className="pt-8 flex flex-col gap-3   md:w-[60%] xs:w-full px-4 mx-auto">
-                            <h2 className="text-3xl text-center font-bold">Cadastro de Patrimônio</h2>
+                            <TitlePage title="Cadastro de Patrimônio" />
                             <Input
                                 fullWidth
                                 name="nome"
@@ -81,7 +87,7 @@ export default function App() {
                                 value={values.tipopatrimonio}
                                 name='tipopatrimonio'
                                 fullWidth
-                                label="Patrimônio"
+                                label="Tipo patrimônio"
                                 isInvalid={errors.tipopatrimonio && touched.tipopatrimonio}
                                 onChange={handleChange}
                             >
@@ -99,9 +105,18 @@ export default function App() {
                                 fullWidth
                                 name="valor"
                                 label="Valor"
+                                value={values.valor}
                                 isInvalid={errors.valor && touched.valor}
-                                value={valorMask(values.valor)}
-                                onChange={handleChange}
+                                onBlur={handleChange}
+                                onChange={(event) => {
+                                    const { name, value } = event.target;
+                                    if (name === 'valor') {
+                                        const maskedValue = valorMask(value);
+                                        setFieldValue(name, maskedValue);
+                                    } else {
+                                        setFieldValue(name, value);
+                                    }
+                                }}
                                 startContent={
                                     <div className="pointer-events-none flex items-center">
                                         <span className="text-white text-small">R$</span>

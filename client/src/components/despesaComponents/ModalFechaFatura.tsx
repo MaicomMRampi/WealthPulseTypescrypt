@@ -1,5 +1,7 @@
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Textarea } from "@nextui-org/react";
+import { Alert } from "@mui/material";
+import AlteraVisualizacaoDataYYYYMM from "../funcoes/alteraVisualizacaoDataYYYMM";
 
 interface Props {
     open: boolean,
@@ -10,11 +12,11 @@ interface Props {
 interface Observacao {
     responsavel: string,
     paganete: string,
-    observacao: string
+    onSubmit: any,
+    mensagem: string
 }
 
-export default function App({ open, onClose, observacao }: Props) {
-
+export default function App({ open, onClose, onSubmit, mes, mensagem }: Props) {
 
     return (
         <>
@@ -32,31 +34,21 @@ export default function App({ open, onClose, observacao }: Props) {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="text-center">Observação</ModalHeader>
-                            <ModalBody className="text-white bg-black">
+                            <ModalHeader className="text-center">Deseja Fechar as Despesas do Mês: {AlteraVisualizacaoDataYYYYMM(mes)} ?</ModalHeader>
+                            <ModalBody className="text-white k">
 
-                                <Input
-                                    label="Comprador"
-                                    defaultValue={observacao.responsavel}
-                                    fullWidth
-                                />
-                                <Input
-                                    label="Pagador"
-                                    defaultValue={observacao.pagante}
-                                    fullWidth
-                                />
-                                <Textarea
-                                    label="Observação"
-                                    defaultValue={observacao.observacao}
-                                    fullWidth
-                                />
+                                <Alert severity="warning" >Obs: Ao inativar não será possível fazer a alteração de dados</Alert>
 
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="danger" variant="light" onPress={onClose}>
+                                <Button color="success" variant="light" onClick={() => onSubmit()}>
+                                    Confirmar
+                                </Button>
+                                <Button color="danger" variant="solid" onPress={onClose}>
                                     Fechar
                                 </Button>
                             </ModalFooter>
+                            {mensagem ? <Alert>{mensagem}</Alert> : null}
                         </>
                     )}
                 </ModalContent>

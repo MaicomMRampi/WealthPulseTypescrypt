@@ -21,6 +21,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/aceternity/ui/navbar-menu";
 import { cn } from "@/lib/utils";
+import useVisibilityCampo from "./hooks/useVisibilityCampos";
 
 
 
@@ -30,6 +31,7 @@ export default function App() {
     const { tokenUsuario } = useToken()
     console.log("🚀 ~ App ~ tokenUsuario", tokenUsuario)
     const { toggleVisibility, visibility } = useVisibility()
+    const { toggleVisibilityCampo, visibilityCampo } = useVisibilityCampo()
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
     const { theme, setTheme } = useTheme();
@@ -54,6 +56,11 @@ export default function App() {
 
 
     ];
+
+
+    const trocaValorVisibilidade = () => {
+        toggleVisibilityCampo();
+    };
 
 
     const handleLogout = () => {
@@ -92,6 +99,7 @@ export default function App() {
                         <Image src="/imagens/logoAjustada.png" alt="logo" width={125} height={150} />
                     </NavbarBrand>
                 </NavbarContent>
+
                 <Menu setActive={setActive}>
                     <MenuItem setActive={setActive} active={active} item="Patrimônio">
                         <div className="flex flex-col space-y-4 text-sm">
@@ -122,10 +130,15 @@ export default function App() {
                 </Menu>
 
 
+
                 <NavbarContent as="div" className="items-center flex gap-6 " justify="end">
                     <p className="cursor-pointer"> {visibility ? <MdVisibility onClick={handleVisibility} size={28} /> : <MdVisibilityOff onClick={handleVisibility} size={28} />}</p>
                     <Switch
-                        onChange={(e) => teste(e.target.checked)}
+                        onChange={(e) => {
+                            teste(e.target.checked);
+                            trocaValorVisibilidade();
+                        }}
+
                         defaultSelected
                         size="lg"
                         color="primary"

@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { jwtDecode } from 'jwt-decode';
 import useToken from '@/components/hooks/useToken';
+import { Alert } from '@mui/material';
 function Copyright(props: any) {
     return (
         <h1 {...props}>
@@ -50,11 +51,11 @@ export default function SignIn() {
                 router.push("/");
             } else {
                 setMessage("Usuario ou senha invalidos");
-                setMessageTipo("danger");
+                setMessageTipo("error");
             }
         } catch (error) {
-            setMessage("Erro no login. Tente novamente.");
-            setMessageTipo("danger");
+            setMessage("Usuario ou senha invalidos");
+            setMessageTipo("error");
         } finally {
             setTimeout(() => {
                 setMessage("");
@@ -142,25 +143,15 @@ export default function SignIn() {
                             </div>
                             <div className='mt-4 text-center text-green-700'>
                                 <Copyright sx={{ mt: 4, mb: 4 }} />
-
+                                <div className='pt-4' >
+                                    {message ? (
+                                        <Alert severity={messageTipo}>{message}</Alert>
+                                    ) : null}
+                                </div>
                             </div>
                         </form>
                     )}
                 </Formik>
-                {message && (
-                    <div className="mt-4">
-                        <Popover placement='top-start' color={messageTipo} isOpen={true}>
-                            <PopoverTrigger>
-                                <Button style={{ display: 'none' }} />
-                            </PopoverTrigger>
-                            <PopoverContent>
-                                <>
-                                    {message}
-                                </>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                )}
             </div>
         </div>
     );

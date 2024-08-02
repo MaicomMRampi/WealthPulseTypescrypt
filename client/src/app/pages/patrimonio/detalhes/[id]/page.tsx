@@ -2,8 +2,7 @@
 import { api } from '@/lib/api';
 import React from 'react'
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Divider, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Tooltip, Select, SelectItem, } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Divider, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Tooltip, Select, SelectItem, Card, Checkbox, } from "@nextui-org/react";
 import { PlusIcon } from '@/components/iconesCompartilhados/PlusIcon';
 import { SearchIcon } from '@/components/iconesCompartilhados/SearchIcon';
 import { EditIcon } from '@/components/iconesCompartilhados/EditIcon';
@@ -15,58 +14,86 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import ModalObservacao from '@/components/ModalObservacaoGastos';
 import ModalObservacaoInativacao from '@/components/ModalObservacaoInativacao';
-
+import { CheckIcon } from "./CheckIcon";
 import { useMemo } from 'react';
 import { useCallback } from 'react';
 import columns from './colunas';
-import { differenceInDays, differenceInMonths, differenceInYears } from 'date-fns';
+import { FaMagnifyingGlass } from "react-icons/fa6";
 import ButtonVoltar from '@/components/ButtonVoltar';
 import useVisibility from '@/components/hooks/useVisibility';
 import useToken from '@/components/hooks/useToken';
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import calcularTempo from '@/components/funcoes/calculaTempo';
+import ModalDelete from '@/components/ModalDelete'
+import { ImBlocked } from "react-icons/im";
+import { MdRemoveRedEye } from 'react-icons/md';
+import PdfDespesasDebens from '@/components/pdfDespesasDeBens';
+import AlteraVisualizacaoData from '@/components/funcoes/alteraVisualizacaoData'
 
-export default function DetalhesDosGastos({ params }) {
+interface Patrimonio {
+    id: number;
+    nomePatrimonio: string;
+    tipoPatrimonio: string;
+    valorPatrimonio: number;
+    dataAquisicao: string;
+}
+
+interface TipoDespesa {
+    id: number;
+    nomeDespesa: string;
+    idUser: number;
+}
+
+interface ModalObservacao {
+    despesa: Despesa;
+    valor: number;
+}
+
+interface Despesa {
+    id: number;
+    idPatrimonio: number;
+    idUser: number;
+    inativo: number;
+    observacao: string;
+    observacaoInativacao: string;
+    responsavel: string;
+    tipoDespesaId: number;
+    valor: number;
+    Patrimonio: Patrimonio;
+    TipoDespesa: TipoDespesa;
+}
+export default function DetalhesDosGastos({ params }: any) {
+    const [isSelected, setIsSelected] = React.useState(false);
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
     const { visibility } = useVisibility()
     const { tokenUsuario } = useToken()
     const Router = useRouter();
     const [dados, setDados] = useState([]);
     console.log("🚀 ~ DetalhesDosGastos ~ dados", dados)
+    const [filtroInativo, setFiltroInativo] = useState('todos');
+    console.log("🚀 ~ DetalhesDosGastos ~ filtroInativo", filtroInativo)
     const [nome, setNome] = useState([]);
     const [filterValue, setFilterValue] = useState("");
-    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-    const [visibleColumns, setVisibleColumns] = useState(new Set(["nomepatrimonio", "nomedespesa", "tipopatrimonio", "valor", "dataaquisicao", "actions"]));
+    const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
+    const [visibleColumns, setVisibleColumns] = useState<string>(new Set(["nomePatrimonio", "nomeDespesa", "tipoPatrimonio", "valor", "dataAquisicao", "actions"]));
     const [statusFilter, setStatusFilter] = useState("all");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [observacao, setObservacao] = useState(false);
-    const [filtroInativo, setFiltroInativo] = useState('todos');
-    const [sortDescriptor, setSortDescriptor] = useState({
+    const [sortDescriptor, setSortDescriptor] = useState<any>({
         column: "age",
         direction: "ascending",
     });
 
     const [message, setMessage] = useState("");
     const [modalInfo, setModalInfo] = useState({ show: false, objeto: null });
+    const [modalDelete, setModalDelete] = useState({ openClose: false, objeto: null });
+    console.log("🚀 ~ DetalhesDosGastos ~ modalDelete", modalDelete)
 
     const [tempoPatrimonio, setTempoPatrimonio] = useState({
         anos: 0,
         meses: 0,
         dias: 0,
     });
-
-
-
-    const calculaTempo = (dataAquisicao: string) => {
-        if (!dataAquisicao) return;
-
-        const dataAquisicaoDate = new Date(dataAquisicao);
-        const hoje = new Date();
-
-        let anos = differenceInYears(hoje, dataAquisicaoDate);
-        let meses = differenceInMonths(hoje, dataAquisicaoDate) - (anos * 12);
-        let dias = differenceInDays(hoje, new Date(dataAquisicaoDate.getFullYear() + anos, dataAquisicaoDate.getMonth() + meses, dataAquisicaoDate.getDate()));
-
-        setTempoPatrimonio({ anos, meses, dias });
-    };
 
 
     const buscaPatrimonios = async () => {
@@ -78,32 +105,15 @@ export default function DetalhesDosGastos({ params }) {
         setDados(response.data);
     };
 
-
-
-    // const buscaPatrimonioNome = async () => {
-    //     if (!email) return;
-    //     const response = await api.get('/buscadespesasdetalhesnome', {
-    //         params,
-    //     });
-    //     setNome(response.data);
-    //     // Calcula o tempo quando o nome do patrimônio for carregado
-    //     if (response.data.length > 0) {
-    //         calculaTempo(response.data[0].dataAquisicao);
-    //     }
-    // };
-
     useEffect(() => {
         buscaPatrimonios();
-    }, [email, nome, filtroInativo]);
+    }, [nome, filtroInativo]);
 
-    const somaDeDespesasPatrimonio = dados && dados.length > 0
-        ? dados.reduce((acc, item) => acc + item.valor, 0)
-        : 0;
 
-    const deleteDespesa = async (idDespesa: number) => {
+    const deleteDespesa = async () => {
         const response = await api.delete('/deletedespesas', {
             params: {
-                id: idDespesa,
+                id: modalDelete.objeto.id,
             },
         });
         if (response.status === 200) {
@@ -117,6 +127,7 @@ export default function DetalhesDosGastos({ params }) {
     };
 
     const [page, setPage] = useState(1);
+    const tempoComPatrimonio = calcularTempo(dados[0]?.Patrimonio?.dataAquisicao)
 
     const hasSearchFilter = Boolean(filterValue);
     const headerColumns = useMemo(() => {
@@ -128,8 +139,14 @@ export default function DetalhesDosGastos({ params }) {
         let filteredUsers = [...dados];
         if (hasSearchFilter) {
             filteredUsers = filteredUsers.filter((item) =>
-                item.nomeDespesa.toLowerCase().includes(filterValue.toLowerCase())
+                item.TipoDespesa.nomeDespesa.toLowerCase().includes(filterValue.toLowerCase())
             );
+        }
+        if (filtroInativo !== 'todos') {
+            const inativoStatus = filtroInativo === 'true' ? 1 : 0;
+            console.log("🚀 ~ filteredItems ~ inativoStatus", inativoStatus)
+
+            filteredUsers = filteredUsers.filter(item => item.inativo === inativoStatus);
         }
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
             filteredUsers = filteredUsers.filter((user) =>
@@ -139,6 +156,12 @@ export default function DetalhesDosGastos({ params }) {
 
         return filteredUsers;
     }, [dados, filterValue, statusFilter, hasSearchFilter]);
+
+
+    const somaDeDespesasPatrimonio = dados && dados.length > 0
+        ? dados.reduce((acc, item) => acc + item.valor, 0)
+        : 0;
+
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
     const items = useMemo(() => {
@@ -156,68 +179,117 @@ export default function DetalhesDosGastos({ params }) {
         });
     }, [sortDescriptor, items]);
 
-    const openObservação = (cellValue) => {
-        setOpenModalObservacao(!openModalObservacao);
-        setObservacao(cellValue);
-    };
+    interface ModalObservacao {
+        despesa: object,
+        valor: number,
+    }
 
-    const confirmaInativacao = async (values) => {
+    const openObservação = (despesa: Despesa, valor: number) => {
+        console.log("🚀 ~ DetalhesDosGastos ~ valor", valor)
+        setOpenModalObservacao(!openModalObservacao);
+        const adicionaValorNasDespesas = {
+            ...despesa,
+            valorOpenModal: valor
+        }
+        setObservacao(adicionaValorNasDespesas);
+    }
+
+    const confirmaInativacao = async (values: any) => {
         console.log("🚀 ~ confirmaInativacao ~ values", values)
 
         const response = await api.put('/inativarpatrimonio', {
-            dados: modalInfo.objeto
+            observacao: values,
+            dados: modalInfo.objeto.id
         })
         buscaPatrimonios();
 
     }
 
-    const renderCell = useCallback((despesa, columnKey) => {
-        const mandaRota = (id) => {
-            Router.push(`/gastoscompatrimonio/${id}`);
-        };
-
+    const renderCell = useCallback((despesa, columnKey: any) => {
         const cellValue = despesa[columnKey];
 
         switch (columnKey) {
             case "actions":
                 return (
-                    <div className="relative flex items-center gap-2">
-                        <Tooltip className="text-black" content='Visualizar'>
-                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <EyeIcon onClick={() => openObservação(despesa)} />
-                            </span>
-                        </Tooltip>
-                        <Tooltip className="text-black" content="Editar">
-                            <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <EditIcon className="text-[#93fad6]" />
-                            </span>
-                        </Tooltip>
-                        {despesa.inativo === 1 ? null :
-                            <Tooltip className="text-black" color="danger" content="Deletar">
-                                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                    <DeleteIcon className="text-red-500" />
-                                </span>
-                            </Tooltip>
+                    <div className="relative flex gap-6 ">
+                        {despesa.inativo === 1 ?
+
+                            <>
+                                <Tooltip className="" content='Mais detalhes'>
+                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                        <MdRemoveRedEye className='text-buttonAzulClaro' onClick={() => openObservação(despesa, 0)} />
+                                    </span>
+                                </Tooltip>
+                                <Tooltip color='warning' content='Motivo Inativação'>
+                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                        <FaMagnifyingGlass onClick={() => openObservação(despesa, 1)} />
+                                    </span>
+                                </Tooltip>
+                            </>
+                            :
+                            <>
+                                <Tooltip className="" content='Mais detalhes'>
+                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                        <MdRemoveRedEye className='text-buttonAzulClaro' onClick={() => openObservação(despesa, 0)} />
+                                    </span>
+                                </Tooltip>
+                                <Tooltip className="" content="Inativar">
+                                    <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                        <ImBlocked className="text-iconeDeBloquiar" />
+                                    </span>
+                                </Tooltip>
+                                <Tooltip className="" color="danger" content="Deletar">
+                                    <span onClick={() => setModalDelete({ openClose: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                        <DeleteIcon className="text-red-500" />
+                                    </span>
+                                </Tooltip>
+                            </>
                         }
 
                     </div>
                 );
-            case "valorPatrimonio":
-                return <p>{currency(despesa.valor)} </p>;
+            case "valor":
+                return <p>{visibility ? currency(despesa.valor) : '****'} </p>;
             case "nomePatrimonio":
                 return <p>{despesa.nomepatrimonio}</p>;
             case "tempo":
-                return <p>Aqui vai o tempo</p>;
+                return <p>{calcularTempo(despesa.dataAquisicao) || "N/A"}</p>;
             case "despesa.TipoDespesa.nomeDespesa":
                 return <p>{despesa.TipoDespesa.nomeDespesa}</p>;
             case "tipopatrimonio":
                 return <p>{despesa.tipopatrimonio}</p>;
             case "dataAquisicao":
-                return <p>{despesa.dataAquisicao}</p>;
+                return <p>{AlteraVisualizacaoData(despesa.dataAquisicao)}</p>;
+            case "inativo":
+                return <p>
+                    {
+                        despesa.inativo === 0 ?
+                            (
+                                <Chip
+                                    startContent={<CheckIcon size={18} />}
+                                    variant="faded"
+                                    color="success"
+                                >
+                                    Ativo
+                                </Chip>
+                            )
+                            :
+                            (
+                                <Chip
+                                    startContent={<CheckIcon size={18} />}
+                                    variant="faded"
+                                    color="danger"
+                                >
+                                    Inativo
+                                </Chip>
+                            )
+                    }
+                </p>
+
             default:
                 return cellValue;
         }
-    }, []);
+    }, [visibility]);
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -236,7 +308,7 @@ export default function DetalhesDosGastos({ params }) {
         setPage(1);
     }, []);
 
-    const onSearchChange = useCallback((value) => {
+    const onSearchChange = useCallback((value: string) => {
         if (value) {
             setFilterValue(value);
             setPage(1);
@@ -250,9 +322,19 @@ export default function DetalhesDosGastos({ params }) {
         setPage(1);
     }, []);
 
+    const filtroPorStatus = useCallback((status: string) => {
+        console.log("🚀 ~ filtroPorStatus ~ status", status)
+
+        const filtro = dados.filter
+    }, []);
+
+
+
+
+
     const headerTable = useMemo(() => {
         return (
-            <div className="flex flex-col gap-4 border-b-2 border-gray-300 pb-4 p-4">
+            <div className="flex flex-col gap-4 p-4">
                 <div className="flex justify-between gap-3 items-end py-4">
                     <div className='flex gap-3 w-full'>
 
@@ -268,34 +350,40 @@ export default function DetalhesDosGastos({ params }) {
                         />
                         <Select
                             className="bg-primaryTable max-w-[200px] text-black"
-                            placeholder="Filtro Inativo"
                             size="md"
+                            placeholder="Todos"
                             value={filtroInativo}
-                            onChange={(e) => setFiltroInativo(e.target.value)}
+                            onChange={(e: any) => setFiltroInativo(e.target.value)}
                         >
-                            <SelectItem value="todos">Todos</SelectItem>
-                            <SelectItem value="true">Inativos</SelectItem>
-                            <SelectItem value="false">Ativos</SelectItem>
+                            <SelectItem key={"todos"} value="todos">Todos</SelectItem>
+                            <SelectItem key={"true"} value={1}>Inativos</SelectItem>
+                            <SelectItem key={"false"} value={0}>Ativos</SelectItem>
                         </Select>
                     </div>
                     <div className="flex gap-3">
-                        <Button fullWidth color="success" variant="solid" endContent={<PlusIcon size={20} />}>
-                            <Link href="/gastosdebens/despesadebem"> Nova Despesa/investimento</Link>
+                        <Button fullWidth color="success" variant="solid" endContent={<PlusIcon width={20} height={20} size={20} />}>
+                            <Link href="/pages/patrimonio/novadespesapatrimonio"> Nova Despesa/investimento</Link>
                         </Button>
                     </div>
+                    <PDFDownloadLink document={<PdfDespesasDebens dadosRelatorios={dados} tempoPatrimonio={tempoComPatrimonio} totalDeGastos={currency(somaDeDespesasPatrimonio)} />} fileName="Despesas Patrimônio " >
+                        {({ blob, url, loading, error }) =>
+                            loading ? 'Loading document...' : <Button className=" bg-buttonAzulClaro text-white" variant="flat" fullWidth>Imprimir</Button>
+                        }
+                    </PDFDownloadLink>
                 </div>
                 <div className="flex justify-between items-center">
-                    <div className='flex flex-col gap-3'>
-                        <span className="text-default-400 text-small font-extrabold">Total {dados.length} despesas/investimentos nesse patrimônio</span>
-                        <span className="text-default-400 text-small font-extrabold ">Total de <span className='text-primaryTableText'>{currency(somaDeDespesasPatrimonio)}</span>  alocados nesse patrimômio</span>
-                        <span className="text-default-400 text-small font-extrabold">
-                            Total de
-                            <span className='text-primaryTableText'>
-                                {tempoPatrimonio.anos > 0 || tempoPatrimonio.meses > 0 || tempoPatrimonio.dias > 0
-                                    ? ` ${tempoPatrimonio.anos} anos, ${tempoPatrimonio.meses} meses e ${tempoPatrimonio.dias} dias `
-                                    : '0 dias '}
-                                com esse patrimônio
-                            </span>
+                    <div className='flex flex-col gap-3 text-default-500 text-small font-extrabold'>
+                        <span >Total {dados.length} despesas/investimentos nesse patrimônio</span>
+                        <span >Total de <span className='text-primaryTableText'>{visibility ? currency(somaDeDespesasPatrimonio) : '****'}
+                        </span>  alocados nesse patrimômio
+                        </span>
+                        <span >
+                            <p>
+                                Tempo com o Patrimônio <span className='text-buttonAzulClaro'>
+                                    {dados[0]?.Patrimonio?.nomePatrimonio}
+                                </span> : {calcularTempo(dados[0]?.Patrimonio?.dataAquisicao)}
+                            </p>
+
                         </span>
                     </div>
                     <label className="flex items-center text-default-400 text-small">
@@ -320,7 +408,8 @@ export default function DetalhesDosGastos({ params }) {
         dados.length,
         onSearchChange,
         hasSearchFilter,
-        tempoPatrimonio // Adicione tempoPatrimonio às dependências
+        visibility,
+        tempoPatrimonio
     ]);
 
     const bottomContent = useMemo(() => {
@@ -341,21 +430,23 @@ export default function DetalhesDosGastos({ params }) {
                     onChange={setPage}
                 />
                 <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                    <ButtonVoltar />
                     <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
                         Previous
                     </Button>
                     <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
                         Next
                     </Button>
+                    <ButtonVoltar
+                        size='sm'
+                    />
                 </div>
             </div>
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
-        <div className="w-full px-4 py-12 ">
-            <Paper elevation={16} className={`p-4 bg-primaryTable text-white`} >
+        <div key={visibility.toString()} className="w-full px-4 py-12 ">
+            <Card className={`p-4 bg-primaryTable text-white`} >
                 <p className="pt-2 text-center font-bold">Detalhes do Patrimômio: <span className='text-buttonAzulClaro'>{dados.length > 0 && dados && dados[0].Patrimonio.nomePatrimonio}</span></p>
                 <Table
                     aria-label="Example table with custom cells, pagination and sorting"
@@ -374,11 +465,12 @@ export default function DetalhesDosGastos({ params }) {
                     onSortChange={setSortDescriptor}
                 >
                     <TableHeader columns={columns}>
+
                         {(column) => (
                             <TableColumn
                                 className="text-primaryTableText font-bold "
                                 key={column.uid}
-                                align={column.uid === "actions" ? "center" : "start"}
+                                align={column.uid === "actions" ? "start" : "start"}
                             >
                                 {column.name}
                             </TableColumn>
@@ -386,13 +478,13 @@ export default function DetalhesDosGastos({ params }) {
                     </TableHeader>
                     <TableBody emptyContent={"Não há investimentos"} items={sortedItems}>
                         {(item) => (
-                            <TableRow className={` ${item.inativo ? 'text-gray-500 ' : 'hover:text-primaryTableText'}`} key={item._id}>
+                            <TableRow className={` ${item.inativo ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item._id}>
                                 {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
-            </Paper>
+            </Card>
             <ModalObservacao
                 open={openModalObservacao}
                 onClose={() => setOpenModalObservacao(false)}
@@ -404,7 +496,13 @@ export default function DetalhesDosGastos({ params }) {
                 observacao={modalInfo.objeto}
                 onSubmit={confirmaInativacao}
             />
+            <ModalDelete
+                isOpen={modalDelete.openClose}
+                onClose={() => setModalDelete({ ...modalDelete, openClose: false })}
+                objeto={modalDelete.objeto}
+                confirmaEsclusao={deleteDespesa}
+            />
         </div>
-    );
+    )
 }
 

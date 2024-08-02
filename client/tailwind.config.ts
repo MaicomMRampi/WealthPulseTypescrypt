@@ -20,7 +20,8 @@ const config: Config = {
         'primaryTableHover': '#10b981',
         'primaryTableText': '#10b981',
         'buttonAzulClaro':'#0284c7',
-        'buttonAzulEscuro':'rgb(30,58,138)'
+        'buttonAzulEscuro':'rgb(30,58,138)',
+        'iconeDeBloquiar':'#eeb70d'
 
       }
     },

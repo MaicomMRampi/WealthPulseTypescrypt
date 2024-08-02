@@ -1,5 +1,5 @@
 import React from "react";
-import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
+import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import currency from "./Currency";
 
 const styles = StyleSheet.create({
@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: "center",
         backgroundColor: "#e6e6e6",
-        border: '1px solid black',
+        // border: '1px solid black',
+        borderRadius: 5,
         padding: 5,
         marginBottom: 5,
     },
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
     assinaturaDiv: {
         display: "flex",
         alignItems: "center",
+        marginTop: 30,
         width: "100%",
     },
     dataDiv: {
@@ -117,16 +119,17 @@ interface Despesa {
     local: string;
     valorGasto: number;
     pagante: string;
+    mesCorrespondente: string;
 }
 
 interface Props {
     despesas: Despesa[];
-    mesano: object;
+    totalFatura: string;
     usuario: any;
 }
 
-const PdfDespesas = ({ despesas, mesano, usuario }: Props) => {
-    console.log("🚀 ~ PdfDespesas ~ emailUser", usuario, mesano, despesas);
+const PdfDespesas = ({ despesas, totalFatura, usuario }: Props) => {
+    console.log("🚀 ~ PdfDespesas ~ despesas", despesas)
 
     const dadosAgrupadosLocal = despesas.reduce((acc: any, item: Despesa) => {
         const { categoria: { nomeCategoria }, valorGasto } = item;
@@ -158,38 +161,26 @@ const PdfDespesas = ({ despesas, mesano, usuario }: Props) => {
 
         return acc;
     }, {});
-
     const arrayAgrupado = Object.values(dadosAgrupados);
 
     return (
         <Document>
             <Page size="A4" style={styles.body}>
                 <Text style={styles.textTittle}>Demonstrativo de Despesas</Text>
-                <View style={styles.header}>
-                    <Text>Mês e Ano da(s) Despesa(s): {mesano}</Text>
-                </View>
-                <View style={styles.table}>
-                    <View style={styles.row}>
-                        <Text style={styles.cell}>Data</Text>
-                        <Text style={styles.cell}>Categoria</Text>
-                        <Text style={styles.cell}>Local</Text>
-                        <Text style={styles.cell}>Valor</Text>
-                    </View>
-                    {despesas.map((despesa: Despesa) => (
-                        <View style={styles.row} key={despesa.id}>
-                            <Text style={styles.cell}>{new Date(despesa.dataGasto).toLocaleDateString()}</Text>
-                            <Text style={styles.cell}>{despesa.categoria.nomeCategoria}</Text>
-                            <Text style={styles.cell}>{despesa.local}</Text>
-                            <Text style={styles.cell}>{currency(despesa.valorGasto)}</Text>
-                        </View>
-                    ))}
-                </View>
+
+                {/* DADOS QUANTITATIVOS */}
                 <View>
                     <Text style={styles.headerQuanti}>Dados Quantitativos:</Text>
                     <View style={styles.rowLocal}>
+                        {despesas.length > 0 ? (
+                            <Text>Mês e Ano da(s) Despesa(s): {despesas[0].mesCorrespondente}</Text>
+                        ) : (
+                            <Text>Não há despesas disponíveis</Text>
+                        )}
                         <Text style={styles.valorTotal}>
-                            VALOR TOTAL: <Text style={styles.textDespesa}>{currency(despesas.reduce((total, despesa) => total + despesa.valorGasto, 0))}</Text>
+                            VALOR FATURA: <Text style={styles.textDespesa}>{currency(despesas.reduce((total, despesa) => total + despesa.valorGasto, 0))}</Text>
                         </Text>
+                        <Text style={styles.headerQuanti}>Locais dos Gastos</Text>
                         {arrayAgrupadoLocal.map((row: any) => (
                             <View style={styles.locals} key={row.categoria}>
                                 <Text>{row.categoria} </Text>
@@ -207,9 +198,35 @@ const PdfDespesas = ({ despesas, mesano, usuario }: Props) => {
                         ))}
                     </View>
                 </View>
+                {/* CRIA A TABELA */}
+                <Text style={styles.headerQuanti}>Detalhes das Despesas</Text>
+                <View style={styles.table}>
+                    <View style={styles.row}>
+                        <Text style={styles.cell}>Id</Text>
+                        <Text style={styles.cell}>Data</Text>
+                        <Text style={styles.cell}>Categoria</Text>
+                        <Text style={styles.cell}>Local</Text>
+                        <Text style={styles.cell}>Valor</Text>
+                    </View>
+                    {despesas.map((despesa: Despesa) => (
+                        <View style={styles.row} key={despesa.id}>
+                            <Text style={styles.cell}>{despesa.id}</Text>
+                            <Text style={styles.cell}>{new Date(despesa.dataGasto).toLocaleDateString()}</Text>
+                            <Text style={styles.cell}>{despesa.categoria.nomeCategoria}</Text>
+                            <Text style={styles.cell}>{despesa.local}</Text>
+                            <Text style={styles.cell}>{currency(despesa.valorGasto)}</Text>
+                        </View>
+                    ))}
+                </View>
+
                 <View style={styles.dataDiv}>
                     <Text>Emitido em: {data}</Text>
                 </View>
+                <View style={styles.assinaturaDiv}>
+                    <Text style={styles.assinatura}>{usuario.nome}</Text>
+                </View>
+
+
                 {/* <View style={styles.assinaturaDiv}><Text style={styles.assinatura}>{usuario.email}</Text></View> */}
                 <View style={styles.footer}>
                     <Text>Relatório emitido por WealthPulse</Text>

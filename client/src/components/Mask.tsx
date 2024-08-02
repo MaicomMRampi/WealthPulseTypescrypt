@@ -1,4 +1,4 @@
-function cpfMask(cpf) {
+function cpfMask(cpf: string) {
     if (cpf) {
         cpf = cpf.replace(/\D/g, '') // remove caracteres não numéricos
         cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2') // adiciona ponto após o terceiro dígito
@@ -9,24 +9,20 @@ function cpfMask(cpf) {
     return cpf
 }
 
-
-function valorMask(valor) {
-    console.log('valor', valor);
+function valorMask(valor: string) {
     if (valor) {
         valor = valor.replace(/\D/g, ''); // remove caracteres não numéricos
-        valor = (parseInt(valor) / 100).toFixed(2) + ''; // divide por 100 e fixa duas casas decimais
+        valor = (parseInt(valor) / 100).toFixed(2); // divide por 100 e fixa duas casas decimais
         valor = valor.replace('.', ','); // substitui o ponto pela vírgula
         valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.'); // adiciona ponto a cada três dígitos
-
     }
 
-    console.log("🚀 ~ valorMask ~ valor", valor);
     return valor;
 }
 
 
 
-function formatarNumero(numeroStr) {
+function formatarNumero(numeroStr: any) {
     // Remove caracteres não numéricos
     numeroStr = numeroStr.replace(/\D/g, '');
 

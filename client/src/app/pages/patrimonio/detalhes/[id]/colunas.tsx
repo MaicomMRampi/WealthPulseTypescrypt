@@ -15,7 +15,7 @@ const columns = [
         sortable: true,
     },
     {
-        name: "Data de Aquisição",
+        name: "Data Cadastro",
         uid: "dataAquisicao",
         sortable: true,
     },
@@ -25,14 +25,14 @@ const columns = [
         sortable: true,
     },
     {
-        name: "Inativo",
+        name: "Status",
         uid: "inativo",
         sortable: true,
     },
     {
         name: "Ações",
         uid: "actions",
-        align: "center",
+        align: "end",
     },
 ];
 

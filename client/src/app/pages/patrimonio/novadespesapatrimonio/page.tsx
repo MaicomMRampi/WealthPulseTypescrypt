@@ -15,6 +15,8 @@ import { initialValues, validationSchema } from "./novaDespesaPatrForm";
 import useToken from "@/components/hooks/useToken";
 import ButtonVoltar from "@/components/ButtonVoltar";
 import Link from "next/link";
+import TitlePage from "@/components/tituloPaginas";
+import { useRouter } from "next/navigation";
 
 
 export default function App() {
@@ -29,14 +31,14 @@ export default function App() {
     const [open, setOpen] = useState(false);
     const [tipobem, setTipoBem] = useState([]);
     const { tokenUsuario } = useToken()
-    const email = 'MAICOM.MATEUS@YAHOO.COM.BR'
+    const router = useRouter()
 
 
-    const buscaPatrimonios = async (email: string) => {
+    const buscaPatrimonios = async () => {
         try {
             const response = await api.get(`/buscabem`, {
                 params: {
-                    email: email
+                    id: tokenUsuario?.id
                 }
             });
             setDados(response.data);
@@ -46,11 +48,11 @@ export default function App() {
 
         }
     };
-    const buscaTipoDespesa = async (email: string) => {
+    const buscaTipoDespesa = async () => {
         try {
             const response = await api.get(`/buscatipodespesa`, {
                 params: {
-                    email: email
+                    id: tokenUsuario?.id
                 }
             });
             setDadosDespesas(response.data);
@@ -62,11 +64,9 @@ export default function App() {
     };
 
     useEffect(() => {
-        if (email) {
-            buscaPatrimonios(email);
-            buscaTipoDespesa(email);
-        }
-    }, [email]);
+        buscaPatrimonios();
+        buscaTipoDespesa();
+    }, []);
 
     const handleSubmit = async (values: object) => {
         const response = await api.post(`/despesadeconsumo`, {
@@ -79,6 +79,7 @@ export default function App() {
             setTimeout(() => {
                 setMessage('')
                 setOpen(false)
+                router.push('/pages/patrimonio/listapatrimonio')
 
             }, 2000)
         }
@@ -92,7 +93,7 @@ export default function App() {
         try {
             const response = await api.post(`/novotipodespesa`, {
                 value,
-                email
+                id: tokenUsuario?.id
             });
             if (response.status === 200) {
                 setMessageTipoDespesa('success')
@@ -101,10 +102,9 @@ export default function App() {
                     setMessageTipoDespesa('')
                     setMessageDespesa('')
                     setOpenModal(false)
-                    buscaTipoDespesa(email)
+                    buscaTipoDespesa()
                 }, 2000)
             }
-            console.log("🚀 ~ novoTipoDespesa ~ response", response);
         } catch (error) {
             setMessageTipoDespesa('error')
             setMessageDespesa('Erro ao Cadastrar Tipo de Despesa')
@@ -113,7 +113,6 @@ export default function App() {
                 setMessageDespesa('')
                 setOpenModal(false)
             }, 2000)
-            console.error("🚀 ~ novoTipoDespesa ~ error", error);
         }
     }
 
@@ -137,7 +136,7 @@ export default function App() {
                 }) => (
                     <form onSubmit={handleSubmit}>
                         <div className="w-[90%] mx-auto">
-                            <h2 className="text-3xl text-center font-bold py-8">Despesa de Bem</h2>
+                            <TitlePage title="Despesa de Bem" />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <Select
                                     name='nomepatrimonio'
@@ -295,7 +294,6 @@ export default function App() {
             </Formik >
             <ModalAddTipoDespesa
                 isOpen={openModal}
-                objetoInvestimento={'fds'}
                 onClose={() => setOpenModal(false)}
                 onSubmit={novoTipoDespesa}
                 message={messageDespesa}

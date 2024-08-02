@@ -76,22 +76,22 @@ model DespesaDeBens {
 }
 
 model Despesas {
-  id                 Int      @id @default(autoincrement())
+  id                 Int             @id @default(autoincrement())
   idUser             Int
-  dataGasto          DateTime @default(now())
+  dataGasto          DateTime        @default(now())
   local              String?
   formaDePagamentoId Int
   valorGasto         Float
   responsavel        String
   categoriaId        Int
   pagante            String
-  fechada            Int      @default(0)
+  fechada            Int             @default(0)
   observacao         String?
   mesCorrespondente  String
-
-  categoria        Categoria       @relation(fields: [categoriaId], references: [id])
-  FormaPagamento   FormaPagamento? @relation(fields: [formaDePagamentoId], references: [id])
-  formaPagamentoId Int?
+  dataAquisicao      String
+  categoria          Categoria       @relation(fields: [categoriaId], references: [id])
+  FormaPagamento     FormaPagamento? @relation(fields: [formaDePagamentoId], references: [id])
+  formaPagamentoId   Int?
 }
 
 model Dividendo {

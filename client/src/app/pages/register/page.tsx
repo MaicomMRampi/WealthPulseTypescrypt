@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { validationSchema, initialValues } from './registerForm';
 import { api } from '@/lib/api';
 import Link from 'next/link';
+import { Alert } from '@mui/material';
 
 interface FormValues {
     nome: string;
@@ -18,7 +19,7 @@ interface FormValues {
 
 export default function SignUp() {
     const [message, setMessage] = useState<any>('');
-    const [messageTipo, setMessageTipo] = useState('');
+    const [messageTipo, setMessageTipo] = useState<string>('');
     const router = useRouter();
 
     const handleSubmit = async (values: FormValues) => {
@@ -29,7 +30,7 @@ export default function SignUp() {
                 setMessageTipo("success");
                 setTimeout(() => {
                     setMessage("");
-                    router.push('/login');
+                    router.push('/pages/login');
                 }, 4000);
             } else {
                 setMessage("Erro ao Criar Usuário");
@@ -45,7 +46,7 @@ export default function SignUp() {
     };
 
     return (
-        <div className="w-full min-h-screen bg-cover bg-[url('/imagens/register2.png')] flex justify-center items-center">
+        <div className="w-full min-h-screen bg-cover bg-[url('/imagens/register2.png')] flex  xs:justify-center items-center  md:justify-end md:items-center md:pr-32">
             <div className="p-8 rounded-lg shadow-lg w-full max-w-md">
                 <Formik
                     initialValues={initialValues}
@@ -140,10 +141,15 @@ export default function SignUp() {
                                 >
                                     Cadastrar
                                 </Button>
+                                <div>
+                                    {message ? (
+                                        <Alert severity={messageTipo}>{message}</Alert>
+                                    ) : null}
+                                </div>
 
                                 <div className="grid grid-cols-1 gap-2">
                                     <div className="text-left">
-                                        <Link href="/login">Já possui uma conta? Entre aqui</Link>
+                                        <Link href="/pages/login">Já possui uma conta? Entre aqui</Link>
                                     </div>
                                 </div>
                             </div>
