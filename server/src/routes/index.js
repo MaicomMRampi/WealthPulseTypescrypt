@@ -2,7 +2,6 @@ const router = require('express').Router()
 const dbConnect = require('../utils/dbConnect')
 const UsuariosSchema = require('../models/usuarios  OK')
 const InvestimentosFiiSchema = require('../models/investimentosfii OK')
-const DespesaSchema = require('../models/despesas OK')
 const ControleContasSchema = require('../models/controleContas OK')
 const DividendosSchema = require('../models/dividendos OK')
 const { crypto } = require('../utils/password')
@@ -1157,32 +1156,6 @@ router.get('/api/buscadespesamesatual', async (req, res) => {
     }
 });
 
-// router.get('/api/buscadespesamesatualhome', async (req, res) => {
-//     try {
-//         const email = req.query.email.email;
-
-//         const user = await prisma.usuario.findUnique({ where: { email: email } });
-
-//         if (!user) {
-//             return res.status(404).json({ message: 'Usuário não encontrado' });
-//         }
-
-//         const mesAtual = new Date();
-//         const mes = mesAtual.getMonth() + 1;
-//         const ano = mesAtual.getFullYear();
-//         const iniciaPadraoData = `${mes}/${ano}`;
-
-//         const buscaDespesa = await prisma.despesas.findMany({
-//             where: { mesAno: iniciaPadraoData, idUser: user.id.toString() },
-//         });
-
-//         res.json(buscaDespesa);
-//     } catch (error) {
-//         console.error("Erro ao buscar usuário:", error);
-//         res.status(500).json({ error: "Erro interno do servidor" });
-//     }
-// });
-
 router.post('/api/buscadespesadata', async (req, res) => {
     try {
         const { data } = req.body;
@@ -1299,53 +1272,64 @@ router.post('/api/fecharfatura', async (req, res) => {
 
 //======================Controle de Contas===================================
 router.post('/api/novaconta', async (req, res) => {
-    await dbConnect()
+
     const nome = req.body
-    const { empresa, datagasto, parcelamento, valorconta, vencimento, formadepagamento } = req.body.values
-    const valorContaConvertido = converteString(valorconta)
-    const emailUser = req.body.emailUser
-    const retornaId = await UsuariosSchema.findOne({ email: emailUser })
-    const idUser = retornaId._id
-    const nomeUppercase = empresa.toUpperCase().trim()
+    console.log("🚀 ~ router.post ~ nome", nome)
+    console.log("🚀 ~ router.post ~ nome", nome.dados.qtdparcelas)
+    const dataFormata = formatDate(nome.dados.datavencimento)
 
-
-    const dataConta = new Date(datagasto);
-    const dia = dataConta.getDate();
-    const mes = dataConta.getMonth() + 1;
-    const ano = dataConta.getFullYear();
-    const dataContaFormatada = `${dia}/${mes}/${ano}`;
+    let dataVencimento = new Date(dataFormata); // Inicia com a data de vencimento original
+    const diaVenc = dataVencimento.getDate();
+    const mesVenc = dataVencimento.getMonth() + 1;
+    const anoVenc = dataVencimento.getFullYear();
+    const dataVencimentoFormatada = `${anoVenc}/${mesVenc < 10 ? `0${mesVenc}` : mesVenc}/${diaVenc}`;
+    const mes_ano = `${anoVenc}-${mesVenc < 10 ? `0${mesVenc}` : mesVenc}`;
 
     try {
-        let dataVencimento = new Date(vencimento); // Inicia com a data de vencimento original
-        for (let i = 0; i < parcelamento; i++) {
-            const diaVenc = dataVencimento.getDate();
-            const mesVenc = dataVencimento.getMonth() + 1;
-            const anoVenc = dataVencimento.getFullYear();
-            const dataVencimentoFormatada = `${diaVenc}/${mesVenc}/${anoVenc}`;
-            const mes_ano = `${mesVenc}/${anoVenc}`;
 
-            const novaConta = new ControleContasSchema({
-                idUser,
-                empresa: nomeUppercase,
-                datagasto: dataContaFormatada,
-                vencimento: dataVencimentoFormatada,
-                parcelamento,
-                valorconta: valorContaConvertido,
-                formadepagamento,
-                mesano: mes_ano,
-                pago: false,
-                emailuser: emailUser
-            });
+        if (nome.dados.qtdparcelas < 2 || nome.dados.qtdparcelas === undefined) {
 
-            const salvaForma = await novaConta.save();
+            const novaConta = await prisma.Contas.create({
+                data: {
+                    idUser: parseInt(nome.idUsuario),
+                    estabelecimento: nome.dados.estabelecimento.toUpperCase().trim(),
+                    comprador: nome.dados.comprador,
+                    pagador: nome.dados.pagador,
+                    valor: converteString(nome.dados.valor),
+                    dataVencimento: dataFormata,
+                    qtdParcelas: nome.dados.qtdparcelas ? parseInt(nome.dados.qtdparcelas) : null,
+                    mesCorrespondente: mes_ano
+                }
+            })
+        } else {
 
-            // Incrementa para o próximo mês de vencimento
-            dataVencimento.setMonth(dataVencimento.getMonth() + 1);
+            for (let i = 0; i < nome.dados.qtdparcelas; i++) {
+                const diaVenc = dataVencimento.getDate();
+                const mesVenc = dataVencimento.getMonth() + 1;
+                const anoVenc = dataVencimento.getFullYear();
+                const dataVencimentoFormatada = `${anoVenc}/${mesVenc < 10 ? `0${mesVenc}` : mesVenc}/${diaVenc}`;
+                const mes_ano = `${anoVenc}-${mesVenc < 10 ? `0${mesVenc}` : mesVenc}`;
 
-            // Se for o último mês do ano, avança para o próximo ano e mês 1 (janeiro)
-            if (mesVenc === 12) {
-                dataVencimento.setFullYear(anoVenc + 1);
-                dataVencimento.setMonth(0); // Janeiro é representado pelo mês 0
+                const novaConta = await prisma.Contas.create({
+                    data: {
+                        idUser: parseInt(nome.idUsuario),
+                        estabelecimento: nome.dados.estabelecimento.toUpperCase().trim(),
+                        comprador: nome.dados.comprador,
+                        pagador: nome.dados.pagador,
+                        valor: converteString(nome.dados.valor),
+                        dataVencimento: dataVencimentoFormatada,
+                        qtdParcelas: nome.dados.qtdparcelas ? parseInt(nome.dados.qtdparcelas) : null,
+                        mesCorrespondente: mes_ano
+                    }
+                })
+                // Incrementa para o próximo mês de vencimento
+                dataVencimento.setMonth(dataVencimento.getMonth() + 1);
+
+                // Se for o último mês do ano, avança para o próximo ano e mês 1 (janeiro)
+                if (mesVenc === 12) {
+                    dataVencimento.setFullYear(anoVenc + 1);
+                    dataVencimento.setMonth(0); // Janeiro é representado pelo mês 0
+                }
             }
         }
 
@@ -1357,117 +1341,62 @@ router.post('/api/novaconta', async (req, res) => {
 
 });
 router.get('/api/buscaconta', async (req, res) => {
-    await dbConnect();
-    const { email } = req.query; // Use req.query para obter parâmetros da URL
 
+    const id = req.query.id
+    console.log("🚀 ~ router.get busca conta ~ id", id)
     try {
-        // Verifique se o email é fornecido
-        if (!email) {
-            return res.status(400).json({ message: 'O parâmetro "email" é obrigatório' });
-        }
-
-        // Busque o usuário pelo email
-        const usuario = await UsuariosSchema.findOne({ email: email.email });
-
-
-        if (!usuario) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-        const buscaDespesa = await ControleContasSchema.find({ idUser: usuario._id }).sort(({ mesano: 1 }))
-
-        res.json(buscaDespesa)
-
+        const buscaConta = await prisma.Contas.findMany({
+            where: {
+                idUser: parseInt(id)
+            }
+        })
+        console.log("🚀 ~ router.get ~ buscaDespesa", buscaConta)
+        res.json(buscaConta)
     } catch (error) {
         console.error('Erro ao buscar despesas:', error);
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
-
-
-
-
-
-
 });
 router.get('/api/buscacontamesatual', async (req, res) => {
-    await dbConnect();
-    const { email } = req.query; // Use req.query para obter parâmetros da URL
+    const id = req.query.id
+    console.log("🚀 ~ router.get ~ id conta mes atual ", id)
     try {
-        // Verifique se o email é fornecido
-        if (!email) {
-            return res.status(400).json({ message: 'O parâmetro "email" é obrigatório' });
-        }
-
-        // Busque o usuário pelo email
-        const usuario = await UsuariosSchema.findOne({ email: email.email });
-
-        if (!usuario) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-
         const mesAtual = new Date();
         const mes = mesAtual.getMonth() + 1;
         const ano = mesAtual.getFullYear();
-        const iniciaPadraoData = `${mes}/${ano}`;
+        const iniciaPadraoData = `${ano}-${mes < 10 ? `0${mes}` : mes}`;
 
-        // Busque as despesas do usuário para o mês atual
-        const buscaDespesa = await ControleContasSchema.find({ mesano: iniciaPadraoData, usuarioId: usuario._id });
-        res.json(buscaDespesa);
+        console.log("🚀 ~ router.get ~ iniciaPadraoData", iniciaPadraoData)
+        const buscaConta = await prisma.Contas.findMany({
+            where: {
+                idUser: parseInt(id),
+                mesCorrespondente: iniciaPadraoData
+            }
+        })
+        console.log("🚀 ~ router.get ~ buscaConta", buscaConta)
+
+        res.json(buscaConta);
     } catch (error) {
         console.error('Erro ao buscar despesas:', error);
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
-router.get('/api/buscacontamesatualhome', async (req, res) => {
-    await dbConnect();
-    const email = req.query.email // Use req.query para obter parâmetros da URL    
-    try {
-        // Verifique se o email é fornecido
-        if (!email) {
-            return res.status(400).json({ message: 'O parâmetro "email" é obrigatório' });
-        }
 
-        // Busque o usuário pelo email
-        const usuario = await UsuariosSchema.findOne({ email: email });
-
-        if (!usuario) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-
-        const mesAtual = new Date();
-        const mes = mesAtual.getMonth() + 1;
-        const ano = mesAtual.getFullYear();
-        const iniciaPadraoData = `${mes}/${ano}`;
-
-        // Busque as despesas do usuário para o mês atual
-        const buscaDespesa = await ControleContasSchema.find({ mesano: iniciaPadraoData, idUser: usuario._id });
-        console.log("🚀 ~ router.get ~ buscaDespesa:", buscaDespesa)
-        res.json(buscaDespesa);
-    } catch (error) {
-        console.error('Erro ao buscar despesas:', error);
-        res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-});
 router.post('/api/buscacontadata', async (req, res) => {
-    await dbConnect();
 
+    const dados = req.body
+    console.log("🚀 ~ router.post ~ buscacontadata", dados)
     try {
+        const buscaConta = await prisma.Contas.findMany({
+            where: {
+                idUser: parseInt(dados.id),
+                mesCorrespondente: dados.data
+            }
+        })
 
-        const { data } = req.body;
-        const emailUser = req.body.emailUser.email
-
-        // Busque o usuário pelo email
-        const usuario = await UsuariosSchema.findOne({ email: emailUser });
-
-        if (!usuario) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-
-
-
-        const buscaDespesa = await ControleContasSchema.find({ mesano: data, idUser: usuario._id });
-        res.json(buscaDespesa);
+        res.json(buscaConta);
     } catch (error) {
-        console.error('Erro ao buscar despesas por data:', error);
+        console.error('Erro ao buscar despesas:', error);
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });

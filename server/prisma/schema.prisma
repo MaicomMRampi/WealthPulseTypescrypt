@@ -42,18 +42,17 @@ model Categoria {
   despesas      Despesas[] // Relação com Despesas
 }
 
-model ControleDeContas {
-  id               Int      @id @default(autoincrement())
-  idUser           Int
-  empresa          String
-  dataGasto        DateTime
-  vencimento       DateTime
-  parcelamento     Int
-  valorConta       Decimal
-  formaDePagamento String
-  pago             Boolean  @default(false)
-  mesAno           String
-  emailUser        String
+model Contas {
+  id                Int    @id @default(autoincrement())
+  idUser            Int
+  estabelecimento   String
+  comprador         String
+  pagador           String
+  valor             Float
+  dataVencimento    String
+  qtdParcelas       Int?
+  pago              Int?   @default(0)
+  mesCorrespondente String
 }
 
 model DespesaDeBens {

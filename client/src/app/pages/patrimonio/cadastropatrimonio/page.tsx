@@ -13,13 +13,7 @@ import { I18nProvider } from '@react-aria/i18n'
 import { Alert } from "@mui/material";
 import TitlePage from "@/components/tituloPaginas";
 import { useRouter } from "next/navigation";
-import formatarParaBackend from "@/components/funcoes/formataValorParaBack";
-
-const patrimonios = [
-    { id: '1', nome: 'Imóvel' },
-    { id: '3', nome: 'Veículo' },
-    { id: '4', nome: 'Outros' },
-];
+import patrimonios from "./tipoPatrimonio";
 
 export default function App() {
     const router = useRouter()
