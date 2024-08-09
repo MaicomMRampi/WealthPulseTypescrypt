@@ -1341,16 +1341,13 @@ router.post('/api/novaconta', async (req, res) => {
 
 });
 router.get('/api/buscaconta', async (req, res) => {
-
     const id = req.query.id
-    console.log("🚀 ~ router.get busca conta ~ id", id)
     try {
         const buscaConta = await prisma.Contas.findMany({
             where: {
                 idUser: parseInt(id)
             }
         })
-        console.log("🚀 ~ router.get ~ buscaDespesa", buscaConta)
         res.json(buscaConta)
     } catch (error) {
         console.error('Erro ao buscar despesas:', error);
@@ -1383,9 +1380,7 @@ router.get('/api/buscacontamesatual', async (req, res) => {
 });
 
 router.post('/api/buscacontadata', async (req, res) => {
-
     const dados = req.body
-    console.log("🚀 ~ router.post ~ buscacontadata", dados)
     try {
         const buscaConta = await prisma.Contas.findMany({
             where: {
@@ -1400,35 +1395,35 @@ router.post('/api/buscacontadata', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
+
+
+
+
+
 router.put('/api/pagaconta', async (req, res) => {
-    const { data } = req.body;
-
     try {
-        await dbConnect();
+        const idConta = req.body
+        console.log("🚀 ~ router.put ~ idConta", idConta.id)
+        const buscaConta = await prisma.Contas.findUnique({
+            where: {
+                id: parseInt(idConta.id)
+            }
+        })
 
-        // Buscar a conta atual no banco de dados
-        const contaAtual = await ControleContasSchema.findById(data);
-
-        // Verificar se a conta existe
-        if (!contaAtual) {
-            return res.status(404).json({ message: 'Conta não encontrada' });
-        }
-
-        // Inverter o valor de 'pago' (true para false e vice-versa)
-        const novoValorPago = !contaAtual.pago;
-
-        // Atualizar o campo 'pago' no banco de dados
-        const buscaConta = await ControleContasSchema.findByIdAndUpdate(
-            data,
-            { pago: novoValorPago },
-            { new: true }
-        );
-
-        res.status(200).json({ message: 'Pagamento realizado com sucesso' });
+        const atualizaPagamento = await prisma.Contas.update({
+            where: {
+                id: parseInt(idConta.id)
+            },
+            data: {
+                pago: buscaConta.pago === 0 ? 1 : buscaConta.pago === 1 ? 0 : null
+            }
+        })
+        res.status(200).json("pago")
     } catch (error) {
-        console.error('Erro ao buscar despesas por data:', error);
-        res.status(500).json({ message: 'Erro interno do servidor' });
+        console.lof(error)
     }
+
+
 });
 router.delete('/api/deletaConta', async (req, res) => {
     try {
@@ -1444,6 +1439,51 @@ router.delete('/api/deletaConta', async (req, res) => {
 //=========================================================
 
 
+// controle de orçamento mensal 
+router.post('/api/controleorcamento', async (req, res) => {
+    const dados = req.body
+    console.log("🚀 ~ router.post ~ dados", dados.data)
+
+    const buscaContas = await prisma.Contas.findMany({
+        where: {
+            idUser: parseInt(dados.id),
+            mesCorrespondente: dados.data
+        },
+        select: {
+            valor: true
+        }
+    })
+
+    const buscaDespesas = await prisma.Despesas.findMany({
+        where: {
+            idUser: parseInt(dados.id),
+            mesCorrespondente: dados.data
+        },
+        select: {
+            valorGasto: true
+        }
+    })
+    console.log("🚀 ~ router.post ~ buscaDespesas", buscaDespesas)
+    const buscaControleUsuario = await prisma.Usuario.findUnique({
+        where: {
+            id: parseInt(dados.id)
+        },
+        select: {
+            valorOrcamentoMensal: true
+        }
+    })
+    const sumValues = (array) => array.reduce((acc, item) => acc + item.valor || item.valorGasto, 0);
+    const totalDespesa = sumValues(buscaDespesas)
+    console.log("🚀 ~ router.post ~ totalDespesa", totalDespesa)
+    const totalContas = sumValues(buscaContas)
+    console.log("🚀 ~ router.post ~ totalContas", totalContas)
+    const orcamentoUsuario = buscaControleUsuario?.valorOrcamentoMensal
+
+    const porcentagem = Math.round(((totalDespesa + totalContas) / orcamentoUsuario) * 100)
+    console.log("🚀 ~ router.post ~ buscaContas", porcentagem)
+
+    res.json(porcentagem)
+});
 
 //==========================================
 

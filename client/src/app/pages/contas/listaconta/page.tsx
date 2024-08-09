@@ -23,6 +23,7 @@ import currency from "@/components/Currency";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import PdfDespesas from "@/components/PdfDespesas";
+import { BsInfoCircle } from "react-icons/bs";
 import ModalObservacao from "@/components/despesaComponents/ModalObservacao";
 import columns from "./data";
 import { format } from 'date-fns';
@@ -43,7 +44,19 @@ import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData"
 import ButtonVoltar from "@/components/ButtonVoltar";
 import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
 import { CheckIcon } from "../../patrimonio/detalhes/[id]/CheckIcon";
-export default function MinhasDespesas() {
+import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
+import { MdOutlinePayments } from "react-icons/md";
+
+
+export default function MinhasContas() {
+    const dataAtual = new Date()
+    const mesVenc = dataAtual.getMonth() + 1;
+    const anoVenc = dataAtual.getFullYear();
+    const dataInicioControle = `${anoVenc}-${mesVenc < 10 ? `0${mesVenc}` : mesVenc}`;
+
+    const [dataControleMensal, setDataControleMensal] = useState<string>(dataInicioControle);
+    const [orcamentoMensal, setOrcamentoMensal] = useState<string>("");
+    console.log("🚀 ~ MinhasContas ~ orcamentoMensal", orcamentoMensal)
     const [message, setMessage] = useState()
     const [mesFatura, setMesFatura] = useState<string>();
     const [opemModalFatura, setOpenModalFatura] = useState(false);
@@ -93,6 +106,20 @@ export default function MinhasDespesas() {
     }, []);
 
 
+    useEffect(() => {
+        const fetchOrcamento = async () => {
+            try {
+                const resultado = await orcamentoMensalControle(dataControleMensal, tokenUsuario?.id);
+                setOrcamentoMensal(resultado);
+            } catch (error) {
+                console.error("Erro ao buscar o orçamento mensal:", error);
+            }
+        };
+
+        fetchOrcamento();
+    }, [dataControleMensal, Despesa]);
+
+
     const opemModalFechaFatura = (mes: string) => {
         console.log("🚀 ~ opemModalFechaFatura ~ mes", mes)
         setMesFatura(mes)
@@ -118,15 +145,31 @@ export default function MinhasDespesas() {
     //     }
     // }
 
-
-
     const handleDataSelect = async (data: string) => {
+        setDataControleMensal(data);
         const response = await api.post(`/buscacontadata`, {
             data: data,
             id: tokenUsuario?.id,
         });
         setDespesaSelect(response.data);
     };
+
+
+    const pagamento = async (id, mesCorrespondente: any) => {
+        const response = await api.put(`/pagaconta`, {
+            id: id
+        });
+
+        handleDataSelect(mesCorrespondente);
+        if (response.status === 200) {
+            handleDataSelect(mesCorrespondente);
+        }
+    };
+
+
+
+
+
 
     const dadosAgrupados = Despesa
         ? Despesa.reduce((acc, item) => {
@@ -266,6 +309,11 @@ export default function MinhasDespesas() {
                                 <EyeIcon />
                             </span>
                         </Tooltip>
+                        <Tooltip className="bg-buttonAzulClaro text-white" content="Fazer o Pagamento?">
+                            <span onClick={() => pagamento(despesa.id, despesa.mesCorrespondente)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                <MdOutlinePayments className="text-buttonAzulClaro" />
+                            </span>
+                        </Tooltip>
                         <Tooltip className="" content="Editar">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EditIcon className="text-[#93fad6]" />
@@ -329,6 +377,7 @@ export default function MinhasDespesas() {
         return (
             <div className="flex flex-col gap-4  pb-4 p-4" >
                 <div className="flex justify-between gap-3 items-end py-4 w-full">
+                    <p>{JSON.stringify(orcamentoMensal)}</p>
                     <Input
                         size="md"
                         fullWidth
@@ -357,20 +406,29 @@ export default function MinhasDespesas() {
                         </Button>
                     </div>
                 </div>
-                <Progress
-                    size="sm"
-                    radius="sm"
-                    classNames={{
-                        base: "max-w-md",
-                        track: "drop-shadow-md border border-default",
-                        indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
-                        label: "text-white",
-                        value: "text-white",
-                    }}
-                    label="Controle de orçamento"
-                    value={80}
-                    showValueLabel={true}
-                />
+                <div className="flex gap-4 items-center">
+                    <Progress
+                        size="sm"
+                        radius="sm"
+                        classNames={{
+                            base: "max-w-md",
+                            track: "drop-shadow-md border border-default",
+                            indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
+                            label: "text-white",
+                            value: "text-white",
+                        }}
+                        label="Controle de orçamento"
+                        value={parseInt(orcamentoMensal)}
+                        showValueLabel={true}
+                    />
+                    <Tooltip color="warning" content="Soma entre despesas e contas" placement="right-end">
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <BsInfoCircle />
+                        </span>
+                    </Tooltip>
+
+
+                </div>
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col gap-1">
                         <span className="text-default-400 text-small font-extrabold">
@@ -392,7 +450,7 @@ export default function MinhasDespesas() {
                         </select>
                     </label>
                 </div>
-            </div>
+            </div >
         );
     }, [
         filterValue,
@@ -400,6 +458,7 @@ export default function MinhasDespesas() {
         DespesaSelect.length,
         onSearchChange,
         hasSearchFilter,
+        Despesa
 
     ]);
 
@@ -440,7 +499,7 @@ export default function MinhasDespesas() {
 
     return (
         <>
-            <div key={visibility} className="w-[95%] m-auto" >
+            <div className="w-[95%] m-auto" >
                 <TitlePage title="Minhas Contas" />
                 <div className="w-full grid grid-cols-1 md:grid-cols-12 pt-6">
                     <div className="col-span-2 justify-center" >
@@ -509,6 +568,7 @@ export default function MinhasDespesas() {
                     <div className="col-span-10 px-6 bg-primaryTable rounded-lg">
                         {headerTable}
                         <Table
+                            key={visibility}
                             aria-label="Example table with custom cells"
                             selectionMode="none"
                             classNames={{
