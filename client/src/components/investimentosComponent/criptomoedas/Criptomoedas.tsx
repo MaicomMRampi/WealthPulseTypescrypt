@@ -13,7 +13,7 @@ import { I18nProvider } from '@react-aria/i18n'
 import { Alert } from "@mui/material";
 import TitlePage from "@/components/tituloPaginas";
 import { useRouter } from "next/navigation";
-import patrimonios from "./tipoPatrimonio";
+
 
 export default function App() {
     const router = useRouter()
@@ -47,6 +47,43 @@ export default function App() {
 
     };
 
+    const titulos = [
+        {
+            tipo: 'Tesouro Direto',
+            nome: 'Tesouro Selic 2024',
+            vencimento: '2024-07-01',
+            taxaJuros: 'Selic + 0.10%',
+            valorMinimo: 1000,
+        },
+        {
+            tipo: 'CDB',
+            nome: 'CDB Banco XYZ',
+            vencimento: '2026-12-31',
+            taxaJuros: '120% do CDI',
+            valorMinimo: 5000,
+        },
+        {
+            tipo: 'LCI',
+            nome: 'LCI Banco ABC',
+            vencimento: '2025-09-30',
+            taxaJuros: '95% do CDI',
+            valorMinimo: 3000,
+        },
+        {
+            tipo: 'LCA',
+            nome: 'LCA Banco DEF',
+            vencimento: '2027-01-15',
+            taxaJuros: '100% do CDI',
+            valorMinimo: 2000,
+        },
+        {
+            tipo: 'Debênture',
+            nome: 'Debênture XYZ 2028',
+            vencimento: '2028-05-20',
+            taxaJuros: 'IPCA + 5.5%',
+            valorMinimo: 10000,
+        },
+    ];
 
 
     return (
@@ -66,45 +103,28 @@ export default function App() {
                     touched,
                 }: any) => (
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
-
                         <Input
                             fullWidth
-                            name="nomeFundo"
-                            label="Nome do Fundo"
-                            value={values.nomeFundo}
+                            name="nomeCripto"
+                            label="Nome da Criptomoeda"
+                            value={values.nomeCripto}
                             onChange={handleChange}
                         />
                         <Input
                             fullWidth
-                            name="quantidadeCotas"
-                            label="Quantidade de Cotas"
-                            value={values.quantidadeCotas}
+                            name="quantidadeCripto"
+                            label="Quantidade"
+                            value={values.quantidadeCripto}
                             onChange={handleChange}
                         />
-
                         <Input
                             fullWidth
-                            name="precoCota"
-                            label="Preço de Compra por Cota"
-                            value={values.valor}
-                            isInvalid={errors.valor && touched.valor}
-                            onBlur={handleChange}
-                            onChange={(event) => {
-                                const { name, value } = event.target;
-                                if (name === 'valor') {
-                                    const maskedValue = valorMask(value);
-                                    setFieldValue(name, maskedValue);
-                                } else {
-                                    setFieldValue(name, value);
-                                }
-                            }}
-                            startContent={
-                                <div className="pointer-events-none flex items-center">
-                                    <span className="text-white text-small">R$</span>
-                                </div>
-                            }
+                            name="precoCompra"
+                            label="Preço de Compra"
+                            value={values.precoCompra}
+                            onChange={handleChange}
+                            startContent={<span className="text-white text-small">R$</span>}
                         />
-
                         <I18nProvider locale="pt-BR">
                             <DatePicker
                                 name="dataCompra"
@@ -112,33 +132,7 @@ export default function App() {
                                 onChange={(val) => setFieldValue("dataCompra", val)}
                             />
                         </I18nProvider>
-
-
-
-                        {/* <input type="date" name="dataaquisicao" onChange={e => setFieldValue('dataaquisicao', e.target.value)} /> */}
-
-                        {/* <DatePicker label="Birth date" className="max-w-[284px]" name="dataaquisicao" isRequired defaultValue={values.dataaquisicao} onChange={setFieldValue} /> */}
-                        <I18nProvider locale="pt-BR">
-                            <DatePicker
-                                name="dataaquisicao"
-                                hideTimeZone
-                                defaultValue={today(getLocalTimeZone())} // Set default value directly
-                                onChange={(val) => setFieldValue("dataaquisicao", val)}
-                                label="Data de Aquisição"
-                            />
-                        </I18nProvider>
-                        <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
-                        {message ?
-                            (
-                                <Alert
-                                    severity="success"
-                                    variant="filled"
-
-                                >
-                                    {message}
-                                </Alert>
-
-                            ) : null}
+                        <ButtonEnviarDadosPadrao />
                     </form>
                 )}
             </Formik>

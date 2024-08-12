@@ -96,11 +96,12 @@ export default function App() {
                 <NavbarContent justify="start">
                     <NavbarMenuToggle className="text-primaryTableText p-4 md:hidden" aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
                     <NavbarBrand className="mr-4">
-                        <Image src="/imagens/logoAjustada.png" alt="logo" width={125} height={150} />
+                        <Link href="/"><Image src="/imagens/logoAjustada.png" alt="logo" width={125} height={150} /></Link>
                     </NavbarBrand>
                 </NavbarContent>
 
                 <Menu setActive={setActive}>
+                    <Link className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white" href={"/"}>Inicio</Link>
                     <MenuItem setActive={setActive} active={active} item="Patrimônio">
                         <div className="flex flex-col space-y-4 text-sm">
                             <HoveredLink href="/pages/patrimonio/cadastropatrimonio">Cadastro De Patrimônio</HoveredLink>

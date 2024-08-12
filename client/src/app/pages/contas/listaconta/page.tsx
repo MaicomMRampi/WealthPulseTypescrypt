@@ -117,33 +117,15 @@ export default function MinhasContas() {
         };
 
         fetchOrcamento();
-    }, [dataControleMensal, Despesa]);
+    }, [dataControleMensal, Despesa, dataInicioControle]);
 
 
     const opemModalFechaFatura = (mes: string) => {
-        console.log("🚀 ~ opemModalFechaFatura ~ mes", mes)
         setMesFatura(mes)
         setOpenModalFatura(true)
     }
 
-    // const pagFatura = async () => {
-    //     console.log('MEs fatura apor confirmare', mesFatura)
-    //     const response = await api.post(`/fecharfatura`, {
-    //         idUsuario: tokenUsuario?.id,
-    //         fatura: mesFatura
-    //     });
-    //     if (response.status == 200) {
-    //         buscaDespesa();
-    //         buscaDespesaMesAtual();
-    //         setMessage(response.data.message)
-    //         setTimeout(() => {
-    //             setMesFatura('')
-    //             setOpenModalFatura(false)
-    //         }, 3000)
-    //     } else {
-    //         setOpenModalFatura(false)
-    //     }
-    // }
+
 
     const handleDataSelect = async (data: string) => {
         setDataControleMensal(data);
@@ -205,9 +187,6 @@ export default function MinhasContas() {
     };
 
     const groupedData = groupByYear(arrayAgrupado);
-    console.log('Agrupando ano', groupedData);
-
-
 
     const somaValores =
         DespesaSelect &&
@@ -377,7 +356,6 @@ export default function MinhasContas() {
         return (
             <div className="flex flex-col gap-4  pb-4 p-4" >
                 <div className="flex justify-between gap-3 items-end py-4 w-full">
-                    <p>{JSON.stringify(orcamentoMensal)}</p>
                     <Input
                         size="md"
                         fullWidth
@@ -396,14 +374,15 @@ export default function MinhasContas() {
                             }
                         </PDFDownloadLink> */}
                         <Button className=" border-orange-500 text-white bg-orange-500" variant="solid" onClick={() => opemModalFechaFatura(DespesaSelect[0].mesCorrespondente)}>Fechar mês</Button>
-                        <Button
-
-                            color="primary"
-                            variant="solid"
-                            endContent={<PlusIcon />}
-                        >
-                            <Link href="/pages/despesas/novadespesa"> Nova Conta</Link>
-                        </Button>
+                        <Link href="/pages/contas/novaconta">
+                            <Button
+                                color="primary"
+                                variant="solid"
+                                endContent={<PlusIcon />}
+                            >
+                                Nova Conta
+                            </Button>
+                        </Link>
                     </div>
                 </div>
                 <div className="flex gap-4 items-center">
@@ -458,7 +437,8 @@ export default function MinhasContas() {
         DespesaSelect.length,
         onSearchChange,
         hasSearchFilter,
-        Despesa
+        Despesa,
+        dataControleMensal,
 
     ]);
 
@@ -591,7 +571,7 @@ export default function MinhasContas() {
                             </TableHeader>
                             <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
                                 {(item) => (
-                                    <TableRow className={` ${item.fechada === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText text-white'}`} key={item.id}>
+                                    <TableRow className={` ${item.pago === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText text-white'}`} key={item.id}>
                                         {(columnKey) => (
                                             <TableCell>{renderCell(item, columnKey)}</TableCell>
                                         )}

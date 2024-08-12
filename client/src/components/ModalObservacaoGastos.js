@@ -1,7 +1,17 @@
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Textarea } from "@nextui-org/react";
 
-export default function App({ open, onClose, observacao }) {
+
+
+interface ModalObservacaoProps {
+    open: boolean;
+    onClose: () => void;
+    observacao: any; // Substitua "any" pelo tipo adequado, se possível.
+}
+
+
+
+export default function App({ open, onClose, observacao }: ModalObservacaoProps) {
 
     return (
         <>
