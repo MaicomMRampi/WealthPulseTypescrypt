@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 
+
+
 const transition = {
     type: "spring",
     mass: 0.5,
@@ -31,6 +33,7 @@ export const MenuItem = ({
                 className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white"
             >
                 {item}
+
             </motion.p>
             {active !== null && (
                 <motion.div

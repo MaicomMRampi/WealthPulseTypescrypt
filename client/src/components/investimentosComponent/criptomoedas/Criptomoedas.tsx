@@ -105,24 +105,33 @@ export default function App() {
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
                         <Input
                             fullWidth
-                            name="nomeCripto"
+                            name="nome"
                             label="Nome da Criptomoeda"
                             value={values.nomeCripto}
                             onChange={handleChange}
                         />
                         <Input
                             fullWidth
-                            name="quantidadeCripto"
+                            name="quantidade"
                             label="Quantidade"
-                            value={values.quantidadeCripto}
+                            value={values.quantidade}
                             onChange={handleChange}
                         />
                         <Input
                             fullWidth
-                            name="precoCompra"
-                            label="Preço de Compra"
-                            value={values.precoCompra}
-                            onChange={handleChange}
+                            name="valorPago"
+                            label="Valor Investido"
+                            value={values.valorPago}
+                            onBlur={handleChange}
+                            onChange={(event) => {
+                                const { name, value } = event.target;
+                                if (name === 'valorPago') {
+                                    const maskedValue = valorMask(value);
+                                    setFieldValue(name, maskedValue);
+                                } else {
+                                    setFieldValue(name, value);
+                                }
+                            }}
                             startContent={<span className="text-white text-small">R$</span>}
                         />
                         <I18nProvider locale="pt-BR">

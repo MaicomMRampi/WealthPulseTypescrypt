@@ -3,18 +3,20 @@ import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@interna
 
 const initialValues = {
     nome: '',
-    tipopatrimonio: '',
-    valor: '',
-    dataaquisicao: today(getLocalTimeZone()),
+    instituicao: '',
+    quantidade: '',
+    precoCompra: '',
+    dataCompra: today(getLocalTimeZone()),
 };
 
 // ... (Função Label - Se necessário) 
 
 const validationSchema = Yup.object().shape({
     nome: Yup.string().required('Patrimônio é obrigatório'),
-    tipopatrimonio: Yup.string().required('Tipo é obrigatório'),
-    valor: Yup.string().required('Valor é obrigatório'),
-    dataaquisicao: Yup.date().required('Data é obrigatório'),
+    instituicao: Yup.string().required('Tipo é obrigatório'),
+    quantidade: Yup.number().required('Tipo é obrigatório'),
+    precoCompra: Yup.string().required('Valor é obrigatório'),
+    dataCompra: Yup.date().required('Data é obrigatório'),
 });
 
 export { initialValues, validationSchema }

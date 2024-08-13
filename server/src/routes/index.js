@@ -16,7 +16,7 @@ const e = require('express')
 
 router.post('/api/login', async (req, res) => {
     const data = req.body.values; // Ajuste para acessar corretamente os dados do corpo da requisição
-    console.log("🚀 ~ router.post ~ data", data)
+
     try {
         const user = await prisma.usuario.findUnique({
             where: {
@@ -97,7 +97,7 @@ router.post('/api/postusers', async (req, res) => {
 
 router.get('/api/buscanome', async (req, res) => {
     const email = req.query.email
-    console.log("🚀 ~ router.get ~ email", email)
+
     const buscaNome = await prisma.usuario.findUnique({ where: { email } })
     res.status(200).json({
         nome: buscaNome.nome,
@@ -106,7 +106,7 @@ router.get('/api/buscanome', async (req, res) => {
 })
 router.get('/api/usuarioedicao', async (req, res) => {
     const email = req.query.email
-    console.log("🚀 ~ router.get ~ email", email)
+
     const buscaNome = await prisma.usuario.findUnique({ where: { email: email } })
     res.status(200).json(buscaNome)
 })
@@ -116,17 +116,17 @@ router.get('/api/usuarioedicao', async (req, res) => {
 
 router.post('api/upload', async (req, res) => {
     const dados = req.body
-    console.log("🚀 ~ router.post ~ dados", dados)
+
 })
 
 // === patrimônio============
 
 router.post('/api/postpatrimonio', async (req, res) => {
     const dados = req.body;
-    console.log("🚀 ~ router.post ~ dados", dados)
+
     try {
         const nomeUper = dados.dados.nome.toUpperCase()
-        console.log("🚀 ~ router.post ~ nomeUper", nomeUper)
+
 
         const valorPatr = converteString(dados.dados.valor)
         const patrimonio = await prisma.patrimonio.create({
@@ -138,7 +138,7 @@ router.post('/api/postpatrimonio', async (req, res) => {
                 idUser: dados.token
             }
         })
-        console.log("🚀 ~ router.post ~ patrimonio", patrimonio)
+
         return res.status(200).json({ message: 'Patrimonio Cadastrado com Sucesso' });
     } catch (error) {
         res.status(500).json({ message: 'Erro ao Cadastrar Patrimonio', error });
@@ -147,7 +147,7 @@ router.post('/api/postpatrimonio', async (req, res) => {
 router.get('/api/buscabem', async (req, res) => {
     try {
         const dados = req.query.id;
-        console.log("🚀 ~ router.get ~ dados", dados)
+
 
         const buscaPatrimonio = await prisma.patrimonio.findMany({ where: { idUser: parseInt(dados) } })
         res.status(200).json(buscaPatrimonio);
@@ -162,7 +162,7 @@ router.post('/api/despesadeconsumo', async (req, res) => {
     try {
 
         const dados = req.body;
-        console.log("🚀 ~ router.post ~ dados", dados)
+
 
         const novaDespesaDeBem = await prisma.despesaDeBens.create({
             data: {
@@ -181,7 +181,7 @@ router.post('/api/despesadeconsumo', async (req, res) => {
             },
         });
 
-        console.log("🚀 ~ router.post ~ novaDespesaDeBem", novaDespesaDeBem);
+
         return res.status(200).json({ message: 'Despesa de Bem Cadastrada com Sucesso' });
     } catch (error) {
         console.error('Erro ao Cadastrar Despesa de Bem:', error);
@@ -268,7 +268,7 @@ router.delete('/api/deletedespesas', async (req, res) => {
 // ============Tipo Despesa ======
 router.post('/api/novotipodespesa', async (req, res) => {
     const value = req.body
-    console.log("🚀 ~ router.post ~ value", value)
+
     try {//     
         const novoTipoDespesa = await prisma.TipoDespesa.create({
             data: {
@@ -335,9 +335,9 @@ router.post('/api/trocarsenha', async (req, res) => {
 router.post('/api/novonome', async (req, res) => {
     try {
         const nome = req.body.nomefundo;
-        console.log("🚀 ~ router.post ~ nome", nome)
+
         const buscaNome = await prisma.nomeFundoImobiliario.findUnique({ where: { nomefundo: nome.toUpperCase().trim() } });
-        console.log("🚀 ~ router.post ~ buscaNome", buscaNome)
+
 
         if (buscaNome) {
             return res.status(400).json({ message: 'Nome Ja Cadastrado' });
@@ -366,25 +366,19 @@ router.get('/api/buscanomefundonovo', async (req, res) => {
 router.post('/api/novonomeacao', async (req, res) => {
     const dados = req.body;
     try {
-        const buscaid = await prisma.usuario.findUnique({ where: { email: dados.emailUser } });
-
-        if (!buscaid) {
-            return res.status(404).json({ message: 'Usuário não encontrado.' });
-        }
-
-        const buscaNome = await prisma.nomeacao.findUnique({ where: { nomeacao: dados.nomefundo.toUpperCase().trim() } });
-
+        const buscaNome = await prisma.Nomeacao.findUnique({
+            where:
+                { nomeAcao: dados.values.acao.toUpperCase().trim() }
+        });
         if (buscaNome) {
             return res.status(400).json({ message: 'Nome Ja Cadastrado' });
         }
-
-        const insereNome = await prisma.nomeacao.create({
+        const insereNome = await prisma.Nomeacao.create({
             data: {
-                nomeacao: dados.nomefundo.toUpperCase().trim(),
-                iduser: buscaid.id,
+                nomeAcao: dados.values.acao.toUpperCase().trim(),
+                idUser: parseInt(dados.token),
             }
         });
-
         res.status(200).json({ message: 'Nome Cadastrado com Sucesso' });
     } catch (error) {
         res.status(500).json({ message: 'Erro ao Cadastrar Nome' });
@@ -392,7 +386,11 @@ router.post('/api/novonomeacao', async (req, res) => {
     }
 });
 router.get('/api/buscanomeacao', async (req, res) => {
-    const nome = await prisma.nomeacao.findMany();
+    const id = req.query.id
+
+    const nome = await prisma.nomeacao.findMany({
+        where: { idUser: parseInt(id) },
+    });
     res.json(nome);
 });
 
@@ -452,7 +450,7 @@ router.get('/api/dividendos', async (req, res) => {
 });
 router.post('/api/dividendos', async (req, res) => {
     const dados = req.body
-    console.log("🚀 ~ router.post ~ dados", dados)
+
     await dbConnect()
     try {
         const novoDividendo = new DividendosSchema({
@@ -472,177 +470,39 @@ router.post('/api/dividendos', async (req, res) => {
 
 })
 
-
-
-// =================================================
-
-// ================API DA RENDA Variavel / AÇÕES
-router.post('/api/postinvestimentacoes', async (req, res) => {
+// ================INVESTIMENTOS======================
+router.post('/api/novoinvestimento', async (req, res) => {
+    const dados = req.body
+    const valor = dados.dados.precoCompra
     try {
-        const { nomeinvestimento, datacompra, valorinvestido, banco, tiporenda } = req.body.values;
-        const data = req.body.values;
-        console.log("🚀 ~ router.post ~ data", data)
-        const emailUser = req.body.emailUser;
-        const retornaId = await prisma.usuario.findUnique({ where: { email: emailUser } });
-
-        if (!retornaId) {
-            return res.status(404).json({ message: 'Usuário não encontrado.' });
-        }
-
-        const idUser = retornaId.id;
-        const tiporendaformatada = tiporenda.toUpperCase();
-        const nomeinvestimentoformatada = nomeinvestimento.toUpperCase();
-        const dataCompra = new Date(datacompra);
-        const dia = dataCompra.getDate();
-        const mes = dataCompra.getMonth() + 1;
-        const ano = dataCompra.getFullYear();
-        const dataCompraFormatada = `${dia}/${mes}/${ano}`;
-
-        const valorConvertido = converteString(valorinvestido);
-
-        const buscaIdNomeFundo = await prisma.nomeacao.findUnique({ where: { nomeacao: nomeinvestimentoformatada } });
-
-        if (!buscaIdNomeFundo) {
-            return res.status(404).json({ message: 'Nome do fundo não encontrado.' });
-        }
-
-        const newInvestimentoAcao = await prisma.acao.create({
+        const novoInvestimento = await prisma.Investimento.create({
             data: {
-                idUser: idUser,
-                nomeInvestimento: nomeinvestimentoformatada,
-                dataCompra: dataCompraFormatada,
-                valorInvestido: valorConvertido,
-                emailUser: emailUser,
-                banco: banco,
-                tipoRenda: tiporendaformatada
+                idUser: dados.token,
+                tipo: dados.dados.tipoInvestimento,
+                nome: dados.dados.nome,
+                quantidade: dados.dados.quantidade,
+                valorPago: converteString(dados.dados.precoCompra),
+                instituicao: dados.dados.instituicao,
+                valorInvestido: dados.dados.tipoInvestimento === 'acoes' || dados.dados.tipoInvestimento === 'fii' ? converteString(dados.dados.precoCompra * dados.dados.quantidade) : converteString(dados.dados.precoCompra),
+                taxaJuros: dados.dados.taxaJuros,
+                dataCompra: formatDate(dados.dados.dataCompra),
+                valorAtualFii: dados.dados.valorPago,
+                dataVencimento: dados.dados.dataVencimento,
+                ticker: '',
+                tipoPlano: dados.dados.tipoFundo,
+                tipoFundo: dados.dados.investimentoTipo,
             }
-        });
+        })
 
-        // Insere na tabela dividendos o valor inicial como 0
-        const insereDvividendo = await prisma.dividendo.create({
-            data: {
-                dataInserido: new Date(),
-                valorDividendo: 0,
-                idInvestimento: newInvestimentoAcao.id,
-                nomeInvestimento: nomeinvestimentoformatada,
-                idUser: idUser,
-                idNomeInvestimento: buscaIdNomeFundo.id
-            }
-        });
-
-        res.status(200).json({ message: 'Investimento Salvo com Sucesso !' });
+        res.status(200).json({ message: 'Investimento Cadastrado com Sucesso !' });
     } catch (error) {
-        console.error("Erro ao criar Investimento:", error);
-    }
-});
-router.get('/api/buscainvestimentoacao', async (req, res) => {
 
-    const email = req.query.email
-    const user = await prisma.usuario.findUnique({ where: { email: email } });
-    try {
-        const buscaInvestimentos = await prisma.acao.findMany({ where: { idUser: user.id } });
-        console.log("🚀 ~ router.get ~ buscaInvestimentos", buscaInvestimentos)
-        res.json(buscaInvestimentos);
-    } catch (error) {
-        console.error("Erro ao criar buscar investimentos:", error);
+        res.status(400).json({ message: 'Erro ao Cadastrar Investimento.' });
 
     }
 })
-router.delete('/api/deletainvestimentoacao', async (req, res) => {
-    const idDeleta = req.query.id
-    console.log("🚀 ~ router.delete ~ idDeleta", idDeleta)
-    try {
-        const deleta = await prisma.acao.delete({ where: { id: parseInt(idDeleta) } });
-        res.status(200).json("Investimento deletado com sucesso !")
-    }
-    catch (error) {
-        console.error("Erro ao deletar Investimento:", error);
-    }
-
-})
 
 
-// ================API DA RENDA FIXA
-router.post('/api/postinvestiment', async (req, res) => {
-    try {
-        const data = req.body.values;
-        const emailUser = req.body.emailUser;
-        const retornaId = await prisma.usuario.findUnique({ where: { email: emailUser } });
-
-        if (!retornaId) {
-            return res.status(404).json({ message: 'Usuário não encontrado.' });
-        }
-
-        const idUser = retornaId.id;
-        const { nomeinvestimento, datacompra, valorinvestido, vencimentoativo, banco, tiporenda } = req.body.values;
-        console.log("🚀 ~ router.post ~ banco", banco)
-        const valorInvestidoAjustado = converteString(valorinvestido);
-        const dataCompra = new Date(datacompra);
-        const dia = dataCompra.getDate();
-        const mes = dataCompra.getMonth() + 1;
-        const ano = dataCompra.getFullYear();
-        const dataCompraFormatada = `${dia}/${mes}/${ano}`;
-        const dataVencimento = new Date(data.vencimentoativo);
-        const diaVenc = dataVencimento.getDate();
-        const mesVenc = dataVencimento.getMonth() + 1;
-        const anoVenc = dataVencimento.getFullYear();
-        const dataVenciFormatada = `${diaVenc}/${mesVenc}/${anoVenc}`;
-        const tiporendaformatada = tiporenda.toUpperCase();
-        const nomeinvestimentoformatada = data.nomeinvestimento.toUpperCase();
-        const diasParaVencimento = Math.floor((dataVencimento - dataCompra) / (1000 * 60 * 60 * 24));
-
-        const newInvestimento = await prisma.investimento.create({
-            data: {
-                idUser: idUser,
-                nomeInvestimento: nomeinvestimentoformatada,
-                dataCompra: dataCompraFormatada,
-                valorInvestido: valorInvestidoAjustado,
-                vencimentoAtivo: dataVenciFormatada,
-                diasParaVencimento: diasParaVencimento,
-                valorAtualinvestimento: 0,
-                emailUser: emailUser,
-                banco: banco,
-                dataSemFormatacao: vencimentoativo,
-                tipoRenda: tiporendaformatada
-            }
-        });
-        const valorAtual = await prisma.valorAtual.create({
-            data: {
-                idInvestimento: newInvestimento.id,
-                valor: 0,
-                data: new Date()
-            }
-        });
-
-        res.status(200).json({ message: 'Investimento Salvo com Sucesso !' });
-    } catch (error) {
-        console.error("Erro ao criar Investimento:", error);
-    }
-});
-router.get('/api/getinvestiment', async (req, res) => {
-    const email = req.query.email;
-    const user = await prisma.usuario.findUnique({ where: { email: email } });
-
-    if (!user) {
-        return res.status(404).json({ message: 'Usuário não encontrado.' });
-    }
-
-    try {
-        const buscaInvestimentos = await prisma.investimento.findMany({ where: { idUser: user.id } });
-        res.json(buscaInvestimentos);
-    } catch (error) {
-        console.error("Erro ao criar buscar investimentos:", error);
-    }
-});
-router.post('/api/buscavalor', async (req, res) => {
-    const data = req.body.id;
-    try {
-        const buscaInvestimentos = await prisma.investimento.findUnique({ where: { id: parseInt(data) } });
-        res.json(buscaInvestimentos);
-    } catch (error) {
-        console.error("Erro ao criar buscar investimentos:", error);
-    }
-});
 router.put('/api/atualizavalor', async (req, res) => {
     const novoValor = req.body.values.novovalorinvestimento;
     const idInvestimento = req.body.data.id;
@@ -668,168 +528,6 @@ router.put('/api/atualizavalor', async (req, res) => {
         res.status(400).json({ message: 'Erro ao Atualizar Valor' });
     }
 });
-router.post('/api/investiment', async (req, res) => {
-    const { id } = req.body;
-
-    try {
-        const response = await prisma.valorAtual.findMany({ where: { idInvestimento: parseInt(id) } });
-        res.json(response);
-    } catch (error) {
-        console.error('Erro ao buscar valor atual:', error);
-        res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-});
-router.delete('/api/deletarendafixaUnico', async (req, res) => {
-    const data = req.body.id;
-    console.log("🚀 ~ router.delete ~ data", data)
-    try {
-        const deletaValorAtual = await prisma.valorAtual.deleteMany({ where: { idInvestimento: parseInt(data) } });
-        console.log("🚀 ~ router.delete ~ deletaValorAtual", deletaValorAtual)
-        const deleteInvest = await prisma.investimento.delete({ where: { id: parseInt(data) } });
-        console.log("🚀 ~ router.delete ~ deleteInvest", deleteInvest)
-        res.status(200).json({ message: "Investimento Excluído com Sucesso " });
-    } catch (error) {
-        res.status(500).json({ error: "Erro interno do servidor" });
-    }
-});
-router.post('/api/getinvestimenthome', async (req, res) => {
-    const emailUser = req.body.emailUser;
-    try {
-        const usuario = await prisma.usuario.findUnique({ where: { email: emailUser } });
-
-        if (!usuario) {
-            return res.json({ message: 'Nenhum investimento encontrado para este usuário.' });
-        }
-
-        const buscaInvestimentos = await prisma.investimento.findUnique({ where: { idUser: usuario.id } });
-
-        if (!buscaInvestimentos) {
-            return res.json({ message: 'Nenhum investimento encontrado para este usuário.' });
-        }
-
-        const idInvestimento = buscaInvestimentos.id.toString();
-        const buscaRendimento = await prisma.valorAtual.findMany({ where: { idInvestimento: parseInt(idInvestimento) } });
-
-        const investimentoComRendimento = {
-            ...buscaInvestimentos,
-            rendimento: buscaRendimento
-        };
-
-        res.json(investimentoComRendimento);
-    } catch (error) {
-        console.error("Erro ao buscar investimentos:", error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar investimentos.' });
-    }
-});
-router.post('/api/getinvestimenthomevalor', async (req, res) => {
-    const emailUser = req.body.emailUser;
-    try {
-        const usuario = await prisma.usuario.findUnique({ where: { email: emailUser } });
-
-        if (!usuario) {
-            return res.json({ message: 'Nenhum investimento encontrado para este usuário.' });
-        }
-
-        const buscaInvestimentos = await prisma.investimento.findMany({ where: { idUser: usuario.id } });
-
-        res.json(buscaInvestimentos);
-    } catch (error) {
-        console.error("Erro ao buscar investimentos:", error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar investimentos.' });
-    }
-});
-
-// ===================================================
-
-
-// ===================================================
-
-
-
-// =====================Fundos de Investimentos ============
-router.post('/api/postfundo', async (req, res) => {
-    try {
-        const data = req.body.values;
-        const emailUser = req.body.emailUser;
-        const retornaId = await prisma.usuario.findUnique({ where: { email: emailUser } });
-
-        if (!retornaId) {
-            return res.status(404).json({ message: 'Usuário não encontrado.' });
-        }
-
-        const idUser = retornaId.id;
-        const tiraespaço = data.nomefii.toUpperCase().trim();
-        const { datacompra, quantidade, valorpago } = req.body.values;
-        const valorPagoConvertido = converteString(valorpago);
-        const dataComprafii = new Date(datacompra);
-        const diaVenc = dataComprafii.getDate();
-        const mesVenc = dataComprafii.getMonth() + 1;
-        const anoVenc = dataComprafii.getFullYear();
-        const dataCompraFormatada = `${diaVenc}/${mesVenc}/${anoVenc}`;
-
-        const valorTotal = quantidade * valorPagoConvertido;
-
-        const buscaIdNomeFundo = await prisma.nomeFundoImobiliario.findUnique({ where: { nomefundo: tiraespaço } });
-
-        if (!buscaIdNomeFundo) {
-            return res.status(404).json({ message: 'Nome do fundo não encontrado.' });
-        }
-
-        const novoInvestimentoFii = await prisma.investimentoFundo.create({
-            data: {
-                iduser: idUser,
-                emailuser: emailUser,
-                nomefii: tiraespaço,
-                datacompra: dataCompraFormatada,
-                quantidade,
-                valorpago: valorPagoConvertido,
-                valorgasto: valorTotal,
-                valoratualfii: valorPagoConvertido,
-                idnomefundo: buscaIdNomeFundo.id,
-                banco: data.banco,
-            }
-        });
-
-        const adicionanatabelaproventos = await prisma.proventos.create({
-            data: {
-                datainserido: new Date(),
-                valorprovento: 0,
-                idinvestimento: novoInvestimentoFii.id,
-                nomeinvestimento: tiraespaço,
-                iduser: idUser,
-                idnomeinvestimento: buscaIdNomeFundo.id
-            }
-        });
-
-        res.status(200).json({ message: 'Investimento Salvo com Sucesso !' });
-    } catch (error) {
-        console.error("Erro ao criar Investimento:", error);
-    }
-});
-router.get('/api/getinvestimentfii', async (req, res) => {
-    const emailUser = req.query.email;
-    const user = await prisma.usuario.findUnique({ where: { email: emailUser } });
-
-    if (!user) {
-        return res.status(404).json({ message: 'Usuário não encontrado.' });
-    }
-
-    try {
-        const buscaInvestimentos = await prisma.investimentoFundo.findMany({ where: { iduser: user.id } });
-        res.json(buscaInvestimentos);
-    } catch (error) {
-        console.error("Erro ao criar buscar investimentos:", error);
-    }
-});
-router.post('/api/buscavalorfii', async (req, res) => {
-    const data = req.body;
-    try {
-        const dataBank = await prisma.investimentoFundo.findUnique({ where: { id: parseInt(data.id) } });
-        res.json(dataBank);
-    } catch (error) {
-        console.error("Erro ao criar Investimento:", error);
-    }
-});
 router.put('/api/atualizavalorfii', async (req, res) => {
     const novoValor = req.body.values.novovalorinvestimento
     const idInvestimento = req.body.data._id
@@ -852,60 +550,7 @@ router.put('/api/atualizavalorfii', async (req, res) => {
 
 
 })
-router.put('/api/atualizafiiselect', async (req, res) => {
-    const data = req.body.data
-    const novoValor = req.body.values.novovalorinvestimento;
-    try {
-        for (let i = 0; i < data.length; i++) {  // Corrigindo a condição de inicialização do loop
-            const updatedInvestimento = await InvestimentosFiiSchema.findOneAndUpdate(
-                { _id: data[i] },
-                { valoratualfii: novoValor },
-                { new: true }
-            );
-        }
-        res.status(200).json({ message: "Investimento Atualizado com Sucesso " });
-    } catch (error) {
-        res.status(500).json({ error: "Erro interno do servidor" });
-    }
-});
-router.post('/api/buscanomesfii', async (req, res) => {
-    const IDs = req.body.ids;
-    const fundos = [];
-    for (let i = 0; i < IDs.length; i++) {
-        try {
-            await dbConnect();
-            const fundo = await InvestimentosFiiSchema.findOne({ _id: IDs[i] });
-            if (fundo) {
-                fundos.push(fundo);
-            }
-        } catch (error) {
-        }
-    }
-    res.json(fundos);
-});
-router.post('/api/investimentfii', async (req, res) => {
-    const { id } = req.body
 
-    try {
-        await dbConnect()
-        const response = await InvestimentosFiiSchema.find({ _id: id })
-
-        res.json(response)
-
-    } catch (error) {
-
-    }
-
-})
-router.delete('/api/deletafii', async (req, res) => {
-    const data = req.query.id;
-    try {
-        const deleteInvest = await prisma.investimentoFundo.delete({ where: { id: parseInt(data) } });
-        res.status(200).json({ message: "Investimento Excluido com Sucesso " });
-    } catch (error) {
-        res.status(500).json({ message: "Erro ao excluir investimento" });
-    }
-});
 router.put('/api/vendacotasfii', async (req, res) => {
     await dbConnect();
     const nome = req.body.nomefii;
@@ -957,38 +602,14 @@ router.put('/api/vendacotasfii', async (req, res) => {
     res.status(200).json({ message: 'Venda de cotas concluída com sucesso.' });
 });
 
+// ==================================================
 
-router.post('/api/getfiihome', async (req, res) => {
-
-
-    const emailUser = req.body.emailUser;
-
-    try {
-        await dbConnect();
-        const usuario = await UsuariosSchema.findOne({ email: emailUser });
-        const buscaInvestimentos = await InvestimentosFiiSchema.find({ iduser: usuario._id }).limit(5);
-
-        if (!buscaInvestimentos) {
-            return res.json({ message: 'Nenhum investimento encontrado para este usuário.' });
-        }
-
-
-
-
-        res.json(buscaInvestimentos);
-    } catch (error) {
-        console.error("Erro ao buscar investimentos:", error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar investimentos.' });
-    }
-
-})
-//=========================================================
 
 
 // +++++++++++++++++++++++++Categoria+++++++++++++++++++++++++++++++++++++++++
 router.post('/api/novacategoria', async (req, res) => {
     const nome = req.body
-    console.log("🚀 ~ router.post ~ nome", nome)
+
 
     try {
         const nomeUppercase = nome.categoria.categoria.toUpperCase().trim();
@@ -1011,7 +632,7 @@ router.post('/api/novacategoria', async (req, res) => {
 });
 router.get('/api/buscacategoria', async (req, res) => {
     const id = req.query.idUser
-    console.log("🚀 ~ router.get ~ id", id)
+
 
     const buscaCategoria = await prisma.categoria.findMany({
         where: {
@@ -1032,7 +653,7 @@ router.delete('/api/deletacategoria', async (req, res) => {
 // +++++++++++++++++++++++++Forma Pagamento+++++++++++++++++++++++++++++++++++++++++
 router.post('/api/novaformapagamento', async (req, res) => {
     const dados = req.body
-    console.log("🚀 ~ router.post ~ Id", typeof dados.idUser)
+
     const nomeUppercase = dados.nome.formapagamento.toUpperCase().trim();
     try {
         // Verifica se a categoria já existe
@@ -1057,7 +678,7 @@ router.post('/api/novaformapagamento', async (req, res) => {
 });
 router.get('/api/buscaformapagamento', async (req, res) => {
     const idUser = req.query.idUser
-    console.log("🚀 ~ router.get ~ idUser", idUser)
+
 
     const buscaFormapagamento = await prisma.FormaPagamento.findMany({
         where: { idUser: parseInt(idUser) },
@@ -1159,7 +780,7 @@ router.get('/api/buscadespesamesatual', async (req, res) => {
 router.post('/api/buscadespesadata', async (req, res) => {
     try {
         const { data } = req.body;
-        console.log("🚀 ~ router.post ~ data", data)
+
         const idUser = req.body.emailUser;
 
 
@@ -1251,7 +872,6 @@ router.put('/api/updatepagante', async (req, res) => {
 
 router.post('/api/fecharfatura', async (req, res) => {
     const dados = req.body
-    console.log("🚀 ~ router.post ~ dados", dados)
     try {
 
         const atualizaDespesa = await prisma.despesas.updateMany({
@@ -1263,7 +883,6 @@ router.post('/api/fecharfatura', async (req, res) => {
                 fechada: 1
             }
         })
-        console.log("🚀 ~ router.post ~ buscaFatura", atualizaDespesa)
         res.status(200).json({ message: 'Fatura Fechada com Sucesso' })
     } catch (error) {
         res.status(500).json({ error: "Erro ao fechar fatura" })
@@ -1274,8 +893,6 @@ router.post('/api/fecharfatura', async (req, res) => {
 router.post('/api/novaconta', async (req, res) => {
 
     const nome = req.body
-    console.log("🚀 ~ router.post ~ nome", nome)
-    console.log("🚀 ~ router.post ~ nome", nome.dados.qtdparcelas)
     const dataFormata = formatDate(nome.dados.datavencimento)
 
     let dataVencimento = new Date(dataFormata); // Inicia com a data de vencimento original
@@ -1356,21 +973,18 @@ router.get('/api/buscaconta', async (req, res) => {
 });
 router.get('/api/buscacontamesatual', async (req, res) => {
     const id = req.query.id
-    console.log("🚀 ~ router.get ~ id conta mes atual ", id)
     try {
         const mesAtual = new Date();
         const mes = mesAtual.getMonth() + 1;
         const ano = mesAtual.getFullYear();
         const iniciaPadraoData = `${ano}-${mes < 10 ? `0${mes}` : mes}`;
 
-        console.log("🚀 ~ router.get ~ iniciaPadraoData", iniciaPadraoData)
         const buscaConta = await prisma.Contas.findMany({
             where: {
                 idUser: parseInt(id),
                 mesCorrespondente: iniciaPadraoData
             }
         })
-        console.log("🚀 ~ router.get ~ buscaConta", buscaConta)
 
         res.json(buscaConta);
     } catch (error) {
@@ -1403,7 +1017,6 @@ router.post('/api/buscacontadata', async (req, res) => {
 router.put('/api/pagaconta', async (req, res) => {
     try {
         const idConta = req.body
-        console.log("🚀 ~ router.put ~ idConta", idConta.id)
         const buscaConta = await prisma.Contas.findUnique({
             where: {
                 id: parseInt(idConta.id)
@@ -1442,7 +1055,6 @@ router.delete('/api/deletaConta', async (req, res) => {
 // controle de orçamento mensal 
 router.post('/api/controleorcamento', async (req, res) => {
     const dados = req.body
-    console.log("🚀 ~ router.post ~ dados", dados.data)
 
     const buscaContas = await prisma.Contas.findMany({
         where: {
@@ -1463,7 +1075,6 @@ router.post('/api/controleorcamento', async (req, res) => {
             valorGasto: true
         }
     })
-    console.log("🚀 ~ router.post ~ buscaDespesas", buscaDespesas)
     const buscaControleUsuario = await prisma.Usuario.findUnique({
         where: {
             id: parseInt(dados.id)
@@ -1474,13 +1085,10 @@ router.post('/api/controleorcamento', async (req, res) => {
     })
     const sumValues = (array) => array.reduce((acc, item) => acc + item.valor || item.valorGasto, 0);
     const totalDespesa = sumValues(buscaDespesas)
-    console.log("🚀 ~ router.post ~ totalDespesa", totalDespesa)
     const totalContas = sumValues(buscaContas)
-    console.log("🚀 ~ router.post ~ totalContas", totalContas)
     const orcamentoUsuario = buscaControleUsuario?.valorOrcamentoMensal
 
     const porcentagem = Math.round(((totalDespesa + totalContas) / orcamentoUsuario) * 100)
-    console.log("🚀 ~ router.post ~ buscaContas", porcentagem)
 
     res.json(porcentagem)
 });
@@ -1490,31 +1098,33 @@ router.post('/api/controleorcamento', async (req, res) => {
 // =====================Banco ============
 
 router.post('/api/banco', async (req, res) => {
+    const dados = req.body
     try {
-        const data = req.body.banco
-        console.log("🚀 ~ router.post ~ data", data)
-        const nomeUppercase = data.toUpperCase().trim();
+
+        const nomeUppercase = dados.values.instituicao.toUpperCase().trim();
         const verificaNome = await prisma.banco.findUnique({ where: { nomeBanco: nomeUppercase } });
-        console.log("🚀 ~ router.post ~ verificaNome", verificaNome)
         if (verificaNome) {
             return res.status(400).json({ message: 'Banco Já Cadastrado ' })
         }
         const novoBanco = await prisma.banco.create({
             data: {
                 nomeBanco: nomeUppercase,
+                idUser: parseInt(dados.token)
             }
         })
-        console.log("🚀 ~ router.post ~ novoBanco", novoBanco)
         res.status(200).json({ message: 'Banco Cadastrado ' })
     } catch (error) {
         res.status(400).json({ message: 'Erro ao Cadastrar' })
     }
 });
 router.get('/api/buscabanco', async (req, res) => {
-    await dbConnect
+    const data = req.query.id
     try {
-
-        const buscaBanco = await prisma.banco.findMany()
+        const buscaBanco = await prisma.banco.findMany({
+            where: {
+                idUser: parseInt(data)
+            }
+        })
         res.json(buscaBanco)
     } catch (error) {
         res.status(400).json({ message: 'Erro ao Cadastrar' })
@@ -1525,7 +1135,6 @@ router.get('/api/buscabanco', async (req, res) => {
 //     await dbConnect
 //     try {
 //         const data = req.body.anotacao
-//         console.log("🚀 ~ router.post ~ data", data)
 //         const novoAnotacao = new AnotacoesSchema({
 //             anotacao: data
 //         })

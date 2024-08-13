@@ -102,6 +102,7 @@ export default function App() {
 
                 <Menu setActive={setActive}>
                     <Link className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white" href={"/"}>Inicio</Link>
+
                     <MenuItem setActive={setActive} active={active} item="Patrimônio">
                         <div className="flex flex-col space-y-4 text-sm">
                             <HoveredLink href="/pages/patrimonio/cadastropatrimonio">Cadastro De Patrimônio</HoveredLink>
@@ -112,7 +113,7 @@ export default function App() {
 
                     <MenuItem setActive={setActive} active={active} item="Investimentos">
                         <div className="flex flex-col space-y-4 text-sm">
-                            <HoveredLink href="/pages/investimentos/meusinvestimentos">Meus Investimentos</HoveredLink>
+                            <HoveredLink href="/pages/investimentos/listainvestimento">Meus Investimentos</HoveredLink>
                             <HoveredLink href="/pages/investimentos/novoinvestimento">Novos Investimentos</HoveredLink>
                         </div>
                     </MenuItem>

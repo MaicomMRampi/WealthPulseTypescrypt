@@ -105,9 +105,9 @@ export default function App() {
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
                         <Input
                             fullWidth
-                            name="nomeFundo"
+                            name="nome"
                             label="Nome do Fundo"
-                            value={values.nomeFundo}
+                            value={values.nome}
                             onChange={handleChange}
                         />
                         <Select
@@ -128,7 +128,16 @@ export default function App() {
                             name="valorInvestido"
                             label="Valor Investido"
                             value={values.valorInvestido}
-                            onChange={handleChange}
+                            onBlur={handleChange}
+                            onChange={(event) => {
+                                const { name, value } = event.target;
+                                if (name === 'valorInvestido') {
+                                    const maskedValue = valorMask(value);
+                                    setFieldValue(name, maskedValue);
+                                } else {
+                                    setFieldValue(name, value);
+                                }
+                            }}
                             startContent={<span className="text-white text-small">R$</span>}
                         />
                         <I18nProvider locale="pt-BR">

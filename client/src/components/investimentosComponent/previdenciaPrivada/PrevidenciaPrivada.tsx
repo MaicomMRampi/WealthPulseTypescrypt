@@ -47,43 +47,6 @@ export default function App() {
 
     };
 
-    const titulos = [
-        {
-            tipo: 'Tesouro Direto',
-            nome: 'Tesouro Selic 2024',
-            vencimento: '2024-07-01',
-            taxaJuros: 'Selic + 0.10%',
-            valorMinimo: 1000,
-        },
-        {
-            tipo: 'CDB',
-            nome: 'CDB Banco XYZ',
-            vencimento: '2026-12-31',
-            taxaJuros: '120% do CDI',
-            valorMinimo: 5000,
-        },
-        {
-            tipo: 'LCI',
-            nome: 'LCI Banco ABC',
-            vencimento: '2025-09-30',
-            taxaJuros: '95% do CDI',
-            valorMinimo: 3000,
-        },
-        {
-            tipo: 'LCA',
-            nome: 'LCA Banco DEF',
-            vencimento: '2027-01-15',
-            taxaJuros: '100% do CDI',
-            valorMinimo: 2000,
-        },
-        {
-            tipo: 'Debênture',
-            nome: 'Debênture XYZ 2028',
-            vencimento: '2028-05-20',
-            taxaJuros: 'IPCA + 5.5%',
-            valorMinimo: 10000,
-        },
-    ];
 
 
     return (
@@ -105,9 +68,9 @@ export default function App() {
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
                         <Input
                             fullWidth
-                            name="nomePlano"
+                            name="nome"
                             label="Nome do Plano"
-                            value={values.nomePlano}
+                            value={values.nome}
                             onChange={handleChange}
                         />
                         <Select
@@ -123,15 +86,26 @@ export default function App() {
                             fullWidth
                             name="valorInvestido"
                             label="Valor Investido"
+                            onBlur={handleChange}
                             value={values.valorInvestido}
-                            onChange={handleChange}
+                            onChange={(event) => {
+                                const { name, value } = event.target;
+                                if (name === 'valorInvestido') {
+                                    const maskedValue = valorMask(value);
+                                    setFieldValue(name, maskedValue);
+                                } else {
+                                    setFieldValue(name, value);
+                                }
+                            }}
                             startContent={<span className="text-white text-small">R$</span>}
                         />
                         <I18nProvider locale="pt-BR">
                             <DatePicker
-                                name="dataContratacao"
+                                name="dataCompra"
                                 label="Data de Contratação"
-                                onChange={(val) => setFieldValue("dataContratacao", val)}
+                                onChange={(val) => setFieldValue("dataCompra", val)}
+                                hideTimeZone
+                                defaultValue={today(getLocalTimeZone())}
                             />
                         </I18nProvider>
                         <ButtonEnviarDadosPadrao />

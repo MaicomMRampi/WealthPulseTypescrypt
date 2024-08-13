@@ -339,8 +339,8 @@ export default function NovaDespesa() {
                                 >
                                     Salvar
                                 </Button>
-                                <Button color="warning" fullWidth onClick={() => opemModalCategoria()} >Nova Categoria</Button>
-                                <Button className="bg-blue-400 text-white" fullWidth onClick={() => opemModalCategoriaForma()} >Nova Forma de Pagamento</Button>
+                                <Button className="bg-buttonCinzaPadrao text-white" fullWidth onClick={() => opemModalCategoria()} >Nova Categoria</Button>
+                                <Button className="bg-buttonAzulClaro text-white" fullWidth onClick={() => opemModalCategoriaForma()} >Nova Forma de Pagamento</Button>
                                 <ButtonVoltar className="md:w-full bg-slate-100" />
                             </div>
 

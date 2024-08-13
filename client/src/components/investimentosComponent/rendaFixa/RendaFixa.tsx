@@ -127,8 +127,17 @@ export default function App() {
                             fullWidth
                             name="valorInvestido"
                             label="Valor Investido"
+                            onBlur={handleChange}
                             value={values.valorInvestido}
-                            onChange={handleChange}
+                            onChange={(event) => {
+                                const { name, value } = event.target;
+                                if (name === 'valorInvestido') {
+                                    const maskedValue = valorMask(value);
+                                    setFieldValue(name, maskedValue);
+                                } else {
+                                    setFieldValue(name, value);
+                                }
+                            }}
                             startContent={<span className="text-white text-small">R$</span>}
                         />
                         <I18nProvider locale="pt-BR">
@@ -136,6 +145,15 @@ export default function App() {
                                 name="dataVencimento"
                                 label="Data de Vencimento"
                                 onChange={(val) => setFieldValue("dataVencimento", val)}
+                            />
+                        </I18nProvider>
+                        <I18nProvider locale="pt-BR">
+                            <DatePicker
+                                name="dataCompra"
+                                hideTimeZone
+                                label="Data da Compra"
+                                onChange={(val) => setFieldValue("dataCompra", val)}
+                                defaultValue={today(getLocalTimeZone())}
                             />
                         </I18nProvider>
                         <Input

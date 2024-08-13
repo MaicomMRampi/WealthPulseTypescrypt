@@ -6,8 +6,8 @@ import { Alert } from "@mui/material";
 
 interface Props {
     isOpen: boolean,
-    onClose: () => void,
-    onSubmit: (value: string) => void,
+    onClose: any,
+    onSubmit: any,
     message: string,
     messageTipo: 'error' | 'warning' | 'info' | 'success' // Corrigindo o tipo aqui
 }

@@ -12,7 +12,7 @@ import Debentures from "@/components/investimentosComponent/debentures/Debenture
 export default function App() {
     const [tipoInvestimento, setTipoInvestimento] = useState("acao");
     return (
-        <div className="flex w-[50%] mx-auto flex-col items-center gap-4 pt-8">
+        <div className="pt-8 flex flex-col gap-3 md:w-[60%] xs:w-full px-4 mx-auto">
 
             <Select
                 // value={value}
@@ -21,28 +21,27 @@ export default function App() {
                 label="Selecione o Tipo de Investimento"
                 onChange={(e) => setTipoInvestimento(e.target.value)}
             >
-                <SelectItem key={1} value="acao">Ações</SelectItem>
-                <SelectItem key={2} value="fii">Fundos Imobiliários (FIIs)</SelectItem>
-                <SelectItem key={3} value="rendaFixa">Renda Fixa</SelectItem>
-                <SelectItem key={4} value="cripto">Criptomoedas</SelectItem>
-                <SelectItem key={5} value="fundo">Fundos de Investimento</SelectItem>
-                <SelectItem key={6} value="previdencia">Previdência Privada</SelectItem>
-                <SelectItem key={7} value="debentures">Debêntures</SelectItem>
+                <SelectItem key={'acao'} value="acao">Ações</SelectItem>
+                <SelectItem key={"fii"} value="fii">Fundos Imobiliários (FIIs)</SelectItem>
+                <SelectItem key={"rendaFixa"} value="rendaFixa">Renda Fixa</SelectItem>
+                <SelectItem key={"cripto"} value="cripto">Criptomoedas</SelectItem>
+                <SelectItem key={"fundo"} value="fundo">Fundos de Investimento</SelectItem>
+                <SelectItem key={"previdencia"} value="previdencia">Previdência Privada</SelectItem>
+                <SelectItem key={"debentures"} value="debentures">Debêntures</SelectItem>
             </Select>
-
-            {tipoInvestimento == '1' ? (
-                <Acoes />
-            ) : tipoInvestimento == '2' ? (
+            {tipoInvestimento == 'acao' ? (
+                <Acoes tipoInvestimento={tipoInvestimento} />
+            ) : tipoInvestimento == 'fii' ? (
                 <MeusFundosImobiliarios />
-            ) : tipoInvestimento == '3' ? (
+            ) : tipoInvestimento == 'rendaFixa' ? (
                 <RendaFixa />
-            ) : tipoInvestimento == '4' ? (
+            ) : tipoInvestimento == 'cripto' ? (
                 <Criptomoedas />
-            ) : tipoInvestimento == '5' ? (
+            ) : tipoInvestimento == 'fundo' ? (
                 <FundosInvestimento />
-            ) : tipoInvestimento == '6' ? (
+            ) : tipoInvestimento == 'previdencia' ? (
                 <PrevidenciaPrivada />
-            ) : tipoInvestimento == '7' ? (
+            ) : tipoInvestimento == 'debentures' ? (
                 <Debentures />
             ) :
 

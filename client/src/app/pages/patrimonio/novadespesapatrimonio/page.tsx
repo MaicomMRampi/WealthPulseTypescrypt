@@ -146,9 +146,8 @@ export default function App() {
                                     label="Patrimônio"
                                     onChange={handleChange}
                                 >
-                                    {dados.map(item => (
+                                    {dados.map((item: any) => (
                                         <MenuItem
-
                                             onClick={() => setTipoBem(item)} value={tipobem} key={item.id}>
                                             {item.nomePatrimonio}
                                         </MenuItem>
@@ -164,7 +163,7 @@ export default function App() {
                                     onChange={handleChange}
 
                                 >
-                                    {dadosDespesas.map(item => (
+                                    {dadosDespesas.map((item: any) => (
                                         <MenuItem onClick={() => {
                                             values.kmatual = '';
                                             values.kmantigo = '';

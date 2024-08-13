@@ -69,14 +69,14 @@ export default function App() {
 
                         <Input
                             fullWidth
-                            name="nomeFundo"
+                            name="nome"
                             label="Nome do Fundo"
-                            value={values.nomeFundo}
+                            value={values.nome}
                             onChange={handleChange}
                         />
                         <Input
                             fullWidth
-                            name="quantidadeCotas"
+                            name="quantidade"
                             label="Quantidade de Cotas"
                             value={values.quantidadeCotas}
                             onChange={handleChange}
@@ -84,14 +84,14 @@ export default function App() {
 
                         <Input
                             fullWidth
-                            name="precoCota"
+                            name="valorPago"
                             label="Preço de Compra por Cota"
-                            value={values.valor}
-                            isInvalid={errors.valor && touched.valor}
+                            value={values.valorPago}
+                            isInvalid={errors.valorPago && touched.valorPago}
                             onBlur={handleChange}
                             onChange={(event) => {
                                 const { name, value } = event.target;
-                                if (name === 'valor') {
+                                if (name === 'valorPago') {
                                     const maskedValue = valorMask(value);
                                     setFieldValue(name, maskedValue);
                                 } else {
@@ -108,23 +108,10 @@ export default function App() {
                         <I18nProvider locale="pt-BR">
                             <DatePicker
                                 name="dataCompra"
+                                hideTimeZone
                                 label="Data da Compra"
                                 onChange={(val) => setFieldValue("dataCompra", val)}
-                            />
-                        </I18nProvider>
-
-
-
-                        {/* <input type="date" name="dataaquisicao" onChange={e => setFieldValue('dataaquisicao', e.target.value)} /> */}
-
-                        {/* <DatePicker label="Birth date" className="max-w-[284px]" name="dataaquisicao" isRequired defaultValue={values.dataaquisicao} onChange={setFieldValue} /> */}
-                        <I18nProvider locale="pt-BR">
-                            <DatePicker
-                                name="dataaquisicao"
-                                hideTimeZone
-                                defaultValue={today(getLocalTimeZone())} // Set default value directly
-                                onChange={(val) => setFieldValue("dataaquisicao", val)}
-                                label="Data de Aquisição"
+                                defaultValue={today(getLocalTimeZone())}
                             />
                         </I18nProvider>
                         <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
