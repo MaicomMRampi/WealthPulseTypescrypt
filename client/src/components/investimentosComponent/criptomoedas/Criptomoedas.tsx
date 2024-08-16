@@ -1,11 +1,11 @@
 "use client"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik } from 'formik';
 import { valorMask } from "@/components/Mask";
 import ButtonEnviarDadosPadrao from "@/components/ButtonEnviarDadosPadrao";
 import { api } from "@/lib/api";
-import { initialValues, validationSchema } from "./patrimonioForm";
-import { Input, Select, SelectItem } from "@nextui-org/react";
+import { initialValues, validationSchema } from "./criptoForm"
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import useToken from "@/components/hooks/useToken";
 import { DatePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
@@ -13,78 +13,101 @@ import { I18nProvider } from '@react-aria/i18n'
 import { Alert } from "@mui/material";
 import TitlePage from "@/components/tituloPaginas";
 import { useRouter } from "next/navigation";
+import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
 
-
-export default function App() {
-    const router = useRouter()
+export default function App({ tipoInvestimento }: any) {
+    const [banco, setBanco] = useState([])
     const { tokenUsuario } = useToken()
-    const [message, setMessage] = useState('');
-    const [messageTipo, setMessageTipo] = useState('');
+    const [messageTipoAlert, setmessageTipoAlert] = useState<string>()
+    const [messageResposta, setMessageResposta] = useState<string>()
+    const [modalOpenBanco, setModalOpenBanco] = useState<boolean>(false);
+    const [modalOpenAcao, setModalOpenAcao] = useState<boolean>(false);
+
+    const buscaBanco = async () => {
+        if (!tokenUsuario) return
+        try {
+            const response = await api.get('/buscabanco', {
+                params: {
+                    id: tokenUsuario?.id,
+                }
+            })
+            setBanco(response.data)
+
+        }
+        catch (error) {
+        }
+    }
+
+    useEffect(() => {
+        buscaBanco()
+    }, [])
 
     const handleSubmit = async (values: any) => {
-
-        const response = await api.post('/postpatrimonio', {
-            dados: values,
+        const valorParaBack = {
+            ...values,
+            tipoInvestimento: tipoInvestimento,
+        }
+        const response = await api.post('/novoinvestimento', {
+            dados: valorParaBack,
             token: tokenUsuario?.id,
         });
+        console.log("🚀 ~ handleSubmit ~ response", response)
 
         if (response.status === 200) {
-            setMessage('Patrimônio Cadastrado com Sucesso');
-            setMessageTipo('success');
-            setTimeout(() => {
-                router.push('/pages/patrimonio/listapatrimonio');
-
-            }, 2000);
+            setMessageResposta('Investimento Cadastrado com Sucesso');
+            setmessageTipoAlert('success');
         } else {
-            setMessage('Erro ao Cadastrar Patrimônio');
-            setMessageTipo('error');
+            setMessageResposta('Erro ao Cadastrar Investimento');
+            setmessageTipoAlert('error');
         }
         setTimeout(() => {
-            setMessage('');
-            setMessageTipo('');
+            setMessageResposta('');
+            setmessageTipoAlert('');
 
         }, 2000);
 
     };
 
-    const titulos = [
-        {
-            tipo: 'Tesouro Direto',
-            nome: 'Tesouro Selic 2024',
-            vencimento: '2024-07-01',
-            taxaJuros: 'Selic + 0.10%',
-            valorMinimo: 1000,
-        },
-        {
-            tipo: 'CDB',
-            nome: 'CDB Banco XYZ',
-            vencimento: '2026-12-31',
-            taxaJuros: '120% do CDI',
-            valorMinimo: 5000,
-        },
-        {
-            tipo: 'LCI',
-            nome: 'LCI Banco ABC',
-            vencimento: '2025-09-30',
-            taxaJuros: '95% do CDI',
-            valorMinimo: 3000,
-        },
-        {
-            tipo: 'LCA',
-            nome: 'LCA Banco DEF',
-            vencimento: '2027-01-15',
-            taxaJuros: '100% do CDI',
-            valorMinimo: 2000,
-        },
-        {
-            tipo: 'Debênture',
-            nome: 'Debênture XYZ 2028',
-            vencimento: '2028-05-20',
-            taxaJuros: 'IPCA + 5.5%',
-            valorMinimo: 10000,
-        },
-    ];
+    const handleSubmitModalBanco = async (values: any) => {
+        try {
+            const response = await api.post(`/banco`, {
+                values,
+                token: tokenUsuario?.id,
+            })
 
+            if (response.status === 200) {
+                setmessageTipoAlert("success")
+                buscaBanco()
+                setMessageResposta(response.data.message)
+                setTimeout(() => {
+                    setMessageResposta("")
+                    setModalOpenBanco(false)
+                }, 2000)
+            }
+        } catch (error: any) {
+            if (error.response && error.response.status === 400) {
+                // O banco já está cadastrado
+                setmessageTipoAlert("error")
+                setMessageResposta(error.response.data.message)
+                setTimeout(() => {
+                    setMessageResposta("")
+                    setModalOpenBanco(false)
+                }, 2000)
+            } else {
+                // Outro erro inesperado
+                console.error('Erro ao tentar cadastrar banco:', error);
+                setmessageTipoAlert("error")
+                setTimeout(() => {
+                    setMessageResposta("")
+                    setModalOpenBanco(false)
+                }, 2000)
+                setMessageResposta("Erro ao tentar cadastrar banco. Por favor, tente novamente mais tarde.")
+            }
+        }
+    }
+    const opemModalInstituicao = () => {
+        setModalOpenBanco(true);
+    }
 
     return (
         <>
@@ -106,6 +129,8 @@ export default function App() {
                         <Input
                             fullWidth
                             name="nome"
+                            autoComplete="off"
+                            isInvalid={errors && errors.nome && touched.nome}
                             label="Nome da Criptomoeda"
                             value={values.nomeCripto}
                             onChange={handleChange}
@@ -113,12 +138,31 @@ export default function App() {
                         <Input
                             fullWidth
                             name="quantidade"
-                            label="Quantidade"
+                            autoComplete="off"
+                            isInvalid={touched.quantidade && !!errors.quantidade}
+                            type="number"
+                            label="Quantidade "
                             value={values.quantidade}
                             onChange={handleChange}
                         />
+                        <Select
+                            isInvalid={touched.instituicao && !!errors.instituicao}
+                            name="instituicao"
+                            fullWidth
+                            value={values.instituicao}
+                            label="Instituição Financeira"
+                            onChange={handleChange}
+                        >
+
+                            {banco.map((item: any) => (
+                                <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
+                                    {item.nomeBanco}
+                                </SelectItem>
+                            ))}
+                        </Select>
                         <Input
                             fullWidth
+                            isInvalid={touched.valorPago && errors.valorPago}
                             name="valorPago"
                             label="Valor Investido"
                             value={values.valorPago}
@@ -138,13 +182,25 @@ export default function App() {
                             <DatePicker
                                 name="dataCompra"
                                 label="Data da Compra"
+                                defaultValue={today(getLocalTimeZone())}
+                                minValue={today(getLocalTimeZone())}
                                 onChange={(val) => setFieldValue("dataCompra", val)}
                             />
                         </I18nProvider>
-                        <ButtonEnviarDadosPadrao />
+                        {JSON.stringify(errors)}
+                        <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
+                        <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
+                        {messageResposta && <Alert severity={messageTipoAlert as 'success' | 'info' | 'warning' | 'error'}>{messageResposta}</Alert>}
                     </form>
                 )}
             </Formik>
+            <ModalNovaInstituicao
+                open={modalOpenBanco}
+                onClose={() => setModalOpenBanco(false)}
+                onSubmit={handleSubmitModalBanco}
+                message={messageResposta}
+                messageTipo={messageTipoAlert}
+            />
         </>
     );
 }

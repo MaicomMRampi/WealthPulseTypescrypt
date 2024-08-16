@@ -32,15 +32,15 @@ export default function App() {
             {tipoInvestimento == 'acao' ? (
                 <Acoes tipoInvestimento={tipoInvestimento} />
             ) : tipoInvestimento == 'fii' ? (
-                <MeusFundosImobiliarios />
+                <MeusFundosImobiliarios tipoInvestimento={tipoInvestimento} />
             ) : tipoInvestimento == 'rendaFixa' ? (
-                <RendaFixa />
+                <RendaFixa tipoInvestimento={tipoInvestimento} />
             ) : tipoInvestimento == 'cripto' ? (
-                <Criptomoedas />
+                <Criptomoedas tipoInvestimento={tipoInvestimento} />
             ) : tipoInvestimento == 'fundo' ? (
-                <FundosInvestimento />
+                <FundosInvestimento tipoInvestimento={tipoInvestimento} />
             ) : tipoInvestimento == 'previdencia' ? (
-                <PrevidenciaPrivada />
+                <PrevidenciaPrivada tipoInvestimento={tipoInvestimento} />
             ) : tipoInvestimento == 'debentures' ? (
                 <Debentures />
             ) :

@@ -15,7 +15,7 @@ import TitlePage from "@/components/tituloPaginas";
 import { useRouter } from "next/navigation";
 
 
-export default function App() {
+export default function App({ tipoInvestimento }: any) {
     const router = useRouter()
     const { tokenUsuario } = useToken()
     const [message, setMessage] = useState('');

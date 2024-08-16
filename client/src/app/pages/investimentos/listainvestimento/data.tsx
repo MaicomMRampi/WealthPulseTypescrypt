@@ -1,19 +1,32 @@
 import React from "react";
 const columns = [
-    { name: "ID", uid: "id", sortable: true },
-    { name: "NAME", uid: "name", sortable: true },
-    { name: "AGE", uid: "age", sortable: true },
-    { name: "ROLE", uid: "role", sortable: true },
-    { name: "TEAM", uid: "team" },
-    { name: "EMAIL", uid: "email" },
-    { name: "STATUS", uid: "status", sortable: true },
-    { name: "ACTIONS", uid: "actions" },
+    { name: "ID", uid: "id" },
+    { name: "Nome Investimento", uid: "nome" },
+    { name: "Data Compra", uid: "dataCompra" },
+    { name: "Valor Investido", uid: "valorInvestido" },
+    { name: "Data Vencimento", uid: "dataVencimento" },
+    { name: "Instituição", uid: "instituicao" },
+    { name: "Quantidade", uid: "quantidade" },
+    { name: "Taxa de Juros", uid: "taxaJuros" },
+    { name: "Ticker", uid: "ticker" },
+    { name: "Tipo", uid: "tipo" },
+    { name: "Tipo Fundo", uid: "tipoFundo" },
+    { name: "Tipo Plano", uid: "tipoPlano" },
+    { name: "Valor Atual FII", uid: "valorAtualFii" },
+    { name: "Valor Pago", uid: "valorPago" },
+    { name: "ID Usuário", uid: "idUser" },
+    { name: "Ações", uid: "actions" },
 ];
 
+
 const statusOptions = [
-    { name: "Active", uid: "active" },
-    { name: "Paused", uid: "paused" },
-    { name: "Vacation", uid: "vacation" },
+    { name: "Ações", uid: "acao" },
+    { name: "Fundos Imobiliários (FIIs)", uid: "fii" },
+    { name: "Renda Fixa", uid: "rendaFixa" },
+    { name: "Criptomoedas", uid: "cripto" },
+    { name: "Fundos de Investimento", uid: "fundo" },
+    { name: "Previdência Privada", uid: "previdencia" },
+    { name: "Debêntures", uid: "debentures" },
 ];
 
 const users = [

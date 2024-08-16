@@ -12,6 +12,7 @@ import { api } from '@/lib/api';
 import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
 import ModalNovaAcao from "./ModalNovaAção";
 import useToken from '@/components/hooks/useToken';
+import { Alert } from '@mui/material';
 export default function Acoes({ tipoInvestimento }: any) {
     const [messageTipoAlert, setmessageTipoAlert] = useState<string>()
     const [messageResposta, setMessageResposta] = useState<string>()
@@ -33,6 +34,7 @@ export default function Acoes({ tipoInvestimento }: any) {
     ]
 
     const buscaAcoes = async () => {
+        if (!tokenUsuario) return
         try {
             const response = await api.get('/buscanomeacao', {
                 params: {
@@ -46,6 +48,7 @@ export default function Acoes({ tipoInvestimento }: any) {
         }
     }
     const buscaBanco = async () => {
+        if (!tokenUsuario) return
         try {
             const response = await api.get('/buscabanco', {
                 params: {
@@ -268,6 +271,7 @@ export default function Acoes({ tipoInvestimento }: any) {
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
                     </div>
                     <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
+                    {messageResposta && <Alert severity={messageTipoAlert}>{messageResposta}</Alert>}
                     <ModalNovaInstituicao
                         open={modalOpenBanco}
                         onClose={() => setModalOpenBanco(false)}

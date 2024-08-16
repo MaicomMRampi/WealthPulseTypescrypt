@@ -119,6 +119,7 @@ model Investimento {
   nome           String // Nome genérico para qualquer tipo de investimento
   quantidade     Float? // Quantidade de ações, cotas, ou criptomoedas
   valorPago      Float? // Quantidade de ações, cotas, ou criptomoedas
+  tipoTitulo     String? // Tipo de título (para renda fixa e debêntures)
   valorInvestido Float // Valor investido
   taxaJuros      Float? // Taxa de juros (para renda fixa, debêntures, etc.)
   dataCompra     String // Data de compra

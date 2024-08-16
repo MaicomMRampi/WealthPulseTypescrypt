@@ -472,36 +472,157 @@ router.post('/api/dividendos', async (req, res) => {
 
 // ================INVESTIMENTOS======================
 router.post('/api/novoinvestimento', async (req, res) => {
-    const dados = req.body
-    const valor = dados.dados.precoCompra
-    try {
-        const novoInvestimento = await prisma.Investimento.create({
-            data: {
-                idUser: dados.token,
-                tipo: dados.dados.tipoInvestimento,
-                nome: dados.dados.nome,
-                quantidade: dados.dados.quantidade,
-                valorPago: converteString(dados.dados.precoCompra),
-                instituicao: dados.dados.instituicao,
-                valorInvestido: dados.dados.tipoInvestimento === 'acoes' || dados.dados.tipoInvestimento === 'fii' ? converteString(dados.dados.precoCompra * dados.dados.quantidade) : converteString(dados.dados.precoCompra),
-                taxaJuros: dados.dados.taxaJuros,
-                dataCompra: formatDate(dados.dados.dataCompra),
-                valorAtualFii: dados.dados.valorPago,
-                dataVencimento: dados.dados.dataVencimento,
-                ticker: '',
-                tipoPlano: dados.dados.tipoFundo,
-                tipoFundo: dados.dados.investimentoTipo,
+    const dados = req.body;
+    console.log("🚀 ~ router.post ~ dados", dados);
+
+    switch (dados.dados.tipoInvestimento) {
+        case 'acao': {
+            try {
+                const precoCompraFormatado = converteString(dados.dados.precoCompra);
+                const novaAcao = await prisma.Investimento.create({
+                    data: {
+                        nome: dados.dados.nome.toUpperCase().trim(),
+                        instituicao: dados.dados.instituicao,
+                        quantidade: dados.dados.quantidade,
+                        valorPago: precoCompraFormatado,
+                        dataCompra: formatDate(dados.dados.dataCompra),
+                        valorInvestido: precoCompraFormatado * dados.dados.quantidade,
+                        idUser: parseInt(dados.token),
+                        tipo: dados.dados.tipoInvestimento // Adicionei o campo 'tipo' aqui
+                    }
+                });
+                console.log("🚀 ~ router.post ~ novaAcao", novaAcao);
+                res.status(200).json({ message: 'Ação Cadastrada com Sucesso!' });
+            } catch (error) {
+                console.error('Erro ao Cadastrar Investimento:', error);
+                res.status(500).json({ message: 'Erro ao Cadastrar Investimento.' });
             }
-        })
+            break; // Adicione um break aqui para sair do case após a execução.
+        }
 
-        res.status(200).json({ message: 'Investimento Cadastrado com Sucesso !' });
+        case 'fii': {
+            try {
+                const valorPagoFormatado = converteString(dados.dados.valorPago);
+                const novaFii = await prisma.Investimento.create({
+                    data: {
+                        nome: dados.dados.nome.toUpperCase().trim(),
+                        instituicao: dados.dados.instituicao,
+                        quantidade: dados.dados.quantidade,
+                        valorPago: valorPagoFormatado,
+                        dataCompra: formatDate(dados.dados.dataCompra),
+                        valorInvestido: valorPagoFormatado * dados.dados.quantidade,
+                        idUser: parseInt(dados.token),
+                        tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento
+                    }
+                });
+                console.log("🚀 ~ router.post ~ novaFii", novaFii);
+                res.status(200).json({ message: 'FII Cadastrado com Sucesso!' });
+            } catch (error) {
+                console.error('Erro ao Cadastrar FII:', error);
+                res.status(500).json({ message: 'Erro ao Cadastrar FII.' });
+            }
+            break;
+        }
+
+        case 'rendaFixa': {
+            try {
+                const valorInvestidoFormatado = converteString(dados.dados.valorInvestido);
+                const novaRendaFixa = await prisma.Investimento.create({
+                    data: {
+                        idUser: parseInt(dados.token), // ID do usuário
+                        tipo: dados.dados.tipoInvestimento, // Tipo de investimento, ex: "rendaFixa"
+                        nome: dados.dados.nome.toUpperCase().trim(), // Nome do título de renda fixa
+                        tipoTitulo: dados.dados.tipoTitulo, // Tipo de tiútulo, ex: "rendaFixa"
+                        valorInvestido: valorInvestidoFormatado, // Valor investido formatado
+                        taxaJuros: parseFloat(dados.dados.taxaJuros), // Taxa de juros
+                        dataCompra: formatDate(dados.dados.dataCompra), // Data de compra formatada
+                        dataVencimento: formatDate(dados.dados.dataVencimento), // Data de vencimento formatada
+                        instituicao: dados.dados.instituicao, // Instituição financeira
+                        tipo: dados.dados.tipoInvestimento
+                    }
+                });
+                console.log("🚀 ~ router.post ~ novaRendaFixa", novaRendaFixa);
+                res.status(200).json({ message: 'Investimento de Renda Fixa Cadastrado com Sucesso!' });
+            } catch (error) {
+                console.error('Erro ao Cadastrar Renda Fixa:', error);
+                res.status(500).json({ message: 'Erro ao Cadastrar Investimento de Renda Fixa.' });
+            }
+            break;
+        }
+
+        case 'cripto': {
+            try {
+                const valorPagoFormatado = converteString(dados.dados.valorPago);
+                const novaCripto = await prisma.Investimento.create({
+                    data: {
+                        nome: dados.dados.nome.toUpperCase().trim(), // Nome da Criptomoeda
+                        instituicao: dados.dados.instituicao || 'Exchange', // Caso a instituição não seja fornecida, defina como 'Exchange'
+                        quantidade: parseInt(dados.dados.quantidade),
+                        valorPago: valorPagoFormatado,
+                        valorInvestido: converteString(dados.dados.valorPago),
+                        dataCompra: formatDate(dados.dados.dataCompra),
+                        idUser: parseInt(dados.token),
+                        tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento 'cripto'
+                    }
+                });
+                console.log("🚀 ~ router.post ~ novaCripto", novaCripto);
+                res.status(200).json({ message: 'Criptomoeda Cadastrada com Sucesso!' });
+            } catch (error) {
+                console.error('Erro ao Cadastrar Criptomoeda:', error);
+                res.status(500).json({ message: 'Erro ao Cadastrar Criptomoeda.' });
+            }
+            break;
+        }
+
+
+        case 'fundo': {
+            try {
+                const valorInvestidoFormatado = converteString(dados.dados.valorInvestido);
+                const novoFundo = await prisma.Investimento.create({
+                    data: {
+                        nome: dados.dados.nome.toUpperCase().trim(), // Nome do fundo de investimento
+                        tipoFundo: dados.dados.tipoFundo || '', // Tipo de fundo de investimento (ex: Fundo Imobiliário, Fundo Multimercado, etc.)
+                        valorInvestido: valorInvestidoFormatado,
+                        dataCompra: formatDate(dados.dados.dataCompra),
+                        idUser: parseInt(dados.token),
+                        tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento 'fundo'
+                    }
+                });
+                console.log("🚀 ~ router.post ~ novoFundo", novoFundo);
+                res.status(200).json({ message: 'Fundo de Investimento Cadastrado com Sucesso!' });
+            } catch (error) {
+                console.error('Erro ao Cadastrar Fundo de Investimento:', error);
+                res.status(500).json({ message: 'Erro ao Cadastrar Fundo de Investimento.' });
+            }
+            break;
+        }
+
+        case 'previdencia': {
+            // Implementação para 'previdencia'
+            break;
+        }
+
+        case 'debentures': {
+            // Implementação para 'debentures'
+            break;
+        }
+
+        default: {
+            res.status(400).json({ message: 'Tipo de investimento não reconhecido.' });
+            break;
+        }
+    }
+});
+
+router.get('/api/meusinvestimentos', async (req, res) => {
+    const id = req.query.id
+    try {
+        const buscaInvestimentos = await prisma.Investimento.findMany({ where: { idUser: parseInt(id) } })
+        res.json(buscaInvestimentos);
     } catch (error) {
-
         res.status(400).json({ message: 'Erro ao Cadastrar Investimento.' });
-
     }
 })
-
 
 router.put('/api/atualizavalor', async (req, res) => {
     const novoValor = req.body.values.novovalorinvestimento;

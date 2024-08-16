@@ -1,5 +1,5 @@
 "use client"
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Table,
     TableHeader,
@@ -21,12 +21,18 @@ import {
     SortDescriptor,
     Card
 } from "@nextui-org/react";
+import TitlePage from "@/components/tituloPaginas";
 import { PlusIcon } from "@/components/iconesCompartilhados/PlusIcon";
 import { VerticalDotsIcon } from "@/components/iconesCompartilhados/VerticalDotsIcon";
 import { ChevronDownIcon } from "@/components/iconesCompartilhados/ChevronDownIcon";
 import { SearchIcon } from "@/components/iconesCompartilhados/SearchIcon";
 import { columns, users, statusOptions } from "./data";
 import { capitalize } from "./utils";
+import { api } from "@/lib/api";
+import useToken from "@/components/hooks/useToken";
+import Link from "next/link";
+import currency from "@/components/Currency";
+
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
     active: "success",
@@ -34,23 +40,75 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
     vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
 
-type User = typeof users[0];
+
+
+
+type User = typeof dados[0];
 
 export default function App() {
-    const [filterValue, setFilterValue] = React.useState("");
-    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
-    const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+
+
+    const [dados, setDados] = useState([])
+    const INITIAL_VISIBLE_COLUMNS = ["nome", "dataCompra", "instituicao", "valorInvestido", "actions"];
+    const { tokenUsuario } = useToken()
+    const [nomePagina, setNomePagina] = useState("Minhas Rendas Fixas");
+    const [filterValue, setFilterValue] = useState();
+    const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
+    const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [statusFilter, setStatusFilter] = useState<string>("rendaFixa");
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "age",
         direction: "ascending",
     });
+    useEffect(() => {
+        const selectedFilter = Array.from(statusFilter)[0] as string;
+        switch (selectedFilter) {
+            case "acao":
+                setNomePagina("Minhas Ações")
+                break;
+            case "fii":
+                setNomePagina("Meus Fundos Imobiliários (FIIs)")
+                break;
+            case "rendaFixa":
+                setNomePagina("Minhas Rendas Fixas")
+                break;
+            case "cripto":
+                setNomePagina("Minhas Criptomoedas")
+                break;
+            case "fundo":
+                setNomePagina("Meus Fundos de Investimento")
+                break;
+            case "previdencia":
+                setNomePagina("Previdência Privada")
+                break;
+            case "debentures":
+                setNomePagina("Meus Debêntures")
+                break;
+            default:
+                setNomePagina("Minhas Rendas Fixas")
+        }
+    }, [statusFilter])
+
+
+    const buscaInvestimentos = async () => {
+        if (!tokenUsuario) return
+        const response = await api.get('/meusinvestimentos', {
+            params: {
+                id: tokenUsuario?.id
+            }
+        })
+        setDados(response.data)
+    }
+
+    useEffect(() => {
+        buscaInvestimentos()
+    }, [])
+
     const [page, setPage] = React.useState(1);
 
-    const pages = Math.ceil(users.length / rowsPerPage);
+    const pages = Math.ceil(dados.length / rowsPerPage);
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -61,21 +119,21 @@ export default function App() {
     }, [visibleColumns]);
 
     const filteredItems = React.useMemo(() => {
-        let filteredUsers = [...users];
+        let filteredUsers = [...dados];
 
         if (hasSearchFilter) {
-            filteredUsers = filteredUsers.filter((user) =>
-                user.name.toLowerCase().includes(filterValue.toLowerCase()),
+            filteredUsers = filteredUsers.filter((investimento) =>
+                investimento.nome.toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
-        if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-            filteredUsers = filteredUsers.filter((user) =>
-                Array.from(statusFilter).includes(user.status),
-            );
-        }
+        // if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
+        //     filteredUsers = filteredUsers.filter((investimentos) =>
+        //         Array.from(statusFilter).includes(investimentos.status),
+        //     );
+        // }
 
         return filteredUsers;
-    }, [users, filterValue, statusFilter]);
+    }, [dados, filterValue, statusFilter]);
 
     const items = React.useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -85,9 +143,9 @@ export default function App() {
     }, [page, filteredItems, rowsPerPage]);
 
     const sortedItems = React.useMemo(() => {
-        return [...items].sort((a: User, b: User) => {
-            const first = a[sortDescriptor.column as keyof User] as number;
-            const second = b[sortDescriptor.column as keyof User] as number;
+        return [...items].sort((a: dados, b: dados) => {
+            const first = a[sortDescriptor.column as keyof dados] as number;
+            const second = b[sortDescriptor.column as keyof dados] as number;
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -98,36 +156,17 @@ export default function App() {
         const cellValue = user[columnKey as keyof User];
 
         switch (columnKey) {
-            case "name":
+            case "nome":
                 return (
-                    <User
-                        avatarProps={{ radius: "full", size: "sm", src: user.avatar }}
-                        classNames={{
-                            description: "text-default-500",
-                        }}
-                        description={user.email}
-                        name={cellValue}
-                    >
-                        {user.email}
-                    </User>
+                    <p>{user.nome}</p>
                 );
-            case "role":
+            case "dataCompra":
                 return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-small capitalize">{cellValue}</p>
-                        <p className="text-bold text-tiny capitalize text-default-500">{user.team}</p>
-                    </div>
+                    <p>{user.dataCompra}</p>
                 );
-            case "status":
+            case "valorInvestido":
                 return (
-                    <Chip
-                        className="capitalize border-none gap-1 text-default-600"
-                        color={statusColorMap[user.status]}
-                        size="sm"
-                        variant="dot"
-                    >
-                        {cellValue}
-                    </Chip>
+                    <p>{currency(user.valorInvestido)}</p>
                 );
             case "actions":
                 return (
@@ -139,9 +178,9 @@ export default function App() {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                                <DropdownItem>View</DropdownItem>
-                                <DropdownItem>Edit</DropdownItem>
-                                <DropdownItem>Delete</DropdownItem>
+                                <DropdownItem>Detalhes</DropdownItem>
+                                <DropdownItem>Editar</DropdownItem>
+                                <DropdownItem>Deletar</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </div>
@@ -174,29 +213,29 @@ export default function App() {
                         size="md"
                         fullWidth
                         className="w-full sm:max-w-[44%]  "
-                        placeholder="Pesquisar Despesa..."
+                        placeholder="Pesquisar Investimento..."
                         startContent={<SearchIcon />}
                         value={filterValue}
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
-                    <div className="flex gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button
                                     endContent={<ChevronDownIcon className="text-small" />}
-                                    size="sm"
-                                    variant="flat"
+                                    className="bg-buttonAzulClaro text-white"
+                                    variant="solid"
                                 >
-                                    Status
+                                    <h2 className="text-lg">Tipo de Investimento</h2>
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
                                 disallowEmptySelection
                                 aria-label="Table Columns"
-                                closeOnSelect={false}
+                                closeOnSelect={true}
                                 selectedKeys={statusFilter}
-                                selectionMode="multiple"
+                                selectionMode="single"
                                 onSelectionChange={setStatusFilter}
                             >
                                 {statusOptions.map((status) => (
@@ -210,10 +249,10 @@ export default function App() {
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button
                                     endContent={<ChevronDownIcon className="text-small" />}
-                                    size="sm"
-                                    variant="flat"
+                                    className="bg-buttonCinzaPadrao text-black"
+                                    variant="solid"
                                 >
-                                    Columns
+                                    <h2 className="text-lg">Colunas</h2>
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -232,11 +271,12 @@ export default function App() {
                             </DropdownMenu>
                         </Dropdown>
                         <Button
-                            className="bg-foreground text-background"
+                            fullWidth
+                            color="primary"
+                            variant="solid"
                             endContent={<PlusIcon />}
-                            size="sm"
                         >
-                            Add New
+                            <Link href="/pages/investimentos/novoinvestimento"> Nova Despesa</Link>
                         </Button>
                     </div>
                 </div>
@@ -268,7 +308,7 @@ export default function App() {
 
     const bottomContent = React.useMemo(() => {
         return (
-            <div className="py-2 px-2 flex justify-between items-center">
+            <div className="py-2 px-2 flex justify-center items-center">
                 <Pagination
                     showControls
                     classNames={{
@@ -281,11 +321,11 @@ export default function App() {
                     variant="light"
                     onChange={setPage}
                 />
-                <span className="text-small text-default-400">
+                {/* <span className="text-small text-default-400">
                     {selectedKeys === "all"
                         ? "All items selected"
                         : `${selectedKeys.size} of ${items.length} selected`}
-                </span>
+                </span> */}
             </div>
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
@@ -312,6 +352,9 @@ export default function App() {
     return (
         <div className="w-full p-8">
             <Card className=" px-4 pt-4  bg-primaryTable rounded-lg">
+                <TitlePage title={
+                    nomePagina}
+                />
                 <Table
                     isCompact
                     removeWrapper
