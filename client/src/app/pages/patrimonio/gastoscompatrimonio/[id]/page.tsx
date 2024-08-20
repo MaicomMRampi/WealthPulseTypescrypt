@@ -15,7 +15,7 @@ import currency from '@/components/Currency';
 // import Tema from '@/components/Tema';
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
-// import ModalObservacao from '@/components/ModalObservacaoGastos';
+/
 // import ModalObservacaoInativacao from '@/components/ModalObservacaoInativacao';
 import { useMemo } from 'react';
 import { useCallback } from 'react';

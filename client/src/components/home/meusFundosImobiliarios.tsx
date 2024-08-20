@@ -1,68 +1,85 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react';
+import {
+    PieChart, Pie, Cell, Legend, ResponsiveContainer
+} from 'recharts';
+import useVisibility from '../hooks/useVisibility';
+import useToken from '../hooks/useToken';
+import { api } from '@/lib/api';
+import { Card } from '@nextui-org/react';
 
 export default function MeusFundosImobiliarios() {
+    const { visibility } = useVisibility();
+    const { tokenUsuario } = useToken();
     const [rendaFii, setRendaFii] = useState([]);
-    const buscaFii = async () => {
-        if (emailUser) {
-            const response = await api.post(`/getfiihome`, {
-                emailUser
-            })
 
-            setRendaFii(response.data)
-        }
-    }
+    const filtraParaFii = (investimentos: any) => {
+        const selectedFilter = 'fii';
+        return investimentos.filter(investimento => investimento.tipo === selectedFilter);
+    };
+
+    const buscaContaMesAtual = async () => {
+        const response = await api.get(`/meusinvestimentos`, {
+            params: {
+                id: tokenUsuario?.id,
+            },
+        });
+        const dadosFiltrados = filtraParaFii(response.data);
+        setRendaFii(dadosFiltrados);
+    };
+
     useEffect(() => {
-        if (emailUser) {
-            buscaFii()
-        }
+        buscaContaMesAtual();
+    }, []);
 
-    }, [emailUser])
+    const dadosAgrupados = rendaFii.reduce((acc, item) => {
+        const { nome, quantidade } = item;
 
-    const dadosAgrupados = rendaFii && rendaFii.reduce((acc, item) => {
-        const { nomefii, quantidade } = item;
-
-        // Se o grupo ainda não existir, crie-o
-        if (!acc[nomefii]) {
-            acc[nomefii] = {
-                nomefii,
-                totalQuantidade: quantidade,
+        if (!acc[nome]) {
+            acc[nome] = {
+                nome,
+                quantidade: quantidade,
             };
         } else {
-            // Se o grupo já existir, atualize o totalQuantidade
-            acc[nomefii].totalQuantidade += quantidade;
+            acc[nome].quantidade += quantidade;
         }
 
         return acc;
     }, {});
 
-    // Converta o objeto de dados agrupados de volta para um array
     const arrayAgrupado = Object.values(dadosAgrupados);
 
-    const data = arrayAgrupado && arrayAgrupado.map(item => ({
-        name: item.nomefii,  // Agora usa o nomefii no eixo X
-        value: item.totalQuantidade,  // Usa a quantidade no eixo Y
+    const data = arrayAgrupado.map(item => ({
+        name: item.nome,
+        value: item.quantidade,
     }));
 
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-
+    const renderCustomizedLabel = ({ name, value }) => `${name}`;
 
     return (
-        // {/* <PieChart>
-        //                     <Pie
-        //                         data={data}
-        //                         cx="50%"
-        //                         cy="50%"
-        //                         labelLine={false}
-        //                         label={renderCustomizedLabel}
-        //                         outerRadius={60}
-        //                         fill="#fffffa"
-        //                         dataKey="value"
-        //                     >
-        //                         {data.map((entry, index) => (
-        //                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-        //                         ))}
-        //                     </Pie>
-        //                     <Legend arabicForm='terminal' display="flex" layout="vertical" align="right" verticalAlign="middle" />
-        //                 </PieChart> */}
-    )
+        <Card className='bg-bgCards col-span-1 h-[400px] p-4 hover:scale-105 duration-75'>
+            <h2 className='text-white text-center'>Meus Fundos Imobiliários</h2>
+            <ResponsiveContainer width="100%" height="100%">
+                <PieChart width={400} height={400}>
+                    <Pie
+                        data={data}
+                        cx="60%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                    >
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                    </Pie>
+                    <Legend layout="vertical" align="right" verticalAlign="middle" />
+                </PieChart>
+            </ResponsiveContainer>
+        </Card>
+    );
 }

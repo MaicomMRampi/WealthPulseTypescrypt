@@ -16,13 +16,14 @@ const config: Config = {
       },
       colors: {
         'default-text': "#93fad6",
-        'primaryTable': '#3F3F46',
+        'primaryTable': '#0b1739',
         'primaryTableHover': '#10b981',
         'primaryTableText': '#10b981',
         'buttonAzulClaro':'#0284c7',
         'buttonCinzaPadrao':'#9ca3af',
         'buttonAzulEscuro':'rgb(30,58,138)',
-        'iconeDeBloquiar':'#eeb70d'
+        'iconeDeBloquiar':'#eeb70d',
+        'bgCards':'#0b1739',
 
       }
     },

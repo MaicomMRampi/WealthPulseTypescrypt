@@ -42,7 +42,7 @@ export default function App() {
             ) : tipoInvestimento == 'previdencia' ? (
                 <PrevidenciaPrivada tipoInvestimento={tipoInvestimento} />
             ) : tipoInvestimento == 'debentures' ? (
-                <Debentures />
+                <Debentures tipoInvestimento={tipoInvestimento} />
             ) :
 
 

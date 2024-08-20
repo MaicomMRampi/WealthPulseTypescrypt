@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Card, CardHeader, CardBody } from '@nextui-org/react';
-import { TbCreditCardPay } from "react-icons/tb";
 import useToken from '../hooks/useToken';
 import { api } from '@/lib/api';
 import currency from '../Currency';
 import useVisibility from '../hooks/useVisibility';
-
+import { GiPayMoney } from "react-icons/gi";
 interface Despesa {
     valorGasto: number;
 }
@@ -32,12 +31,12 @@ export default function TotalDespesas() {
 
 
     return (
-        <Card fullWidth className='bg-[#1c1d24] p-4'>
+        <Card fullWidth className='bg-bgCards p-4 hover:scale-105 duration-75 text-white'>
             <CardHeader>
                 Despesas Mês Atual
             </CardHeader>
             <CardBody>
-                <p className='text-white font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <TbCreditCardPay /></p>
+                <p className='text-white font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <GiPayMoney size={40} className='text-orange-500' /></p>
             </CardBody>
         </Card>
     )

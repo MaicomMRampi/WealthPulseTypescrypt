@@ -598,14 +598,51 @@ router.post('/api/novoinvestimento', async (req, res) => {
         }
 
         case 'previdencia': {
-            // Implementação para 'previdencia'
+            try {
+                const valorInvestidoFormatado = converteString(dados.dados.valorInvestido);
+                const novaPrevidencia = await prisma.Investimento.create({
+                    data: {
+                        nome: dados.dados.nome.toUpperCase().trim(), // Nome do plano de previdência
+                        tipoPlano: dados.dados.tipoPlano, // Tipo do plano (PGBL ou VGBL)
+                        valorInvestido: valorInvestidoFormatado, // Valor investido no plano
+                        instituicao: dados.dados.instituicao.toUpperCase().trim(), // Nome da instituição financeira
+                        dataCompra: formatDate(dados.dados.dataCompra), // Data de contratação do plano
+                        idUser: parseInt(dados.token), // Identificador do usuário
+                        tipo: dados.dados.tipoInvestimento // Tipo de investimento 'previdencia'
+                    }
+                });
+                console.log("🚀 ~ router.post ~ novaPrevidencia", novaPrevidencia);
+                res.status(200).json({ message: 'Plano de Previdência Cadastrado com Sucesso!' });
+            } catch (error) {
+                console.error('Erro ao Cadastrar Plano de Previdência:', error);
+                res.status(500).json({ message: 'Erro ao Cadastrar Plano de Previdência.' });
+            }
+            break;
+        }
+        case 'debentures': {
+            try {
+                const valorInvestidoFormatado = converteString(dados.dados.valorInvestido); // Função para converter string em valor numérico
+                const novaDebenture = await prisma.Investimento.create({
+                    data: {
+                        nome: dados.dados.nome.toUpperCase().trim(), // Nome da debênture
+                        instituicao: dados.dados.instituicao.toUpperCase().trim(), // Nome da instituição financeira
+                        valorInvestido: valorInvestidoFormatado, // Valor investido na debênture
+                        taxaJuros: parseFloat(dados.dados.taxaJuros), // Taxa de juros aplicada
+                        dataCompra: formatDate(dados.dados.dataCompra), // Data de compra da debênture
+                        dataVencimento: formatDate(dados.dados.dataVencimento), // Data de vencimento da debênture
+                        idUser: parseInt(dados.token), // Identificador do usuário
+                        tipo: dados.dados.tipoInvestimento // Tipo de investimento 'debentures'
+                    }
+                });
+                console.log("🚀 ~ router.post ~ novaDebenture", novaDebenture);
+                res.status(200).json({ message: 'Debênture Cadastrada com Sucesso!' });
+            } catch (error) {
+                console.error('Erro ao Cadastrar Debênture:', error);
+                res.status(500).json({ message: 'Erro ao Cadastrar Debênture.' });
+            }
             break;
         }
 
-        case 'debentures': {
-            // Implementação para 'debentures'
-            break;
-        }
 
         default: {
             res.status(400).json({ message: 'Tipo de investimento não reconhecido.' });

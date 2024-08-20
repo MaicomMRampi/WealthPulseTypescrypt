@@ -221,7 +221,6 @@ export default function Acoes({ tipoInvestimento }: any) {
                         onChange={handleChange}
                         isInvalid={touched.instituicao && !!errors.instituicao}
                     >
-
                         {banco.map((item: any) => (
                             <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
                                 {item.nomeBanco}

@@ -74,6 +74,7 @@ export default function App({ tipoInvestimento }: any) {
                 values,
                 token: tokenUsuario?.id,
             })
+            console.log("🚀 ~ handleSubmitModalBanco ~ response", response)
 
             if (response.status === 200) {
                 setmessageTipoAlert("success")
@@ -169,7 +170,8 @@ export default function App({ tipoInvestimento }: any) {
                         <Input
                             fullWidth
                             name="nome"
-                            isInvalid={touched.nome || errors.nome}
+                            autoComplete="off"
+                            isInvalid={touched.nome && !!errors.nome}
                             label="Nome do Fundo"
                             value={values.nome}
                             onChange={handleChange}
@@ -180,7 +182,7 @@ export default function App({ tipoInvestimento }: any) {
                             value={values.instituicao}
                             label="Instituição Financeira"
                             onChange={handleChange}
-                            isInvalid={touched.instituicao || errors.instituicao}
+                            isInvalid={touched.instituicao && !!errors.instituicao}
                         >
 
                             {banco.map((item: any) => (
@@ -190,7 +192,7 @@ export default function App({ tipoInvestimento }: any) {
                             ))}
                         </Select>
                         <Select
-                            isInvalid={touched.tipoFundo || errors.tipoFundo}
+                            isInvalid={touched.tipoFundo && !!errors.tipoFundo}
                             name="tipoFundo"
                             fullWidth
                             label="Tipo de Fundo"
@@ -206,8 +208,9 @@ export default function App({ tipoInvestimento }: any) {
                         </Select>
                         <Input
                             fullWidth
-                            isInvalid={touched.valorInvestido || errors.valorInvestido}
+                            isInvalid={touched.valorInvestido && !!errors.valorInvestido}
                             name="valorInvestido"
+                            autoComplete="off"
                             label="Valor Investido"
                             value={values.valorInvestido}
                             onBlur={handleChange}
@@ -224,7 +227,7 @@ export default function App({ tipoInvestimento }: any) {
                         />
                         <I18nProvider locale="pt-BR">
                             <DatePicker
-                                isInvalid={touched.dataCompra || errors.dataCompra}
+                                isInvalid={touched.dataCompra && !!errors.dataCompra}
                                 name="dataCompra"
                                 label="Data da Compra"
                                 onChange={(val) => setFieldValue("dataCompra", val)}

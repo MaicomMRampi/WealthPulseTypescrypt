@@ -47,7 +47,7 @@ export default function DespesasComPatrimonios() {
         },
     ];
     return (
-        <Card className='bg-[#1c1d24] col-span-1 h-[400px] p-4'>
+        <Card className='bg-bgCards col-span-1 h-[400px] p-4 hover:scale-105 duration-75'>
             <h2 className='text-white text-center'>Maiores Despesas com Patrimônios</h2>
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart width={150} height={40} data={data}>

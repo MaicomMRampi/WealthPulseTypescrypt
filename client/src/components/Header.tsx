@@ -86,7 +86,7 @@ export default function App() {
     if (pathname === '/pages/login' || pathname === '/pages/register') return null
 
     return (
-        <Navbar className="bg-primaryTable"
+        <Navbar className="bg-bgCards"
             maxWidth="2xl"
             shouldHideOnScroll
             isMenuOpen={isMenuOpen}
@@ -100,7 +100,7 @@ export default function App() {
                     </NavbarBrand>
                 </NavbarContent>
 
-                <Menu setActive={setActive}>
+                <Menu className="hidden sm:flex" setActive={setActive} >
                     <Link className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white" href={"/"}>Inicio</Link>
 
                     <MenuItem setActive={setActive} active={active} item="Patrimônio">

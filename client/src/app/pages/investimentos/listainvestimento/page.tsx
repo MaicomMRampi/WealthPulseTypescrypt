@@ -32,36 +32,32 @@ import { api } from "@/lib/api";
 import useToken from "@/components/hooks/useToken";
 import Link from "next/link";
 import currency from "@/components/Currency";
+import useVisibility from "@/components/hooks/useVisibility";
+import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData";
+import ModalDetalhesFii from "@/components/ModalDetalhesFii";
+import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 
-
-const statusColorMap: Record<string, ChipProps["color"]> = {
-    active: "success",
-    paused: "danger",
-    vacation: "warning",
-};
-
-
-
-
-
-type User = typeof dados[0];
+// type User = typeof dados[0];
 
 export default function App() {
-
-
+    const [total, setTotal] = useState(0)
+    const [dadosFiltro, setDadosFiltro] = useState([])
     const [dados, setDados] = useState([])
+    const [modalDetalhes, setModalDetalhes] = useState(false)
     const INITIAL_VISIBLE_COLUMNS = ["nome", "dataCompra", "instituicao", "valorInvestido", "actions"];
     const { tokenUsuario } = useToken()
     const [nomePagina, setNomePagina] = useState("Minhas Rendas Fixas");
     const [filterValue, setFilterValue] = useState();
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = useState<string>("rendaFixa");
+    const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['acao']));
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "age",
         direction: "ascending",
     });
+    const { visibility } = useVisibility()
+
     useEffect(() => {
         const selectedFilter = Array.from(statusFilter)[0] as string;
         switch (selectedFilter) {
@@ -90,8 +86,6 @@ export default function App() {
                 setNomePagina("Minhas Rendas Fixas")
         }
     }, [statusFilter])
-
-
     const buscaInvestimentos = async () => {
         if (!tokenUsuario) return
         const response = await api.get('/meusinvestimentos', {
@@ -108,7 +102,7 @@ export default function App() {
 
     const [page, setPage] = React.useState(1);
 
-    const pages = Math.ceil(dados.length / rowsPerPage);
+
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -126,14 +120,25 @@ export default function App() {
                 investimento.nome.toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
-        // if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-        //     filteredUsers = filteredUsers.filter((investimentos) =>
-        //         Array.from(statusFilter).includes(investimentos.status),
-        //     );
-        // }
+
+        if (statusFilter) {
+            const selectedFilter = Array.from(statusFilter)[0] as string;
+            console.log("🚀 ~ filteredItems ~ selectedFilter", statusFilter)
+
+            filteredUsers = filteredUsers.filter((investimento) =>
+                investimento.tipo === selectedFilter
+            );
+        }
+
+        setDadosFiltro(filteredUsers)
+        const somaValores =
+            filteredUsers &&
+            filteredUsers.reduce((acc, despesa) => acc + despesa.valorInvestido, 0);
+        setTotal(somaValores)
 
         return filteredUsers;
     }, [dados, filterValue, statusFilter]);
+    const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
     const items = React.useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -162,11 +167,19 @@ export default function App() {
                 );
             case "dataCompra":
                 return (
-                    <p>{user.dataCompra}</p>
+                    <p>{AlteraVisualizacaoData(user.dataCompra)}</p>
+                );
+            case "dataVencimento":
+                return (
+                    <p>{user.dataVencimento ? AlteraVisualizacaoData(user.dataVencimento) : null}</p>
                 );
             case "valorInvestido":
                 return (
-                    <p>{currency(user.valorInvestido)}</p>
+                    <p>{visibility ? currency(user.valorInvestido) : '****'}</p>
+                );
+            case "valorPago":
+                return (
+                    <p>{visibility ? currency(user.valorPago) : '****'}</p>
                 );
             case "actions":
                 return (
@@ -178,6 +191,7 @@ export default function App() {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
+                                <DropdownItem><DeleteIcon /></DropdownItem>
                                 <DropdownItem>Detalhes</DropdownItem>
                                 <DropdownItem>Editar</DropdownItem>
                                 <DropdownItem>Deletar</DropdownItem>
@@ -188,7 +202,7 @@ export default function App() {
             default:
                 return cellValue;
         }
-    }, []);
+    }, [visibility]);
 
 
     const onRowsPerPageChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -205,23 +219,49 @@ export default function App() {
         }
     }, []);
 
+    const onClear = React.useCallback(() => {
+        setFilterValue("")
+        setPage(1)
+    }, [])
     const topContent = React.useMemo(() => {
         return (
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-between gap-3 items-end">
+            <div className="w-full flex flex-col gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                         size="md"
                         fullWidth
-                        className="w-full sm:max-w-[44%]  "
+                        className=" "
                         placeholder="Pesquisar Investimento..."
                         startContent={<SearchIcon />}
                         value={filterValue}
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {Array.from(statusFilter)[0] as string === "fii" ?
+                            <Button
+                                color="warning"
+                                endContent={<ChevronDownIcon className="text-small" />}
+                                onClick={() => setModalDetalhes(true)}
+                                variant="solid"
+                            >
+                                <h2 className="text-lg">Detalhes</h2>
+                            </Button>
+                            : null
+                        }
+
+                        {Array.from(statusFilter)[0] as string === "fii" ?
+                            <Button
+                                endContent={<ChevronDownIcon className="text-small" />}
+                                className="bg-buttonAzulEscuro text-white"
+                                variant="solid"
+                            >
+                                <h2 className="text-lg">Dividendos</h2>
+                            </Button>
+                            : null
+                        }
                         <Dropdown>
-                            <DropdownTrigger className="hidden sm:flex">
+                            <DropdownTrigger>
                                 <Button
                                     endContent={<ChevronDownIcon className="text-small" />}
                                     className="bg-buttonAzulClaro text-white"
@@ -246,7 +286,7 @@ export default function App() {
                             </DropdownMenu>
                         </Dropdown>
                         <Dropdown>
-                            <DropdownTrigger className="hidden sm:flex">
+                            <DropdownTrigger>
                                 <Button
                                     endContent={<ChevronDownIcon className="text-small" />}
                                     className="bg-buttonCinzaPadrao text-black"
@@ -276,12 +316,15 @@ export default function App() {
                             variant="solid"
                             endContent={<PlusIcon />}
                         >
-                            <Link href="/pages/investimentos/novoinvestimento"> Nova Despesa</Link>
+                            <Link href="/pages/investimentos/novoinvestimento"> Novo Investimento</Link>
                         </Button>
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">Total {users.length} users</span>
+                    <div className="flex flex-col gap-1text-default-900 text-small">
+                        <span>Total {users.length} Investimentos</span>
+                        <span>{nomePagina}, <span className="text-primaryTableText">{visibility ? currency(total) : '****'}</span> Investidos </span>
+                    </div>
                     <label className="flex items-center text-default-400 text-small">
                         Linhas por Páginas:
                         <select
@@ -294,7 +337,7 @@ export default function App() {
                         </select>
                     </label>
                 </div>
-            </div>
+            </div >
         );
     }, [
         filterValue,
@@ -304,6 +347,9 @@ export default function App() {
         onRowsPerPageChange,
         users.length,
         hasSearchFilter,
+        total,
+        nomePagina,
+        visibility
     ]);
 
     const bottomContent = React.useMemo(() => {
@@ -321,36 +367,11 @@ export default function App() {
                     variant="light"
                     onChange={setPage}
                 />
-                {/* <span className="text-small text-default-400">
-                    {selectedKeys === "all"
-                        ? "All items selected"
-                        : `${selectedKeys.size} of ${items.length} selected`}
-                </span> */}
             </div>
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
-
-    const classNames = React.useMemo(
-        () => ({
-            wrapper: ["max-h-[382px]", "max-w-3xl"],
-            th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
-            td: [
-                // changing the rows border radius
-                // first
-                "group-data-[first=true]:first:before:rounded-none",
-                "group-data-[first=true]:last:before:rounded-none",
-                // middle
-                "group-data-[middle=true]:before:rounded-none",
-                // last
-                "group-data-[last=true]:first:before:rounded-none",
-                "group-data-[last=true]:last:before:rounded-none",
-            ],
-        }),
-        [],
-    );
-
     return (
-        <div className="w-full p-8">
+        <div key={visibility} className="w-full p-8">
             <Card className=" px-4 pt-4  bg-primaryTable rounded-lg">
                 <TitlePage title={
                     nomePagina}
@@ -384,15 +405,21 @@ export default function App() {
                             </TableColumn>
                         )}
                     </TableHeader>
-                    <TableBody emptyContent={"No users found"} items={sortedItems}>
+                    <TableBody emptyContent={"Não há Investimentos Cadastrados"} items={sortedItems}>
                         {(item) => (
-                            <TableRow key={item.id}>
-                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                            <TableRow className="hover:text-primaryTableText text-white" key={item.id}>
+                                {(columnKey) => <TableCell >{renderCell(item, columnKey)}</TableCell>}
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </Card>
+            <ModalDetalhesFii
+                data={dadosFiltro}
+                open={modalDetalhes}
+                onClose={() => setModalDetalhes(false)}
+
+            />
         </div>
 
     );
