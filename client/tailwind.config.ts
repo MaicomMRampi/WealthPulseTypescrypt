@@ -33,16 +33,19 @@ const config: Config = {
     themes: {
       dark: {        
         colors: {
+          textCards:'#fff',
+          BgCardPadrao: '#0b1739',
+          BgCardPadraoTable: '#0b1739',
           background: '#0000003b',
-          primary: '#10b981',
-          
-          // Customize the light theme here
-          
-
+          primary: '#10b981',          
+          // Customize the light theme here        
         },
       },
       light: {
         colors: {
+          textCards:'#000',
+          BgCardPadraoTable: '#0b1739',
+          BgCardPadrao: '#ffffff',
           primary: '#10b981',
         }
       },

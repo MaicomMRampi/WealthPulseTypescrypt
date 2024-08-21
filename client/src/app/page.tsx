@@ -18,17 +18,12 @@ import Link from 'next/link';
 
 import TotalDespesas from '@/components/home/totalDespesas';
 import { Card } from '@nextui-org/react';
+import ContasHaVencer from '@/components/home/contasHaVencer';
 import DespesasComPatrimonios from '@/components/home/despesasComPatrimonios';
 import MeusFundosImobiliarios from '@/components/home/meusFundosImobiliarios';
 import UltimasDespesas from '@/components/home/ultimasDespesas';
-import { useTheme } from "next-themes";
-
+import PorcentagemMes from '@/components/home/porcentagemMes';
 export default function Home() {
-    const { theme, setTheme } = useTheme();
-    console.log("🚀 ~ Home ~ theme", theme)
-
-
-
     return (
         <>
             <div className='w-[95%] mx-auto'>
@@ -37,6 +32,8 @@ export default function Home() {
                     <TotalContas />
                     <TotalDespesas />
                     <MeusFundosImobiliarios />
+                    <PorcentagemMes />
+                    <ContasHaVencer />
                     <UltimasDespesas />
                     <DespesasComPatrimonios />
                 </div>

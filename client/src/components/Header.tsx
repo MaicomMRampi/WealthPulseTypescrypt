@@ -86,7 +86,7 @@ export default function App() {
     if (pathname === '/pages/login' || pathname === '/pages/register') return null
 
     return (
-        <Navbar className="bg-bgCards"
+        <Navbar className="bg-BgCardPadrao"
             maxWidth="2xl"
             shouldHideOnScroll
             isMenuOpen={isMenuOpen}
@@ -96,12 +96,26 @@ export default function App() {
                 <NavbarContent justify="start">
                     <NavbarMenuToggle className="text-primaryTableText p-4 md:hidden" aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
                     <NavbarBrand className="mr-4">
-                        <Link href="/"><Image src="/imagens/logoAjustada.png" alt="logo" width={125} height={150} /></Link>
+                        <div className="flex items-center gap-2 font-bold">
+                            <div >
+                                <Avatar src="/login.jpg" className="w-10 h-10 text-large" />
+                            </div>
+                            <div className="flex flex-col">
+                                <div>
+                                    Fluxo do
+                                </div>
+                                <div className="text-primaryTableText">
+                                    Dinheiro
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* <Link href="/"><Image src="/imagens/logoAjustada.png" alt="logo" width={125} height={150} /></Link> */}
                     </NavbarBrand>
                 </NavbarContent>
 
                 <Menu className="hidden sm:flex" setActive={setActive} >
-                    <Link className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white" href={"/"}>Inicio</Link>
+                    <Link className="cursor-pointer font-semibold" href={"/"}>Inicio</Link>
 
                     <MenuItem setActive={setActive} active={active} item="Patrimônio">
                         <div className="flex flex-col space-y-4 text-sm">

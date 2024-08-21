@@ -397,7 +397,7 @@ export default function MinhasContas() {
                             value: "text-white",
                         }}
                         label="Controle de orçamento"
-                        value={parseInt(orcamentoMensal)}
+                        value={parseInt(orcamentoMensal.porcentagem)}
                         showValueLabel={true}
                     />
                     <Tooltip color="warning" content="Soma entre despesas e contas" placement="right-end">

@@ -417,7 +417,7 @@ export default function MinhasDespesas() {
                                 ))}
                         </Listbox>
                     </div>
-                    <div className="col-span-10 px-6 bg-primaryTable rounded-lg">
+                    <div className="col-span-10 px-6 bg-BgCardPadraoTable rounded-lg">
                         {headerTable}
                         <Table
                             aria-label="Example table with custom cells"

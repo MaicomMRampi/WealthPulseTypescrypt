@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState } from 'react'
 import { Card, CardHeader, CardBody } from '@nextui-org/react';
 import useVisibility from '../hooks/useVisibility';
@@ -10,6 +11,7 @@ export default function TotalContas() {
     const { tokenUsuario } = useToken();
     const [DespesaSelect, setDespesaSelect] = useState([]);
     const buscaContaMesAtual = async () => {
+        if (!tokenUsuario) return
         const response = await api.get(`/buscacontamesatual`, {
             params: {
                 id: tokenUsuario?.id,
@@ -25,12 +27,12 @@ export default function TotalContas() {
         DespesaSelect.reduce((acc, despesa) => acc + despesa.valor, 0);
 
     return (
-        <Card fullWidth className='bg-bgCards p-4 hover:scale-105 duration-75 text-white'>
-            <CardHeader>
+        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards">
+            <CardHeader className='font-semibold'>
                 Contas no Mês
             </CardHeader>
             <CardBody>
-                <p className='text-white font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <MdMoneyOff size={40} className='text-red-500 ' /></p>
+                <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <MdMoneyOff size={40} className='text-red-500 ' /></p>
             </CardBody>
         </Card>
     )

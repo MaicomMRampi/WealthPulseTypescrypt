@@ -19,6 +19,7 @@ export default function MeusFundosImobiliarios() {
     };
 
     const buscaContaMesAtual = async () => {
+        if (!tokenUsuario) return
         const response = await api.get(`/meusinvestimentos`, {
             params: {
                 id: tokenUsuario?.id,
@@ -54,32 +55,30 @@ export default function MeusFundosImobiliarios() {
         value: item.quantidade,
     }));
 
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+    const COLORS = ['#cb3cff', '#0e43fb', '#00c2ff', '#FF8042'];
 
-    const renderCustomizedLabel = ({ name, value }) => `${name}`;
+    const renderCustomizedLabel = ({ name, value }: any) => `${name}`;
 
     return (
-        <Card className='bg-bgCards col-span-1 h-[400px] p-4 hover:scale-105 duration-75'>
-            <h2 className='text-white text-center'>Meus Fundos Imobiliários</h2>
-            <ResponsiveContainer width="100%" height="100%">
-                <PieChart width={400} height={400}>
-                    <Pie
-                        data={data}
-                        cx="60%"
-                        cy="50%"
-                        labelLine={false}
-                        label={renderCustomizedLabel}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Legend layout="vertical" align="right" verticalAlign="middle" />
-                </PieChart>
-            </ResponsiveContainer>
+        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards flex items-center">
+            <h2 className='font-semibold text-center'>Meus Fundos Imobiliários</h2>
+            <PieChart width={400} height={400}>
+                <Pie
+                    data={data}
+                    cx="60%"
+                    cy="50%"
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                >
+                    {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                </Pie>
+                <Legend layout="vertical" align="right" verticalAlign="middle" />
+            </PieChart>
         </Card>
     );
 }

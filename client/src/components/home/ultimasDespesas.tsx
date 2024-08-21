@@ -13,6 +13,7 @@ export default function ultimasDespesas() {
 
 
     const buscaDespesaMesAtual = async () => {
+        if (!tokenUsuario) return
         const response = await api.get(`/buscadespesamesatual`, {
             params: {
                 email: tokenUsuario?.id,
@@ -24,12 +25,12 @@ export default function ultimasDespesas() {
         buscaDespesaMesAtual();
     }, []);
     return (
-        <Card className='bg-bgCards col-span-1 h-[400px] p-4 hover:scale-105 duration-75'>
-            <h2 className='text-white text-center'>Maiores Despesas Mês Atual</h2>
+        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards">
+            <h2 className='font-semibold'>Maiores Despesas Mês Atual</h2>
             <ul>
                 {rendaFii && rendaFii.map((row) => (
                     <>
-                        <div className='w-full text-white flex justify-between pt-4'>
+                        <div className='w-full flex justify-between pt-4'>
                             <div>
                                 <p>{row.local.toUpperCase()}</p>
                             </div>

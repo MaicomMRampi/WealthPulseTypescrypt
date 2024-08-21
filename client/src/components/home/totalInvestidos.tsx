@@ -6,7 +6,10 @@ import useToken from '../hooks/useToken';
 import useVisibility from '../hooks/useVisibility';
 import currency from '../Currency';
 import { api } from '@/lib/api';
+import { useTheme } from "next-themes";
 export default function TotalInvestidos() {
+    const { theme, setTheme } = useTheme();
+    console.log("🚀 ~ Home ~ theme", theme)
     const { visibility } = useVisibility()
     const { tokenUsuario } = useToken()
     const [dados, setDados] = useState([])
@@ -31,12 +34,15 @@ export default function TotalInvestidos() {
 
 
     return (
-        <Card fullWidth className='bg-bgCards p-4 hover:scale-105 duration-75 text-white'>
-            <CardHeader>
+        <Card
+            fullWidth
+            className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards"
+        >
+            <CardHeader className='font-semibold'>
                 Total investidos
             </CardHeader>
             <CardBody>
-                <p className='text-white font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <IoBarChartSharp size={40} className='text-green-500' /></p>
+                <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <IoBarChartSharp size={40} className='text-green-500' /></p>
             </CardBody>
         </Card>
     )

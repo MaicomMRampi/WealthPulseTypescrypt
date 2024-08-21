@@ -84,7 +84,7 @@ export default function SignIn() {
                             <div className="flex justify-center items-center mb-4">
                                 <Avatar src="/login.jpg" className="w-20 h-20 text-large" />
                             </div>
-                            <h1 className="text-center text-2xl font-bold mb-4">Faça seu Login</h1>
+                            <h1 className="text-center text-2xl font-bold mb-4 text-white">Faça seu Login</h1>
                             <div className="flex flex-col gap-4">
                                 <Input
                                     autoComplete="off"
@@ -95,6 +95,7 @@ export default function SignIn() {
                                         setFieldValue(name, name === 'cpf' ? cpfMask(value) : value);
                                     }}
                                     size="lg"
+                                    className='text-white'
                                     onBlur={handleChange}
                                     name='cpf'
                                     variant="bordered"
@@ -111,6 +112,7 @@ export default function SignIn() {
                                     onBlur={handleChange}
                                     name='senha'
                                     variant="bordered"
+                                    className='text-white'
                                     placeholder="Insira sua senha"
                                     endContent={
                                         <button type="button" onClick={toggleVisibility} className="focus:outline-none">

@@ -1115,6 +1115,42 @@ router.post('/api/novaconta', async (req, res) => {
     }
 
 });
+router.get('/api/buscacontaproximavencer', async (req, res) => {
+    const id = req.query.id;
+    const dataAtual = new Date();
+    const anoAtual = dataAtual.getFullYear();
+    const mesAtual = dataAtual.getMonth() + 1;
+    const diaAtual = dataAtual.getDate();
+    const dataAtualFormatada = `${anoAtual}/${mesAtual < 10 ? `0${mesAtual}` : mesAtual}/${diaAtual < 10 ? `0${diaAtual}` : diaAtual}`;
+
+    console.log("🚀 ~ router.get ~ dataAtualFormatada", dataAtualFormatada)
+    // Adiciona 10 dias à data atual
+    dataAtual.setDate(dataAtual.getDate() + 10);
+    const anoFim = dataAtual.getFullYear();
+    const mesFim = dataAtual.getMonth() + 1;
+    const diaFim = dataAtual.getDate();
+    const dataFimFormatada = `${anoFim}/${mesFim < 10 ? `0${mesFim}` : mesFim}/${diaFim < 10 ? `0${diaFim}` : diaFim}`;
+
+    console.log("🚀 ~ router.get ~ dataFimFormatada", dataFimFormatada)
+    try {
+        const buscaConta = await prisma.Contas.findMany({
+            where: {
+                idUser: parseInt(id),
+                dataVencimento: {
+                    gte: dataAtualFormatada,  // Data atual formatada
+                    lte: dataFimFormatada     // Data limite (10 dias após)
+                },
+                pago: 0
+            }
+        });
+        console.log("🚀 ~ router.get ~ buscaConta", buscaConta)
+        res.json(buscaConta);
+    } catch (error) {
+        console.error('Erro ao buscar contas:', error);
+        res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+});
+
 router.get('/api/buscaconta', async (req, res) => {
     const id = req.query.id
     try {
@@ -1212,44 +1248,61 @@ router.delete('/api/deletaConta', async (req, res) => {
 
 // controle de orçamento mensal 
 router.post('/api/controleorcamento', async (req, res) => {
-    const dados = req.body
+    const dados = req.body;
+    console.log("🚀 ~ router.post ~ dados", dados);
 
-    const buscaContas = await prisma.Contas.findMany({
-        where: {
-            idUser: parseInt(dados.id),
-            mesCorrespondente: dados.data
-        },
-        select: {
-            valor: true
-        }
-    })
+    try {
+        const buscaContas = await prisma.Contas.findMany({
+            where: {
+                idUser: parseInt(dados.id),
+                mesCorrespondente: dados.data
+            },
+            select: {
+                valor: true
+            }
+        });
+        console.log("🚀 ~ router.post ~ buscaContas", buscaContas);
 
-    const buscaDespesas = await prisma.Despesas.findMany({
-        where: {
-            idUser: parseInt(dados.id),
-            mesCorrespondente: dados.data
-        },
-        select: {
-            valorGasto: true
-        }
-    })
-    const buscaControleUsuario = await prisma.Usuario.findUnique({
-        where: {
-            id: parseInt(dados.id)
-        },
-        select: {
-            valorOrcamentoMensal: true
-        }
-    })
-    const sumValues = (array) => array.reduce((acc, item) => acc + item.valor || item.valorGasto, 0);
-    const totalDespesa = sumValues(buscaDespesas)
-    const totalContas = sumValues(buscaContas)
-    const orcamentoUsuario = buscaControleUsuario?.valorOrcamentoMensal
+        const buscaDespesas = await prisma.Despesas.findMany({
+            where: {
+                idUser: parseInt(dados.id),
+                mesCorrespondente: dados.data
+            },
+            select: {
+                valorGasto: true
+            }
+        });
+        console.log("🚀 ~ router.post ~ buscaDespesas", buscaDespesas);
 
-    const porcentagem = Math.round(((totalDespesa + totalContas) / orcamentoUsuario) * 100)
+        const buscaControleUsuario = await prisma.Usuario.findUnique({
+            where: {
+                id: parseInt(dados.id)
+            },
+            select: {
+                valorOrcamentoMensal: true
+            }
+        });
 
-    res.json(porcentagem)
+        // Função de soma ajustada
+        const sumValues = (array, key) => array.reduce((acc, item) => acc + item[key], 0);
+
+        const totalDespesa = sumValues(buscaDespesas, 'valorGasto');
+        const totalContas = sumValues(buscaContas, 'valor');
+        const orcamentoUsuario = buscaControleUsuario?.valorOrcamentoMensal;
+        const porcentagem = orcamentoUsuario ? Math.round(((totalDespesa + totalContas) / orcamentoUsuario) * 100) : 0;
+        const total = totalDespesa + totalContas;
+        res.json({
+            porcentagem: porcentagem,
+            total: total,
+            orcamentoUsuario
+        });
+
+    } catch (error) {
+        console.error(error);
+    }
+
 });
+
 
 //==========================================
 
