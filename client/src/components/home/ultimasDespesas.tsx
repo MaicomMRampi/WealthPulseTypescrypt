@@ -5,10 +5,16 @@ import useVisibility from '../hooks/useVisibility';
 import useToken from '../hooks/useToken';
 import { api } from '@/lib/api';
 import currency from '../Currency';
+
+type Renda = {
+    local: string;
+    valorGasto: number;
+}
+
 export default function ultimasDespesas() {
     const { visibility } = useVisibility();
     const { tokenUsuario } = useToken();
-    const [rendaFii, setRendaFii] = useState([]);
+    const [rendaFii, setRendaFii] = useState<Renda[]>([]);
 
 
 
@@ -25,10 +31,11 @@ export default function ultimasDespesas() {
         buscaDespesaMesAtual();
     }, []);
     return (
-        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards">
-            <h2 className='font-semibold'>Maiores Despesas Mês Atual</h2>
+        <Card fullWidth className="bg-BgCardPadrao p-4 duration-75 text-textCards">
+            <h2 className='font-semibold text-center'>Ultimas Despesas inseridas </h2>
             <ul>
-                {rendaFii && rendaFii.map((row) => (
+                {rendaFii && rendaFii.map((row, index) => (
+                    index < 5 &&
                     <>
                         <div className='w-full flex justify-between pt-4'>
                             <div>

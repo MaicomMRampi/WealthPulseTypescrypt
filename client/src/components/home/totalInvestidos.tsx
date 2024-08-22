@@ -7,12 +7,17 @@ import useVisibility from '../hooks/useVisibility';
 import currency from '../Currency';
 import { api } from '@/lib/api';
 import { useTheme } from "next-themes";
+
+type Props = {
+    valorInvestido: number
+}
+
 export default function TotalInvestidos() {
     const { theme, setTheme } = useTheme();
     console.log("🚀 ~ Home ~ theme", theme)
     const { visibility } = useVisibility()
     const { tokenUsuario } = useToken()
-    const [dados, setDados] = useState([])
+    const [dados, setDados] = useState<Props[]>([])
 
     const buscaInvestimentos = async () => {
         if (!tokenUsuario) return
@@ -36,7 +41,7 @@ export default function TotalInvestidos() {
     return (
         <Card
             fullWidth
-            className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards"
+            className="bg-BgCardPadrao p-4 text-textCards"
         >
             <CardHeader className='font-semibold'>
                 Total investidos

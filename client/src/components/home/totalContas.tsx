@@ -27,7 +27,7 @@ export default function TotalContas() {
         DespesaSelect.reduce((acc, despesa) => acc + despesa.valor, 0);
 
     return (
-        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards">
+        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
             <CardHeader className='font-semibold'>
                 Contas no Mês
             </CardHeader>

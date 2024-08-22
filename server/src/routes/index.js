@@ -228,6 +228,26 @@ router.get('/api/detalhespatrimonio', async (req, res) => {
         res.status(500).json({ message: 'Despesas não encontradas' });
     }
 });
+router.get('/api/detalhespatrimoniohome', async (req, res) => {
+    try {
+        const dados = req.query.id;
+
+        const despesasPatrimonio = await prisma.DespesaDeBens.findMany({
+            where: {
+                idPatrimonio: parseInt(dados),
+            },
+            include: {
+                TipoDespesa: true,
+                Patrimonio: true
+            }
+        });
+
+        res.status(200).json(despesasPatrimonio);
+    } catch (error) {
+        console.error('Erro ao buscar despesas do patrimônio:', error);
+        res.status(500).json({ message: 'Despesas não encontradas' });
+    }
+});
 
 router.get('/api/buscadespesasdetalhesnome', async (req, res) => {
     try {

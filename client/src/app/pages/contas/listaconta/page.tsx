@@ -16,7 +16,8 @@ import {
     Accordion,
     AccordionItem,
     Checkbox,
-    Chip
+    Chip,
+    Card
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import currency from "@/components/Currency";
@@ -47,6 +48,14 @@ import { CheckIcon } from "../../patrimonio/detalhes/[id]/CheckIcon";
 import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
 import { MdOutlinePayments } from "react-icons/md";
 
+type Despesa = {
+    id: string;
+    dataGasto: string;
+    valor: string;
+    tipo: string;
+    categoria: string;
+    observacao: string;
+}
 
 export default function MinhasContas() {
     const dataAtual = new Date()
@@ -65,8 +74,7 @@ export default function MinhasContas() {
     const [observacao, setObservacao] = useState<object>(false);
     const [selectedIndex, setSelectedIndex] = useState(0); // Inicia com -1 para nenhum item selecionado
     const [Despesa, setDespesa] = useState();
-    const [DespesaSelect, setDespesaSelect] = useState([]);
-    console.log("🚀 ~ MinhasDespesas ~ DespesaSelect", DespesaSelect)
+    const [DespesaSelect, setDespesaSelect] = useState<Despesa[]>([])
     const [filterValue, setFilterValue] = useState<string>("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(1);
@@ -393,8 +401,6 @@ export default function MinhasContas() {
                             base: "max-w-md",
                             track: "drop-shadow-md border border-default",
                             indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
-                            label: "text-white",
-                            value: "text-white",
                         }}
                         label="Controle de orçamento"
                         value={parseInt(orcamentoMensal.porcentagem)}
@@ -545,41 +551,43 @@ export default function MinhasContas() {
                             ))}
                         </Accordion>
                     </div>
-                    <div className="col-span-10 px-6 bg-primaryTable rounded-lg">
-                        {headerTable}
-                        <Table
-                            key={visibility}
-                            aria-label="Example table with custom cells"
-                            selectionMode="none"
-                            classNames={{
-                                wrapper: "max-h-[382px] bg-primaryTable ",
-                            }}
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
-                        >
-                            <TableHeader columns={columns}>
-                                {(column) => (
-                                    <TableColumn
-                                        className="text-primaryTableText font-bold "
-                                        key={column.uid}
-                                        allowsSorting={column.sortable}
-                                        align={column.uid === "actions" || column.uid === "pago" ? "center" : "start"}
-                                    >
-                                        {column.name}
-                                    </TableColumn>
-                                )}
-                            </TableHeader>
-                            <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
-                                {(item) => (
-                                    <TableRow className={` ${item.pago === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText text-white'}`} key={item.id}>
-                                        {(columnKey) => (
-                                            <TableCell>{renderCell(item, columnKey)}</TableCell>
-                                        )}
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                        {bottomContent}
+                    <div className="col-span-10 px-6  rounded-lg">
+                        <Card className="bg-BgCardPadrao">
+                            {headerTable}
+                            <Table
+                                key={visibility}
+                                aria-label="Example table with custom cells"
+                                selectionMode="none"
+                                classNames={{
+                                    wrapper: "max-h-[382px]  bg-BgCardPadrao",
+                                }}
+                                sortDescriptor={sortDescriptor}
+                                onSortChange={setSortDescriptor}
+                            >
+                                <TableHeader columns={columns}>
+                                    {(column) => (
+                                        <TableColumn
+                                            className="text-primaryTableText font-bold "
+                                            key={column.uid}
+                                            allowsSorting={column.sortable}
+                                            align={column.uid === "actions" || column.uid === "pago" ? "center" : "start"}
+                                        >
+                                            {column.name}
+                                        </TableColumn>
+                                    )}
+                                </TableHeader>
+                                <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
+                                    {(item) => (
+                                        <TableRow className={` ${item.pago === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item.id}>
+                                            {(columnKey) => (
+                                                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                                            )}
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                            {bottomContent}
+                        </Card>
                     </div>
                 </div >
             </div >

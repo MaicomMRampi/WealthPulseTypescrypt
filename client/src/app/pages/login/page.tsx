@@ -47,7 +47,7 @@ export default function SignIn() {
                 console.log("🚀 ~ handleSubmit ~ decodedToken", decodedToken)
                 setTokenUsuario(decodedToken.userId);
                 setMessageTipo("success");
-                setMessage("Usuario Logado Com Sucesso");
+                setMessage("Usuario Logado com Sucesso");
                 router.push("/");
             } else {
                 setMessage("Usuario ou senha invalidos");

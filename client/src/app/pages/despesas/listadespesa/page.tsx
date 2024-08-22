@@ -12,7 +12,8 @@ import {
     Tooltip,
     Listbox,
     ListboxItem,
-    Progress
+    Progress,
+    Card
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import currency from "@/components/Currency";
@@ -390,6 +391,7 @@ export default function MinhasDespesas() {
 
     return (
         <>
+
             <div key={visibility} className="w-[95%] m-auto" >
                 <TitlePage title="Minhas Despesas" />
                 <div className="w-full grid grid-cols-1 md:grid-cols-12 pt-6">
@@ -417,43 +419,45 @@ export default function MinhasDespesas() {
                                 ))}
                         </Listbox>
                     </div>
-                    <div className="col-span-10 px-6 bg-BgCardPadraoTable rounded-lg">
-                        {headerTable}
-                        <Table
-                            aria-label="Example table with custom cells"
-                            selectionMode="none"
-                            classNames={{
-                                wrapper: "max-h-[382px] bg-primaryTable ",
-                            }}
-                            sortDescriptor={sortDescriptor}
-                            onSortChange={setSortDescriptor}
-                        >
-                            <TableHeader columns={columns}>
-                                {(column) => (
-                                    <TableColumn
-                                        className="text-primaryTableText font-bold "
-                                        key={column.uid}
-                                        allowsSorting={column.sortable}
-                                        align={column.uid === "actions" ? "center" : "start"}
-                                    >
-                                        {column.name}
-                                    </TableColumn>
-                                )}
-                            </TableHeader>
-                            <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
-                                {(item) => (
-                                    <TableRow className={` ${item.fechada === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText text-white'}`} key={item.id}>
-                                        {(columnKey) => (
-                                            <TableCell>{renderCell(item, columnKey)}</TableCell>
-                                        )}
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                        {bottomContent}
+                    <div className="col-span-10 px-6  rounded-lg">
+                        <Card className="bg-BgCardPadrao">
+                            {headerTable}
+                            <Table
+                                aria-label="Example table with custom cells"
+                                selectionMode="none"
+                                classNames={{
+                                    wrapper: "max-h-[382px]  bg-BgCardPadrao",
+                                }}
+                                sortDescriptor={sortDescriptor}
+                                onSortChange={setSortDescriptor}
+                            >
+                                <TableHeader columns={columns}>
+                                    {(column) => (
+                                        <TableColumn
+                                            className="text-primaryTableText font-bold "
+                                            key={column.uid}
+                                            allowsSorting={column.sortable}
+                                            align={column.uid === "actions" ? "center" : "start"}
+                                        >
+                                            {column.name}
+                                        </TableColumn>
+                                    )}
+                                </TableHeader>
+                                <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
+                                    {(item) => (
+                                        <TableRow className={` ${item.fechada === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item.id}>
+                                            {(columnKey) => (
+                                                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                                            )}
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                            {bottomContent}
+                        </Card >
                     </div>
                 </div>
-            </div>
+            </div >
             <ModalObservacao
                 open={openModalObservacao}
                 onClose={() => setOpenModalObservacao(false)}

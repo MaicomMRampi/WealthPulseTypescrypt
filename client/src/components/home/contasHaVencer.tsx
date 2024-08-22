@@ -5,14 +5,25 @@ import useVisibility from '../hooks/useVisibility';
 import useToken from '../hooks/useToken';
 import { api } from '@/lib/api';
 import currency from '../Currency';
+import AlteraVisualizacaoData from '../funcoes/alteraVisualizacaoData';
+
+
+type Despesa = {
+    dataVencimento: string;
+    valor: number;
+    estabelecimento: string;
+    mesCorrespondente: string;
+    nome: string;
+}
+
 
 export default function TotalContas() {
     const { visibility } = useVisibility();
     const { tokenUsuario } = useToken();
-    const [despesas, setDespesas] = useState([]);
+    const [despesas, setDespesas] = useState<Despesa[]>([]);
 
     const buscaContaMesAtual = async () => {
-        if (!tokenUsuario) return;
+
         const response = await api.get(`/buscacontaproximavencer`, {
             params: {
                 id: tokenUsuario?.id,
@@ -27,7 +38,7 @@ export default function TotalContas() {
 
     return (
 
-        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards flex items-center">
+        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards flex items-center">
             <h2 className='font-semibold text-center'>Contas a vencer</h2>
             <CardBody>
                 {despesas.length > 0 ? (
@@ -36,8 +47,8 @@ export default function TotalContas() {
                             <Card key={index} className="w-full">
                                 <CardBody className="space-y-2">
                                     <h3 className="text-lg font-bold">{despesa.estabelecimento}</h3>
-                                    <p className="text-base text-green-400">{currency(despesa.valor)}</p>
-                                    <p className="text-sm text-gray-300">{despesa.dataVencimento}</p>
+                                    <p className="text-base text-green-400">{visibility ? currency(despesa.valor) : '****'}</p>
+                                    <p className="text-sm text-gray-300">{AlteraVisualizacaoData(despesa.dataVencimento)}</p>
                                 </CardBody>
                             </Card>
                         ))}

@@ -45,7 +45,7 @@ export default function UltimasDespesas() { // Nome do componente com a primeira
     const COLORS = ['#cb3cff', '#0e43fb', '#00c2ff', '#FF8042'];
 
     return (
-        <Card fullWidth className=" bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards ">
+        <Card fullWidth className=" bg-BgCardPadrao p-4 text-textCards ">
             <h2 className='font-semibold text-center'>Porcentagem Gasto Mês</h2>
             <div className='w-full h-full flex flex-col items-center justify-center'>
                 <PieChart width={200} height={200}>
@@ -70,7 +70,7 @@ export default function UltimasDespesas() { // Nome do componente com a primeira
                     <p className="text-lg font-semibold">
                         {visibility ? `${currency(orcamentoMensal.total)} / ${currency(orcamentoMensal.orcamentoUsuario)}` : '****'}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm">
                         {orcamentoMensal.porcentagem}% alcançado
                     </p>
                 </div>

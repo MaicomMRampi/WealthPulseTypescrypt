@@ -372,7 +372,7 @@ export default function App() {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
     return (
         <div key={visibility} className="w-full p-8">
-            <Card className=" px-4 pt-4  bg-primaryTable rounded-lg">
+            <Card className=" px-4 pt-4  bg-BgCardPadrao rounded-lg">
                 <TitlePage title={
                     nomePagina}
                 />
@@ -383,7 +383,7 @@ export default function App() {
                     bottomContent={bottomContent}
                     bottomContentPlacement="outside"
                     classNames={{
-                        wrapper: "max-h-[382px] bg-primaryTable ",
+                        wrapper: "max-h-[382px] bg-BgCardPadrao ",
                     }}
                     selectedKeys={selectedKeys}
                     selectionMode="none"
@@ -407,7 +407,7 @@ export default function App() {
                     </TableHeader>
                     <TableBody emptyContent={"Não há Investimentos Cadastrados"} items={sortedItems}>
                         {(item) => (
-                            <TableRow className="hover:text-primaryTableText text-white" key={item.id}>
+                            <TableRow className="hover:text-primaryTableText" key={item.id}>
                                 {(columnKey) => <TableCell >{renderCell(item, columnKey)}</TableCell>}
                             </TableRow>
                         )}

@@ -316,14 +316,14 @@ export default function App() {
 
         <div key={visibility} className="px-4 w-full" prefech={true}>
             <TitlePage title="Meus patrimônios" />
-            <div className="rounded-lg bg-primaryTable    mt-12 ">
+            <div className="rounded-lg bg-BgCardPadrao    mt-12 ">
                 <Table
                     aria-label="Example table with custom cells, pagination and sorting"
                     isHeaderSticky
                     bottomContent={bottomContent}
                     bottomContentPlacement="outside"
                     classNames={{
-                        wrapper: "max-h-[382px] bg-primaryTable",
+                        wrapper: "max-h-[382px] bg-BgCardPadrao",
                     }}
                     selectedKeys={selectedKeys}
                     selectionMode="none"

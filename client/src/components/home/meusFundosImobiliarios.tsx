@@ -60,7 +60,7 @@ export default function MeusFundosImobiliarios() {
     const renderCustomizedLabel = ({ name, value }: any) => `${name}`;
 
     return (
-        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards flex items-center">
+        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards flex items-center">
             <h2 className='font-semibold text-center'>Meus Fundos Imobiliários</h2>
             <PieChart width={400} height={400}>
                 <Pie

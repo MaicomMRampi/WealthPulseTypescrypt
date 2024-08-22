@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState } from 'react'
 import { Card, CardHeader, CardBody } from '@nextui-org/react';
 import useToken from '../hooks/useToken';
@@ -12,7 +13,7 @@ interface Despesa {
 export default function TotalDespesas() {
     const { visibility } = useVisibility()
     const { tokenUsuario } = useToken();
-    const [DespesaSelect, setDespesaSelect] = useState([]);
+    const [DespesaSelect, setDespesaSelect] = useState<Despesa[]>([]);
     const buscaDespesaMesAtual = async () => {
         if (!tokenUsuario) return
         const response = await api.get(`/buscadespesamesatual`, {
@@ -32,7 +33,7 @@ export default function TotalDespesas() {
 
 
     return (
-        <Card fullWidth className="bg-BgCardPadrao p-4 hover:scale-105 duration-75 text-textCards">
+        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
             <CardHeader className='font-semibold'>
                 Despesas Mês Atual
             </CardHeader>

@@ -97,10 +97,8 @@ export default function DetalhesDosGastos({ params }: any) {
 
 
     const buscaPatrimonios = async () => {
-
         const response = await api.get('/detalhespatrimonio', {
             params,
-
         });
         setDados(response.data);
     };
@@ -349,7 +347,7 @@ export default function DetalhesDosGastos({ params }: any) {
                             onValueChange={onSearchChange}
                         />
                         <Select
-                            className="bg-primaryTable max-w-[200px] text-black"
+                            className="max-w-[200px] text-black"
                             size="md"
                             placeholder="Todos"
                             value={filtroInativo}
@@ -446,7 +444,7 @@ export default function DetalhesDosGastos({ params }: any) {
 
     return (
         <div key={visibility.toString()} className="w-full px-4 py-12 ">
-            <Card className={`p-4 bg-primaryTable text-white`} >
+            <Card className={`p-4 bg-BgCardPadrao`} >
                 <p className="pt-2 text-center font-bold">Detalhes do Patrimômio: <span className='text-buttonAzulClaro'>{dados.length > 0 && dados && dados[0].Patrimonio.nomePatrimonio}</span></p>
                 <Table
                     aria-label="Example table with custom cells, pagination and sorting"
@@ -454,7 +452,7 @@ export default function DetalhesDosGastos({ params }: any) {
                     bottomContent={bottomContent}
                     bottomContentPlacement="outside"
                     classNames={{
-                        wrapper: "max-h-[382px] bg-primaryTable",
+                        wrapper: "max-h-[382px] bg-BgCardPadrao",
                     }}
                     // selectedKeys={selectedKeys}
                     selectionMode="none"

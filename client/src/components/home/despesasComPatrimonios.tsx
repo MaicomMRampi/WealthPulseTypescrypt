@@ -1,59 +1,80 @@
-import { Card } from '@nextui-org/react'
-import React from 'react'
-import { BarChart, Bar, ResponsiveContainer } from 'recharts';
+"use client";
+import { Card } from "@nextui-org/react";
+import React, { useEffect, useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import useVisibility from "../hooks/useVisibility";
+import useToken from "../hooks/useToken";
+import { api } from "@/lib/api";
+
+type Props = {
+    nomePatrimonio: string,
+    idPatrimonio: string,
+    valorTotal: number
+    valor: number,
+    Patrimonio: {
+        idPatrimonio: number,
+        nomePatrimonio: string,
+        valorPatrimonio: number,
+        valorTotal: number
+
+    }
+}
+
+
 export default function DespesasComPatrimonios() {
-    const data = [
-        {
-            name: 'Page A',
-            uv: 4000,
-            pv: 2400,
-            amt: 2400,
-        },
-        {
-            name: 'Page B',
-            uv: 3000,
-            pv: 1398,
-            amt: 2210,
-        },
-        {
-            name: 'Page C',
-            uv: 2000,
-            pv: 9800,
-            amt: 2290,
-        },
-        {
-            name: 'Page D',
-            uv: 2780,
-            pv: 3908,
-            amt: 2000,
-        },
-        {
-            name: 'Page E',
-            uv: 1890,
-            pv: 4800,
-            amt: 2181,
-        },
-        {
-            name: 'Page F',
-            uv: 2390,
-            pv: 3800,
-            amt: 2500,
-        },
-        {
-            name: 'Page G',
-            uv: 3490,
-            pv: 4300,
-            amt: 2100,
-        },
-    ];
+    const { visibility } = useVisibility();
+    const { tokenUsuario } = useToken();
+    const [despesas, setDespesas] = useState<Props[]>([]);
+
+    const buscaContaMesAtual = async () => {
+        const response = await api.get(`/detalhespatrimoniohome`, {
+            params: {
+                id: tokenUsuario?.id,
+            },
+        });
+        setDespesas(response.data);
+    };
+
+    useEffect(() => {
+        if (tokenUsuario?.id) {
+            buscaContaMesAtual();
+        }
+    }, [tokenUsuario]);
+
+    // Agrupar e somar as despesas por patrimônio
+    const despesasAgrupadas = despesas.reduce((acc, despesa) => {
+        const { idPatrimonio, valor, Patrimonio } = despesa;
+        const patrimonioExistente = acc.find((item) => item.idPatrimonio === idPatrimonio);
+
+        if (patrimonioExistente) {
+            patrimonioExistente.valorTotal += valor;
+        } else {
+            acc.push({
+                idPatrimonio,
+                nomePatrimonio: Patrimonio.nomePatrimonio,
+                valorTotal: valor,
+            });
+        }
+
+        return acc;
+    }, []);
+
     return (
-        <Card className='bg-BgCardPadrao col-span-1 h-[400px] p-4 hover:scale-105 duration-75'>
-            <h2 className='font-semibold'>Maiores Despesas com Patrimônios</h2>
+        <Card className="bg-BgCardPadrao col-span-1 h-[400px] p-4">
+            <h2 className="font-semibold text-center">Patrimônios e suas Despesas</h2>
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart width={150} height={40} data={data}>
-                    <Bar dataKey="uv" fill="#000" />
+                <BarChart data={despesasAgrupadas}>
+
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="nomePatrimonio" />
+                    <YAxis />
+                    <Tooltip
+                        // contentStyle={{ display: 'none' }}
+                        cursor={false}
+                    />
+                    <Bar barSize={20} dataKey="valorTotal" fill="#0e43fb" />
                 </BarChart>
             </ResponsiveContainer>
         </Card>
-    )
+    );
 }
