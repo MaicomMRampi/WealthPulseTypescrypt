@@ -109,7 +109,8 @@ model Nomeacao {
 
 model NomeFundoImobiliario {
   id        Int    @id @default(autoincrement())
-  nomefundo String @unique
+  nomeFundo String @unique
+  idUser    Int
 }
 
 model Investimento {

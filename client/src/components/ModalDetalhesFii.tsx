@@ -52,12 +52,13 @@ export default function BasicModal({ open, onClose, data }) {
                 onClose={onClose}
                 hideCloseButton={true}
                 placement="center"
-                className="bg-primaryTable"
+                // className="bg-primaryTable"
+                className="bg-BgCardPadrao "
                 backdrop="opaque"
                 size="2xl"
                 classNames={{
                     backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
-                    content: "bg-black rounded-lg p-4 text-white",
+                    content: "bg-black rounded-lg p-4 ",
                 }}
             >
 
@@ -66,7 +67,7 @@ export default function BasicModal({ open, onClose, data }) {
                         <>
 
                             <ModalBody>
-                                <Table classNames={{ 'wrapper': 'max-h-[382px] bg-primaryTable text-white' }} >
+                                <Table classNames={{ 'wrapper': 'max-h-[382px] bg-BgCardPadrao ' }} >
                                     <TableHeader>
 
                                         <TableColumn><b>Nome Do Fii</b></TableColumn>

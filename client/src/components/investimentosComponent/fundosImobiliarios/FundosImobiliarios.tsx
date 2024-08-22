@@ -15,14 +15,17 @@ import TitlePage from "@/components/tituloPaginas";
 import { useRouter } from "next/navigation";
 import patrimonios from "./tipoPatrimonio";
 import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
-
+import ModalNovoNome from '@/components/ModalNovoNome';
 export default function App({ tipoInvestimento }: any) {
+    const [messageBanco, setMessageBanco] = useState<string>()
+    const [messageBancoTipo, setMessageBancoTipo] = useState()
     const [banco, setBanco] = useState([])
     const { tokenUsuario } = useToken()
     const [messageTipoAlert, setmessageTipoAlert] = useState<string>()
     const [messageResposta, setMessageResposta] = useState<string>()
     const [modalOpenBanco, setModalOpenBanco] = useState<boolean>(false);
-    const [modalOpenAcao, setModalOpenAcao] = useState<boolean>(false);
+    const [modalNovoNome, setModalNovoNome] = useState<boolean>(false);
+    const [dadosNomeFundo, setDadosNomeFundo] = useState([]);
 
     const buscaBanco = async () => {
         if (!tokenUsuario) return
@@ -39,8 +42,19 @@ export default function App({ tipoInvestimento }: any) {
         }
     }
 
+    const buscarNome = async () => {
+        try {
+            const response = await api.get(`/buscanomefundonovo`)
+            setDadosNomeFundo(response.data)
+            console.log("🚀 ~ buscarNome ~ response", response)
+        } catch (error) {
+            console.error('Erro ao buscar nome:', error);
+        }
+    }
+
     useEffect(() => {
         buscaBanco()
+        buscarNome()
     }, [])
 
     const handleSubmit = async (values: any) => {
@@ -110,6 +124,36 @@ export default function App({ tipoInvestimento }: any) {
         setModalOpenBanco(true);
     }
 
+    const handleSubmitNome = async (values: any) => {
+        const nomefundo = values.nomefundo
+        try {
+            const response = await api.post(`/novonome`, {
+                nomefundo,
+                id: tokenUsuario?.id
+            })
+            console.log("🚀 ~ handleSubmitNome ~ response", response)
+            if (response.status === 200) {
+                // setMessageBancoTipo("success")
+                buscarNome()
+                setMessageBanco(response.data.message)
+                setTimeout(() => {
+                    setMessageBanco("")
+                    setModalNovoNome(false)
+                }, 2000)
+            }
+        } catch (error) {
+            // setMessageBancoTipo("error")
+            // setMessageBanco('Nome já existe.')
+            console.error('Erro salvar nome:', error);
+            buscarNome()
+            setTimeout(() => {
+                // setMessageBanco("")
+                // setIsOpen(false)
+            }, 2000)
+        }
+
+    }
+
 
 
     return (
@@ -129,8 +173,7 @@ export default function App({ tipoInvestimento }: any) {
                     touched,
                 }: any) => (
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
-                        {JSON.stringify(errors)}
-                        <Input
+                        <Select
                             fullWidth
                             name="nome"
                             label="Nome do Fundo"
@@ -138,7 +181,13 @@ export default function App({ tipoInvestimento }: any) {
                             isInvalid={touched.nome && !!errors.nome}
                             value={values.nome}
                             onChange={handleChange}
-                        />
+                        >
+                            {dadosNomeFundo && dadosNomeFundo.map((item: any) => (
+                                <SelectItem value={item.nomeFundo} key={item.nomeFundo}>
+                                    {item.nomeFundo}
+                                </SelectItem>
+                            ))}
+                        </Select>
                         <Input
                             fullWidth
                             name="quantidade"
@@ -198,6 +247,7 @@ export default function App({ tipoInvestimento }: any) {
                                 defaultValue={today(getLocalTimeZone())}
                             />
                         </I18nProvider>
+                        <Button fullWidth className="bg-buttonAzulEscuro text-white" onClick={() => setModalNovoNome(true)}>Novo nome Fii</Button>
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
                         <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
                         {messageResposta && <Alert severity={messageTipoAlert as 'success' | 'info' | 'warning' | 'error'}>{messageResposta}</Alert>}
@@ -212,6 +262,13 @@ export default function App({ tipoInvestimento }: any) {
                 onSubmit={handleSubmitModalBanco}
                 message={messageResposta}
                 messageTipo={messageTipoAlert}
+            />
+            <ModalNovoNome
+                message={messageBanco}
+                messageTipo={messageBancoTipo}
+                onSubmit={handleSubmitNome}
+                open={modalNovoNome}
+                onClose={() => setModalNovoNome(false)}
             />
         </>
     );

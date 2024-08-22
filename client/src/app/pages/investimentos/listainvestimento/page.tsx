@@ -26,7 +26,7 @@ import { PlusIcon } from "@/components/iconesCompartilhados/PlusIcon";
 import { VerticalDotsIcon } from "@/components/iconesCompartilhados/VerticalDotsIcon";
 import { ChevronDownIcon } from "@/components/iconesCompartilhados/ChevronDownIcon";
 import { SearchIcon } from "@/components/iconesCompartilhados/SearchIcon";
-import { columns, users, statusOptions } from "./data";
+import { columns, statusOptions } from "./data";
 import { capitalize } from "./utils";
 import { api } from "@/lib/api";
 import useToken from "@/components/hooks/useToken";
@@ -322,7 +322,7 @@ export default function App() {
                 </div>
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col gap-1text-default-900 text-small">
-                        <span>Total {users.length} Investimentos</span>
+                        <span>Total {dadosFiltro.length} Investimentos</span>
                         <span>{nomePagina}, <span className="text-primaryTableText">{visibility ? currency(total) : '****'}</span> Investidos </span>
                     </div>
                     <label className="flex items-center text-default-400 text-small">
@@ -345,7 +345,6 @@ export default function App() {
         visibleColumns,
         onSearchChange,
         onRowsPerPageChange,
-        users.length,
         hasSearchFilter,
         total,
         nomePagina,

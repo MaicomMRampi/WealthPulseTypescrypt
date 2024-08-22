@@ -16,7 +16,7 @@ const config: Config = {
       },
       colors: {
         'default-text': "#93fad6",
-        'primaryTable': '#0b1739',
+        'primaryTable': '#3e3b3b',
         'primaryTableHover': '#10b981',
         'primaryTableText': '#10b981',
         'buttonAzulClaro':'#0284c7',

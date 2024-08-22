@@ -353,19 +353,27 @@ router.post('/api/trocarsenha', async (req, res) => {
 // ==============  FUNDOS IMOBILIARIOS ==========
 
 router.post('/api/novonome', async (req, res) => {
+    const dados = req.body;
+    console.log("🚀 ~ router.post ~ dados", dados)
     try {
-        const nome = req.body.nomefundo;
+        const nome = dados.nomefundo.toUpperCase().trim();
+        const idUser = parseInt(dados.id); // Obtenha o ID do usuário da requisição
 
-        const buscaNome = await prisma.nomeFundoImobiliario.findUnique({ where: { nomefundo: nome.toUpperCase().trim() } });
-
+        const buscaNome = await prisma.NomeFundoImobiliario.findUnique({
+            where: {
+                nomeFundo: nome,
+                idUser: idUser // Inclua o ID do usuário na consulta
+            }
+        });
 
         if (buscaNome) {
-            return res.status(400).json({ message: 'Nome Ja Cadastrado' });
+            return res.status(400).json({ message: 'Nome Já Cadastrado' });
         }
 
-        const insereNome = await prisma.nomeFundoImobiliario.create({
+        const insereNome = await prisma.NomeFundoImobiliario.create({
             data: {
-                nomefundo: nome.toUpperCase().trim(),
+                nomeFundo: nome,
+                idUser: idUser
             }
         });
 
