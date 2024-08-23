@@ -20,6 +20,7 @@ const columns = [
 
 
 const statusOptions = [
+    { name: "Todos", uid: "todos" },
     { name: "Ações", uid: "acao" },
     { name: "Fundos Imobiliários (FIIs)", uid: "fii" },
     { name: "Renda Fixa", uid: "rendaFixa" },

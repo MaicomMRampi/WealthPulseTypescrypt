@@ -34,8 +34,8 @@ const config: Config = {
       dark: {        
         colors: {
           textCards:'#fff',
-          BgCardPadrao: '#0b1739',
-          BgCardPadraoTable: '#0b1739',
+          BgCardPadrao: '#1f2127',
+          BgCardPadraoTable: '#1f2127',
           background: '#0000003b',
           primary: '#10b981',          
           // Customize the light theme here        

@@ -57,7 +57,7 @@ export default function App() {
     const [filterValue, setFilterValue] = useState<any>();
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['acao']));
+    const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['todos']));
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState<any>({
         column: "age",
@@ -130,11 +130,16 @@ export default function App() {
 
         if (statusFilter) {
             const selectedFilter = Array.from(statusFilter)[0] as string;
-            console.log("🚀 ~ filteredItems ~ selectedFilter", statusFilter)
 
-            filteredUsers = filteredUsers.filter((investimento) =>
-                investimento.tipo === selectedFilter
-            );
+            if (selectedFilter != "todos") {
+                filteredUsers = filteredUsers.filter((investimento) =>
+                    investimento.tipo === selectedFilter
+                )
+            } else {
+                filteredUsers = filteredUsers.filter((investimento) =>
+                    investimento.tipo != selectedFilter
+                )
+            }
         }
 
         setDadosFiltro(filteredUsers)
@@ -245,28 +250,6 @@ export default function App() {
                         onValueChange={onSearchChange}
                     />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        {Array.from(statusFilter)[0] as string === "fii" ?
-                            <Button
-                                color="warning"
-                                endContent={<ChevronDownIcon className="text-small" />}
-                                onClick={() => setModalDetalhes(true)}
-                                variant="solid"
-                            >
-                                <h2 className="text-lg">Detalhes</h2>
-                            </Button>
-                            : null
-                        }
-
-                        {Array.from(statusFilter)[0] as string === "fii" ?
-                            <Button
-                                endContent={<ChevronDownIcon className="text-small" />}
-                                className="bg-buttonAzulEscuro text-white"
-                                variant="solid"
-                            >
-                                <h2 className="text-lg">Dividendos</h2>
-                            </Button>
-                            : null
-                        }
                         <Dropdown>
                             <DropdownTrigger>
                                 <Button
@@ -274,7 +257,7 @@ export default function App() {
                                     className="bg-buttonAzulClaro text-white"
                                     variant="solid"
                                 >
-                                    <h2 className="text-lg">Tipo de Investimento</h2>
+                                    <p>Tipo de Investimento</p>
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -298,6 +281,29 @@ export default function App() {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
+                        {Array.from(statusFilter)[0] as string === "fii" ?
+                            <Button
+                                color="warning"
+                                endContent={<ChevronDownIcon className="text-small" />}
+                                onClick={() => setModalDetalhes(true)}
+                                variant="solid"
+                            >
+                                <h2 className="text-lg">Detalhes</h2>
+                            </Button>
+                            : null
+                        }
+
+                        {Array.from(statusFilter)[0] as string === "fii" ?
+                            <Button
+                                endContent={<ChevronDownIcon className="text-small" />}
+                                className="bg-buttonAzulEscuro text-white"
+                                variant="solid"
+                            >
+                                <p>Dividendos</p>
+                            </Button>
+                            : null
+                        }
+
                         <Dropdown>
                             <DropdownTrigger>
                                 <Button
