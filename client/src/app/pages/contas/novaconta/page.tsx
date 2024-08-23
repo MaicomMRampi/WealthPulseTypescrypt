@@ -77,7 +77,7 @@ export default function NovaConta() {
                                 fullWidth
                                 name="estabelecimento"
                                 label="Estabelecimento"
-                                isInvalid={errors.estabelecimento && touched.estabelecimento}
+                                isInvalid={!!errors.estabelecimento && touched.estabelecimento}
                                 autoComplete="off"
                                 value={values.estabelecimento}
                                 onChange={handleChange}
@@ -86,7 +86,7 @@ export default function NovaConta() {
                                 fullWidth
                                 name="comprador"
                                 label="Comprador"
-                                isInvalid={errors.comprador && touched.comprador}
+                                isInvalid={!!errors.comprador && touched.comprador}
                                 autoComplete="off"
                                 value={values.comprador}
                                 onChange={handleChange}
@@ -106,7 +106,7 @@ export default function NovaConta() {
                                 label="Valor Total Compra"
                                 value={values.valor}
                                 autoComplete="off"
-                                isInvalid={errors.valor && touched.valor}
+                                isInvalid={!!errors.valor && touched.valor}
                                 onBlur={handleChange}
                                 onChange={(event) => {
                                     const { name, value } = event.target;
@@ -127,7 +127,7 @@ export default function NovaConta() {
                             <I18nProvider locale="pt-BR">
                                 <DatePicker
                                     name="datavencimento"
-                                    isInvalid={errors.datavencimento && touched.datavencimento}
+                                    isInvalid={!!errors.datavencimento && touched.datavencimento}
                                     hideTimeZone
                                     onChange={(val) => setFieldValue("datavencimento", val)}
                                     label="1° Vencimento"
@@ -152,14 +152,14 @@ export default function NovaConta() {
                             )}
                             {isSelected && (
                                 <Alert severity="info">
-                                    Conta parcelada em {values.qtdparcelas} vezes no valor de {formatarParaReais(formatarParaBackend(values.valor) / values.qtdparcelas)}
+                                    Conta parcelada em {values.qtdparcelas} vezes no valor de {formatarParaReais(formatarParaBackend(values.valor) / parseInt(values.qtdparcelas))}
                                 </Alert>
                             )}
                             {JSON.stringify(errors)}
 
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
                             {message ? (
-                                <Alert severity={messageTipo} variant="filled">
+                                <Alert severity={messageTipo as 'success' | 'info' | 'warning' | 'error'} variant="filled">
                                     {message}
                                 </Alert>
                             ) : null}

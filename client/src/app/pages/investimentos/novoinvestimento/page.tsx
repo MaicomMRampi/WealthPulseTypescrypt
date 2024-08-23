@@ -20,6 +20,7 @@ export default function App() {
                 fullWidth
                 label="Selecione o Tipo de Investimento"
                 onChange={(e) => setTipoInvestimento(e.target.value)}
+                value={tipoInvestimento}
             >
                 <SelectItem key={'acao'} value="acao">Ações</SelectItem>
                 <SelectItem key={"fii"} value="fii">Fundos Imobiliários (FIIs)</SelectItem>

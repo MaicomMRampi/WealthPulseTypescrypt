@@ -12,35 +12,30 @@ import axios from 'axios';
 import { Formik } from 'formik';
 import { useEffect, useState } from 'react'
 import * as yup from 'yup'
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 500,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
+
+interface Props {
+  open: boolean;
+  onclose: any;
+  status: string;
+  nome: string;
 }
 
-export default function BasicModal({ open, onclose, status, nome }) {
+export default function BasicModal({ open, onclose, status, nome }: Props) {
   const initialValues = {
     qtdvenda: '',
   };
 
   const validationSchema = yup.object().shape({
-    qtdvenda: yup
-      .number("Digite Apenas Números")
-      .required('Campo Obrigatório'),
+    qtdvenda: yup.number().required('Campo Obrigatório'),
+
   });
-  const [message, setMessage] = useState('');
-  const [messageTipo, setmessageTipo] = useState('');
+  const [message, setMessage] = useState<string>('');
+  const [messageTipo, setmessageTipo] = useState<string>('');
 
 
 
 
-  const vendaFii = async (values) => {
+  const vendaFii = async (values: any) => {
     try {
       const response = await api.put(`/vendacotasfii`, {
         nomefii: nome,
@@ -55,7 +50,7 @@ export default function BasicModal({ open, onclose, status, nome }) {
         }, 3000);
         return () => clearTimeout(timer);
       }
-    } catch (error) {
+    } catch (error: any) {
       setmessageTipo('error')
       console.error('Erro ao vender FII:', error);
       setMessage(error.response.data.message);
@@ -103,7 +98,7 @@ export default function BasicModal({ open, onclose, status, nome }) {
                   <Button onClick={onclose}>Cancelar</Button>
                   <Button type="submit">Confirmar</Button>
                 </Typography>
-                {message ? <Alert color={messageTipo}>{message}</Alert> : null}
+                {message ? <Alert color={messageTipo as any}>{message}</Alert> : null}
               </Box>
             </form>
           )}

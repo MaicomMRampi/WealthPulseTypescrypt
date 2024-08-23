@@ -1,10 +1,18 @@
 import React from "react";
+
+type Props = {
+    size?: number;
+    height?: number;
+    width?: number;
+};
+
+
 export const CheckIcon = ({
     size,
     height,
     width,
     ...props
-}) => {
+}: Props) => {
     return (
         <svg
             width={size || width || 24}

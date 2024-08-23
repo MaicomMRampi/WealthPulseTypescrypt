@@ -5,7 +5,9 @@ const initialValues = {
     estabelecimento: '',
     comprador: '',
     valor: '',
+    qtdparcelas: '',
     datavencimento: '',
+    pagador: '',
 };
 
 // ... (Função Label - Se necessário) 
@@ -15,6 +17,8 @@ const validationSchema = Yup.object().shape({
     comprador: Yup.string().required('Patrimônio é obrigatório'),
     valor: Yup.string().required('Valor é obrigatório'),
     datavencimento: Yup.date().required('Data é obrigatório'),
+    qtdparcelas: Yup.string().optional(),
+    pagador: Yup.string().optional(),
 });
 
 export { initialValues, validationSchema }

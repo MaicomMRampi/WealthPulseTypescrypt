@@ -10,11 +10,11 @@ interface ModalFormaPagamentoProps {
     open: boolean;
     onClose: () => void;
     onSubmit: (values: any) => void;
-    message: string;
-    messageTipo: string;
+    message: any;
+    messagemTipo: any;
 }
 
-export default function App({ open, onClose, onSubmit, message, messageTipo }: ModalFormaPagamentoProps) {
+export default function App({ open, onClose, onSubmit, message, messagemTipo }: ModalFormaPagamentoProps) {
     const initialValues = {
         formapagamento: '',
     };
@@ -80,7 +80,7 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: M
                                             </Button>
                                         </ModalFooter>
                                         {message ? (
-                                            <Alert severity={messageTipo}>{message}</Alert>
+                                            <Alert severity={messagemTipo as "success" | "error" | "warning" | "info"}>{message}</Alert>
 
                                         ) :
                                             null

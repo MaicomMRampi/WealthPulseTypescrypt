@@ -13,10 +13,6 @@ import {
     Listbox,
     ListboxItem,
     Progress,
-    Accordion,
-    AccordionItem,
-    Checkbox,
-    Chip,
     Card
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -24,11 +20,10 @@ import currency from "@/components/Currency";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import PdfDespesas from "@/components/PdfDespesas";
-import { BsInfoCircle } from "react-icons/bs";
 import ModalObservacao from "@/components/despesaComponents/ModalObservacao";
 import columns from "./data";
 import { format } from 'date-fns';
-import { id, ptBR, vi } from 'date-fns/locale'
+import { ptBR, vi } from 'date-fns/locale'
 import { SearchIcon } from "@/components/iconesCompartilhados/SearchIcon";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useMemo } from "react";
@@ -41,40 +36,39 @@ import { PlusIcon } from "@/components/iconesCompartilhados/PlusIcon";
 import useToken from "@/components/hooks/useToken";
 import TitlePage from "@/components/tituloPaginas";
 import AlteraVisualizacaoDataYYYYMM from "@/components/funcoes/alteraVisualizacaoDataYYYMM";
-import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData";
 import ButtonVoltar from "@/components/ButtonVoltar";
 import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
-import { CheckIcon } from "../../patrimonio/detalhes/[id]/CheckIcon";
-import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
-import { MdOutlinePayments } from "react-icons/md";
 
-type Despesa = {
+interface Acumulador {
+    [key: string]: {
+        data: string;
+        itens: Omit<Item, 'mesCorrespondente'>[];
+
+    },
+}
+
+interface Item {
     id: string;
     dataGasto: string;
     valor: string;
     tipo: string;
     categoria: string;
     observacao: string;
+    mesCorrespondente: any;
+    pago: number;
 }
 
-export default function MinhasContas() {
-    const dataAtual = new Date()
-    const mesVenc = dataAtual.getMonth() + 1;
-    const anoVenc = dataAtual.getFullYear();
-    const dataInicioControle = `${anoVenc}-${mesVenc < 10 ? `0${mesVenc}` : mesVenc}`;
-
-    const [dataControleMensal, setDataControleMensal] = useState<string>(dataInicioControle);
-    const [orcamentoMensal, setOrcamentoMensal] = useState<string>("");
-    console.log("🚀 ~ MinhasContas ~ orcamentoMensal", orcamentoMensal)
+export default function ListaDespesa() {
     const [message, setMessage] = useState()
     const [mesFatura, setMesFatura] = useState<string>();
     const [opemModalFatura, setOpenModalFatura] = useState(false);
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
     const { visibility } = useVisibility()
-    const [observacao, setObservacao] = useState<object>(false);
+    const [observacao, setObservacao] = useState<any>();
     const [selectedIndex, setSelectedIndex] = useState(0); // Inicia com -1 para nenhum item selecionado
-    const [Despesa, setDespesa] = useState();
-    const [DespesaSelect, setDespesaSelect] = useState<Despesa[]>([])
+    const [Despesa, setDespesa] = useState<any>();
+    const [DespesaSelect, setDespesaSelect] = useState<any>([]);
+
     const [filterValue, setFilterValue] = useState<string>("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(1);
@@ -88,19 +82,19 @@ export default function MinhasContas() {
     })
     const { tokenUsuario } = useToken()
 
-    const buscaContaMesAtual = async () => {
-        const response = await api.get(`/buscacontamesatual`, {
+    const buscaDespesaMesAtual = async () => {
+        const response = await api.get(`/buscadespesamesatual`, {
             params: {
-                id: tokenUsuario?.id,
+                email: tokenUsuario?.id,
             },
         });
         setDespesaSelect(response.data);
     };
 
-    const buscaConta = async () => {
-        const response = await api.get(`/buscaconta`, {
+    const buscaDespesa = async () => {
+        const response = await api.get(`/buscadespesa`, {
             params: {
-                id: tokenUsuario?.id,
+                email: tokenUsuario?.id,
             },
         });
         setDespesa(response.data);
@@ -109,60 +103,48 @@ export default function MinhasContas() {
 
 
     useEffect(() => {
-        buscaContaMesAtual();
-        buscaConta()
+        buscaDespesa();
+        buscaDespesaMesAtual();
     }, []);
 
 
-    useEffect(() => {
-        const fetchOrcamento = async () => {
-            try {
-                const resultado = await orcamentoMensalControle(dataControleMensal, tokenUsuario?.id);
-                setOrcamentoMensal(resultado);
-            } catch (error) {
-                console.error("Erro ao buscar o orçamento mensal:", error);
-            }
-        };
-
-        fetchOrcamento();
-    }, [dataControleMensal, Despesa, dataInicioControle]);
-
-
     const opemModalFechaFatura = (mes: string) => {
+        console.log("🚀 ~ opemModalFechaFatura ~ mes", mes)
         setMesFatura(mes)
         setOpenModalFatura(true)
+    }
+
+    const pagFatura = async () => {
+        console.log('MEs fatura apor confirmare', mesFatura)
+        const response = await api.post(`/fecharfatura`, {
+            idUsuario: tokenUsuario?.id,
+            fatura: mesFatura
+        });
+        if (response.status == 200) {
+            buscaDespesa();
+            buscaDespesaMesAtual();
+            setMessage(response.data.message)
+            setTimeout(() => {
+                setMesFatura('')
+                setOpenModalFatura(false)
+            }, 3000)
+        } else {
+            setOpenModalFatura(false)
+        }
     }
 
 
 
     const handleDataSelect = async (data: string) => {
-        setDataControleMensal(data);
-        const response = await api.post(`/buscacontadata`, {
+        const response = await api.post(`/buscadespesadata`, {
             data: data,
-            id: tokenUsuario?.id,
+            emailUser: tokenUsuario?.id,
         });
         setDespesaSelect(response.data);
     };
 
-
-    const pagamento = async (id, mesCorrespondente: any) => {
-        const response = await api.put(`/pagaconta`, {
-            id: id
-        });
-
-        handleDataSelect(mesCorrespondente);
-        if (response.status === 200) {
-            handleDataSelect(mesCorrespondente);
-        }
-    };
-
-
-
-
-
-
     const dadosAgrupados = Despesa
-        ? Despesa.reduce((acc, item) => {
+        ? Despesa.reduce((acc: any, item: any) => {
             const { mesCorrespondente, ...outrasPropriedades } = item;
             if (!acc[mesCorrespondente]) {
                 acc[mesCorrespondente] = {
@@ -176,29 +158,17 @@ export default function MinhasContas() {
         }, {})
         : {};
 
+
     const arrayAgrupado = Despesa
         ? Object.keys(dadosAgrupados).map((key) => dadosAgrupados[key])
         : [];
 
 
-    const datasOdenadasMaiorMenor = arrayAgrupado && arrayAgrupado.sort((b, a) => new Date(b.data) - new Date(a.data));
-
-    const groupByYear = (data: string) => {
-        return data.reduce((acc, item) => {
-            const year = item.data.split('-')[0];
-            if (!acc[year]) {
-                acc[year] = [];
-            }
-            acc[year].push(item);
-            return acc;
-        }, {});
-    };
-
-    const groupedData = groupByYear(arrayAgrupado);
+    const datasOdenadasMaiorMenor = arrayAgrupado && arrayAgrupado.sort((b, a) => new Date(b.data).getTime() - new Date(a.data).getTime());
 
     const somaValores =
         DespesaSelect &&
-        DespesaSelect.reduce((acc, despesa) => acc + despesa.valor, 0);
+        DespesaSelect.reduce((acc: number, despesa: any) => acc + despesa.valorGasto, 0);
 
     const openObservação = (observacao: object) => {
         setObservacao(observacao)
@@ -211,8 +181,8 @@ export default function MinhasContas() {
         let filteredUsers = [...DespesaSelect];
 
         if (hasSearchFilter) {
-            filteredUsers = filteredUsers.filter((item) =>
-                item.estabelecimento.toLowerCase().includes(filterValue.toLowerCase())
+            filteredUsers = filteredUsers.filter((item: any) =>
+                item.categoria.nomeCategoria.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
 
@@ -229,7 +199,7 @@ export default function MinhasContas() {
     }, [page, filteredItems, rowsPerPage]);
 
     const sortedItems = useMemo(() => {
-        return [...items].sort((a, b) => {
+        return [...items].sort((a: any, b: any) => {
             const first = a[sortDescriptor.column];
             const second = b[sortDescriptor.column];
             const cmp = first < second ? -1 : first > second ? 1 : 0;
@@ -241,53 +211,24 @@ export default function MinhasContas() {
     const renderCell = useCallback((despesa: any, columnKey: any) => {
         const cellValue = despesa[columnKey];
         switch (columnKey) {
-            case "estabelecimento":
-                return <p>{despesa.estabelecimento}</p>;
-            case "dataVencimento":
-                return <p>{despesa.dataVencimento && AlteraVisualizacaoData(despesa.dataVencimento)}</p>;
             case "mesCorrespondente":
                 return <p>{AlteraVisualizacaoDataYYYYMM(despesa.mesCorrespondente)}</p>;
-            case "valor":
+            case "categoria":
+                return <p>{despesa.categoria && despesa.categoria.nomeCategoria}</p>;
+            case "valorGasto":
                 return (
                     <p>
-                        {visibility ? currency(despesa.valor) : '****'}
+                        {visibility ? currency(despesa.valorGasto) : '****'}
                     </p>
                 );
-            case "pagador:":
-                return (
-                    <p>
-                        {despesa.pagador}
-                    </p>
-                );
-            case "pago":
-                return <p>
-                    {
-                        despesa.pago === 0 ?
-                            (
-                                <Chip
-                                    startContent={<CheckIcon size={18} />}
-                                    variant="faded"
-                                    color="danger"
-                                >
-                                    À pagar
-                                </Chip>
-                            )
-                            :
-                            (
-                                <Chip
-                                    startContent={<CheckIcon size={18} />}
-                                    variant="faded"
-                                    color="success"
-                                >
-                                    Pago
-                                </Chip>
-                            )
-                    }
-                </p>
-
-
-
-
+            case "local":
+                return <p>{despesa.local}</p>;
+            case "formaDePagamento":
+                return <p>{despesa.FormaPagamento.nomeFormaPagamento}</p>;
+            case "pagante":
+                return <p>{despesa.pagante}</p>;
+            case "responsavel":
+                return <p>{despesa.responsavel}</p>;
             case "actions":
                 return (
                     <div className="relative flex items-center gap-12 ">
@@ -296,22 +237,18 @@ export default function MinhasContas() {
                                 <EyeIcon />
                             </span>
                         </Tooltip>
-                        <Tooltip className="bg-buttonAzulClaro text-white" content="Fazer o Pagamento?">
-                            <span onClick={() => pagamento(despesa.id, despesa.mesCorrespondente)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <MdOutlinePayments className="text-buttonAzulClaro" />
-                            </span>
-                        </Tooltip>
                         <Tooltip className="" content="Editar">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EditIcon className="text-[#93fad6]" />
                             </span>
                         </Tooltip>
-                        <Tooltip className="" color="danger" content="Deletar">
-                            <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                <DeleteIcon className="text-red-500" />
-                            </span>
-                        </Tooltip>
-
+                        {despesa.fechada === 0 ? (
+                            <Tooltip className="" color="danger" content="Deletar">
+                                <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                    <DeleteIcon className="text-red-500" />
+                                </span>
+                            </Tooltip>
+                        ) : (null)}
 
                     </div>
                 );
@@ -363,57 +300,49 @@ export default function MinhasContas() {
     const headerTable = useMemo(() => {
         return (
             <div className="flex flex-col gap-4  pb-4 p-4" >
-                <div className="flex justify-between gap-3 items-end py-4 w-full">
+                <div className="flex justify-between gap-3 items-end py-4">
                     <Input
                         size="md"
                         fullWidth
                         className="w-full sm:max-w-[44%]  "
-                        placeholder="Pesquisar Contas..."
+                        placeholder="Pesquisar Despesa..."
                         startContent={<SearchIcon />}
                         value={filterValue}
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
 
-                    <div className="flex gap-3 w-full justify-end">
-                        {/* <PDFDownloadLink document={<PdfDespesas despesas={DespesaSelect} totalFatura={currency(somaValores)} usuario={tokenUsuario} />} fileName="Despesas Patrimônio " >
+                    <div className="flex gap-3">
+                        <PDFDownloadLink document={<PdfDespesas despesas={DespesaSelect} totalFatura={currency(somaValores)} usuario={tokenUsuario} />} fileName="Despesas Patrimônio " >
                             {({ blob, url, loading, error }) =>
                                 loading ? 'Loading document...' : <Button className=" bg-buttonAzulClaro text-white" variant="flat" fullWidth>Imprimir</Button>
                             }
-                        </PDFDownloadLink> */}
-                        <Button className=" border-orange-500 text-white bg-orange-500" variant="solid" onClick={() => opemModalFechaFatura(DespesaSelect[0].mesCorrespondente)}>Fechar mês</Button>
-                        <Link href="/pages/contas/novaconta">
-                            <Button
-                                color="primary"
-                                variant="solid"
-                                endContent={<PlusIcon />}
-                            >
-                                Nova Conta
-                            </Button>
-                        </Link>
+                        </PDFDownloadLink>
+                        <Button className=" border-orange-500 text-white bg-orange-500" variant="solid" fullWidth onClick={() => opemModalFechaFatura(DespesaSelect[0].mesCorrespondente)}>Fechar mês</Button>
+                        <Button
+                            fullWidth
+                            color="primary"
+                            variant="solid"
+                            endContent={<PlusIcon size={16} width={16} height={16} />}
+                        >
+                            <Link href="/pages/despesas/novadespesa"> Nova Despesa</Link>
+                        </Button>
                     </div>
                 </div>
-                <div className="flex gap-4 items-center">
-                    <Progress
-                        size="sm"
-                        radius="sm"
-                        classNames={{
-                            base: "max-w-md",
-                            track: "drop-shadow-md border border-default",
-                            indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
-                        }}
-                        label="Controle de orçamento"
-                        value={parseInt(orcamentoMensal.porcentagem)}
-                        showValueLabel={true}
-                    />
-                    <Tooltip color="warning" content="Soma entre despesas e contas" placement="right-end">
-                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <BsInfoCircle />
-                        </span>
-                    </Tooltip>
-
-
-                </div>
+                <Progress
+                    size="sm"
+                    radius="sm"
+                    classNames={{
+                        base: "max-w-md",
+                        track: "drop-shadow-md border border-default",
+                        indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
+                        label: "text-white",
+                        value: "text-white",
+                    }}
+                    label="Controle de orçamento"
+                    value={80}
+                    showValueLabel={true}
+                />
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col gap-1">
                         <span className="text-default-400 text-small font-extrabold">
@@ -435,7 +364,7 @@ export default function MinhasContas() {
                         </select>
                     </label>
                 </div>
-            </div >
+            </div>
         );
     }, [
         filterValue,
@@ -443,8 +372,6 @@ export default function MinhasContas() {
         DespesaSelect.length,
         onSearchChange,
         hasSearchFilter,
-        Despesa,
-        dataControleMensal,
 
     ]);
 
@@ -485,77 +412,38 @@ export default function MinhasContas() {
 
     return (
         <>
-            <div className="w-[95%] m-auto" >
-                <TitlePage title="Minhas Contas" />
+
+            <div key={String(visibility)} className="w-[95%] m-auto" >
+                <TitlePage title="Minhas Despesas" />
                 <div className="w-full grid grid-cols-1 md:grid-cols-12 pt-6">
-                    <div className="col-span-2 justify-center" >
-                        <Accordion
-                            motionProps={{
-                                variants: {
-                                    enter: {
-                                        y: 0,
-                                        opacity: 1,
-                                        height: 'auto',
-                                        transition: {
-                                            height: {
-                                                type: 'spring',
-                                                stiffness: 500,
-                                                damping: 30,
-                                                duration: 1,
-                                            },
-                                            opacity: {
-                                                easings: 'ease',
-                                                duration: 1,
-                                            },
-                                        },
-                                    },
-                                    exit: {
-                                        y: -10,
-                                        opacity: 0,
-                                        height: 0,
-                                        transition: {
-                                            height: {
-                                                easings: 'ease',
-                                                duration: 0.25,
-                                            },
-                                            opacity: {
-                                                easings: 'ease',
-                                                duration: 0.3,
-                                            },
-                                        },
-                                    },
-                                },
-                            }}
+                    <div className="col-span-2 ">
+                        <Listbox
+                            aria-label="Example with disabled actions"
                         >
-                            {Object.keys(groupedData).map((year) => (
-                                <AccordionItem classNames={{ title: 'primaryTableText' }} key={year} aria-label={`Acordeão ${year}`} title={year}>
-                                    <div >
-                                        {groupedData[year].map((item, index) => (
-                                            <div
-                                                key={item.data}
-                                                className={`text-center border-b-orange-100 cursor-pointer ${index === selectedIndex ? 'bg-primaryTableText' : ''}`}
-                                                onClick={() => {
-                                                    handleDataSelect(item.data);
-                                                    setSelectedIndex(index);
-                                                }}
-                                            >
-                                                {(() => {
-                                                    const [ano, mes] = item.data.split('-').map(Number);
-                                                    const data = new Date(ano, mes - 1);
-                                                    return format(data, 'MMMM yyyy', { locale: ptBR }).toUpperCase();
-                                                })()}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
+                            {datasOdenadasMaiorMenor &&
+                                datasOdenadasMaiorMenor.map((item, index) => (
+                                    <ListboxItem
+                                        key={item.data}
+                                        className={`text-center border-b-orange-100 cursor-pointer ${index === selectedIndex ? 'bg-primaryTableText' : ''
+                                            }`}
+                                        onClick={() => {
+                                            handleDataSelect(item.data);
+                                            setSelectedIndex(index); // Define o índice do item selecionado
+                                        }}
+                                    >
+                                        {(() => {
+                                            const [ano, mes] = datasOdenadasMaiorMenor && item.data.split('-').map(Number);
+                                            const data = new Date(ano, mes - 1); // Ajusta o mês (0-indexed)
+                                            return format(data, 'MMMM yyyy', { locale: ptBR }).toUpperCase();
+                                        })()}
+                                    </ListboxItem>
+                                ))}
+                        </Listbox>
                     </div>
                     <div className="col-span-10 px-6  rounded-lg">
                         <Card className="bg-BgCardPadrao">
                             {headerTable}
                             <Table
-                                key={visibility}
                                 aria-label="Example table with custom cells"
                                 selectionMode="none"
                                 classNames={{
@@ -570,15 +458,15 @@ export default function MinhasContas() {
                                             className="text-primaryTableText font-bold "
                                             key={column.uid}
                                             allowsSorting={column.sortable}
-                                            align={column.uid === "actions" || column.uid === "pago" ? "center" : "start"}
+                                            align={column.uid === "actions" ? "center" : "start"}
                                         >
                                             {column.name}
                                         </TableColumn>
                                     )}
                                 </TableHeader>
                                 <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
-                                    {(item) => (
-                                        <TableRow className={` ${item.pago === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item.id}>
+                                    {(item: any) => (
+                                        <TableRow className={` ${item.fechada === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item.id}>
                                             {(columnKey) => (
                                                 <TableCell>{renderCell(item, columnKey)}</TableCell>
                                             )}
@@ -587,9 +475,9 @@ export default function MinhasContas() {
                                 </TableBody>
                             </Table>
                             {bottomContent}
-                        </Card>
+                        </Card >
                     </div>
-                </div >
+                </div>
             </div >
             <ModalObservacao
                 open={openModalObservacao}

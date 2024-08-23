@@ -1,5 +1,11 @@
 import React from "react";
-export const VerticalDotsIcon = ({ size = 24, width, height, ...props }) => (
+
+type Props = {
+    size?: number
+    width?: number
+    height?: number
+}
+export const VerticalDotsIcon = ({ size = 24, width, height, ...props }: Props) => (
     <svg
         aria-hidden="true"
         fill="none"

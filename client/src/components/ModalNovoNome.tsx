@@ -4,7 +4,16 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import { Alert } from "@mui/material";
 import { PiPaperPlaneTiltFill } from "react-icons/pi";
-export default function App({ open, onClose, onSubmit, message, messageTipo }) {
+
+interface Props {
+    open: boolean;
+    onClose: () => void;
+    onSubmit: (values: any) => void;
+    message: any;
+    messageTipo: any;
+}
+
+export default function App({ open, onClose, onSubmit, message, messageTipo }: Props) {
     const initialValues = {
         nomefundo: '',
     };
@@ -15,7 +24,7 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }) {
             .required('Campo Obrigatório'),
     });
 
-    const mandaValorAtualizado = async (values) => {
+    const mandaValorAtualizado = async (values: any) => {
         console.log("🚀 ~ mandaValorAtualizado ~ values", values)
         try {
             onSubmit(values);

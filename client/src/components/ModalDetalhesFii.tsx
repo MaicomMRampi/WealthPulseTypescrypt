@@ -5,12 +5,18 @@ import ModalVendaFii from './ModalVendaFii';
 import { useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi";
 
-export default function BasicModal({ open, onClose, data }) {
+interface Props {
+    open: boolean
+    onClose: () => void
+    data: any
+}
+
+export default function BasicModal({ open, onClose, data }: Props) {
     const [openModal, setOpenModal] = useState(false)
     const [fechaModal, setfechaModal] = useState(false)
     const [nomeVendaFii, setnomeVendaFii] = useState('')
     // Crie um objeto para armazenar os dados agrupados
-    const dadosAgrupados = data && data.reduce((acc, item) => {
+    const dadosAgrupados = data && data.reduce((acc: any, item: any) => {
         const { nome, quantidade } = item;
 
         if (!acc[nome]) {
@@ -32,7 +38,7 @@ export default function BasicModal({ open, onClose, data }) {
         return <div>Carregando...</div>
     }
 
-    const opemModalEVendafii = (id) => {
+    const opemModalEVendafii = (id: any) => {
         setnomeVendaFii('')
         setOpenModal(true)
         setnomeVendaFii(id)
@@ -58,7 +64,7 @@ export default function BasicModal({ open, onClose, data }) {
                 size="2xl"
                 classNames={{
                     backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
-                    content: "bg-black rounded-lg p-4 ",
+
                 }}
             >
 
@@ -77,13 +83,13 @@ export default function BasicModal({ open, onClose, data }) {
 
                                     <TableBody className="bg-primaryTable">
 
-                                        {arrayAgrupado && arrayAgrupado.map((row) => (
-                                            <TableRow className="border-b-1 border-white" hover key={row.id}>
-                                                <TableCell component="th" scope="row">
+                                        {arrayAgrupado && arrayAgrupado.map((row: any) => (
+                                            <TableRow className="border-b-1 border-white" key={row.id}>
+                                                <TableCell scope="row">
                                                     {row.nome}
                                                 </TableCell>
                                                 <TableCell align="center">{row.quantidade}</TableCell>
-                                                <TableCell align="center"><Button color="success" onPress={onClose} endContent={<HiOutlinePlus />} size="xs" onClick={() => opemModalEVendafii(row.nome)} >Vender</Button></TableCell>
+                                                <TableCell align="center"><Button color="success" onPress={onClose} endContent={<HiOutlinePlus />} onClick={() => opemModalEVendafii(row.nome)} >Vender</Button></TableCell>
                                             </TableRow>
                                         ))}
 

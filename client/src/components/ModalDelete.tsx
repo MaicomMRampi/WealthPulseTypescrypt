@@ -9,11 +9,7 @@ interface ObjetoInvestimento {
 }
 
 interface Props {
-    isOpen: boolean;
-    onClose: () => void;
-    objeto: ObjetoInvestimento;
-    confirmaEsclusao: () => void;
-    message: string;
+    isOpen: boolean; onClose: () => void; objeto: null; confirmaEsclusao: () => Promise<void>; message?: string
 }
 
 export default function ModalDele({ isOpen, onClose, objeto, confirmaEsclusao, message }: Props) {

@@ -1,3 +1,4 @@
+"use client";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import currency from "./Currency";
 
@@ -43,7 +44,7 @@ const DocumentoDespesasBens = ({ dadosRelatorios, tempoPatrimonio, totalDeGastos
                 <Text style={styles.subtitle}>Total de Gastos: R$ {totalDeGastos}</Text>
             </View>
             <View style={styles.section}>
-                {dadosRelatorios.map((item, index: any) => (
+                {dadosRelatorios.map((item: any, index: any) => (
                     <View key={index} style={styles.section}>
                         <Text style={styles.subtitle}>Despesa {index + 1}</Text>
                         <Text style={styles.text}>ID: {item.id}</Text>

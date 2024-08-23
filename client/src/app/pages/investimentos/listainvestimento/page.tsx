@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Table,
     TableHeader,
@@ -37,22 +37,29 @@ import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData"
 import ModalDetalhesFii from "@/components/ModalDetalhesFii";
 import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 
-// type User = typeof dados[0];
+type Dados = {
+    tipo: string
+}
+type Column = {
+    name: string;
+    uid: string;
+    sortable?: boolean; // Aqui, a propriedade sortable é opcional
+};
 
 export default function App() {
     const [total, setTotal] = useState(0)
-    const [dadosFiltro, setDadosFiltro] = useState([])
-    const [dados, setDados] = useState([])
+    const [dadosFiltro, setDadosFiltro] = useState<any>([])
+    const [dados, setDados] = useState<any>([])
     const [modalDetalhes, setModalDetalhes] = useState(false)
     const INITIAL_VISIBLE_COLUMNS = ["nome", "dataCompra", "instituicao", "valorInvestido", "actions"];
     const { tokenUsuario } = useToken()
     const [nomePagina, setNomePagina] = useState("Minhas Rendas Fixas");
-    const [filterValue, setFilterValue] = useState();
+    const [filterValue, setFilterValue] = useState<any>();
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['acao']));
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    const [sortDescriptor, setSortDescriptor] = useState<any>({
         column: "age",
         direction: "ascending",
     });
@@ -116,7 +123,7 @@ export default function App() {
         let filteredUsers = [...dados];
 
         if (hasSearchFilter) {
-            filteredUsers = filteredUsers.filter((investimento) =>
+            filteredUsers = filteredUsers.filter((investimento: any) =>
                 investimento.nome.toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
@@ -147,39 +154,39 @@ export default function App() {
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
-    const sortedItems = React.useMemo(() => {
-        return [...items].sort((a: dados, b: dados) => {
-            const first = a[sortDescriptor.column as keyof dados] as number;
-            const second = b[sortDescriptor.column as keyof dados] as number;
+    const sortedItems = useMemo(() => {
+        return [...items].sort((a: any, b: any) => {
+            const first = a[sortDescriptor.column];
+            const second = b[sortDescriptor.column];
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
-        const cellValue = user[columnKey as keyof User];
+    const renderCell = React.useCallback((investimento: any, columnKey: any) => {
+        const cellValue = investimento[columnKey];
 
         switch (columnKey) {
             case "nome":
                 return (
-                    <p>{user.nome}</p>
+                    <p>{investimento.nome}</p>
                 );
             case "dataCompra":
                 return (
-                    <p>{AlteraVisualizacaoData(user.dataCompra)}</p>
+                    <p>{AlteraVisualizacaoData(investimento.dataCompra)}</p>
                 );
             case "dataVencimento":
                 return (
-                    <p>{user.dataVencimento ? AlteraVisualizacaoData(user.dataVencimento) : null}</p>
+                    <p>{investimento.dataVencimento ? AlteraVisualizacaoData(investimento.dataVencimento) : null}</p>
                 );
             case "valorInvestido":
                 return (
-                    <p>{visibility ? currency(user.valorInvestido) : '****'}</p>
+                    <p>{visibility ? currency(investimento.valorInvestido) : '****'}</p>
                 );
             case "valorPago":
                 return (
-                    <p>{visibility ? currency(user.valorPago) : '****'}</p>
+                    <p>{visibility ? currency(investimento.valorPago) : '****'}</p>
                 );
             case "actions":
                 return (
@@ -187,7 +194,7 @@ export default function App() {
                         <Dropdown className="bg-background border-1 border-default-200">
                             <DropdownTrigger>
                                 <Button isIconOnly radius="full" size="sm" variant="light">
-                                    <VerticalDotsIcon className="text-default-400" />
+                                    <VerticalDotsIcon width={18} height={18} size={18} />
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
@@ -276,7 +283,13 @@ export default function App() {
                                 closeOnSelect={true}
                                 selectedKeys={statusFilter}
                                 selectionMode="single"
-                                onSelectionChange={setStatusFilter}
+                                onSelectionChange={(keys: any) => {
+                                    if (typeof keys === 'string') {
+                                        setStatusFilter(new Set([keys]));
+                                    } else if (keys instanceof Set) {
+                                        setStatusFilter(keys);
+                                    }
+                                }}
                             >
                                 {statusOptions.map((status) => (
                                     <DropdownItem key={status.uid} className="capitalize">
@@ -314,7 +327,7 @@ export default function App() {
                             fullWidth
                             color="primary"
                             variant="solid"
-                            endContent={<PlusIcon />}
+                            endContent={<PlusIcon size={18} width={18} height={18} />}
                         >
                             <Link href="/pages/investimentos/novoinvestimento"> Novo Investimento</Link>
                         </Button>
@@ -370,7 +383,7 @@ export default function App() {
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
     return (
-        <div key={visibility} className="w-full p-8">
+        <div key={String(visibility)} className="w-full p-8">
             <Card className=" px-4 pt-4  bg-BgCardPadrao rounded-lg">
                 <TitlePage title={
                     nomePagina}
@@ -393,12 +406,12 @@ export default function App() {
                     onSortChange={setSortDescriptor}
                 >
                     <TableHeader columns={headerColumns}>
-                        {(column) => (
+                        {(column: any) => (
                             <TableColumn
+                                className="text-primaryTableText font-bold "
                                 key={column.uid}
-                                align={column.uid === "actions" ? "center" : "start"}
                                 allowsSorting={column.sortable}
-                                className="text-primaryTableText"
+                                align={column.uid === "actions" || column.uid === "pago" ? "center" : "start"}
                             >
                                 {column.name}
                             </TableColumn>

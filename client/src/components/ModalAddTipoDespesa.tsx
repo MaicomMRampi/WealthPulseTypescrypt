@@ -9,7 +9,7 @@ interface Props {
     onClose: any,
     onSubmit: any,
     message: string,
-    messageTipo: 'error' | 'warning' | 'info' | 'success' // Corrigindo o tipo aqui
+    messageTipo: string
 }
 
 export default function App({ isOpen, onClose, onSubmit, message, messageTipo }: Props) {
@@ -35,7 +35,7 @@ export default function App({ isOpen, onClose, onSubmit, message, messageTipo }:
                                     Salvar
                                 </Button>
                             </ModalFooter>
-                            {message ? <Alert severity={messageTipo}>{message}</Alert> : null}
+                            {message ? <Alert severity={messageTipo as any}>{message}</Alert> : null}
                         </>
                     )}
                 </ModalContent>

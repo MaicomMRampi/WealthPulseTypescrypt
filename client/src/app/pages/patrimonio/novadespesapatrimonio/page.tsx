@@ -22,14 +22,13 @@ import { useRouter } from "next/navigation";
 export default function App() {
     const [openModal, setOpenModal] = useState(false);
     const [dados, setDados] = useState([]);
-    console.log("🚀 ~ App ~ dados", dados)
     const [dadosDespesas, setDadosDespesas] = useState([]);
     const [message, setMessage] = useState('');
     const [messageTipo, setMessageTipo] = useState('');
     const [messageDespesa, setMessageDespesa] = useState('');
     const [messageTipoDespesa, setMessageTipoDespesa] = useState('');
     const [open, setOpen] = useState(false);
-    const [tipobem, setTipoBem] = useState([]);
+    const [tipobem, setTipoBem] = useState<any>([]);
     const { tokenUsuario } = useToken()
     const router = useRouter()
 
@@ -205,7 +204,6 @@ export default function App() {
                                             null
                                         )
                                 }
-                                {errors.tipopatrimonio && touched.tipopatrimonio && <p className="text-red-500">{errors.tipopatrimonio}</p>}
                                 <Input
                                     fullWidth
                                     label="Valor Gasto"

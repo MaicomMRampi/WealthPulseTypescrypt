@@ -4,17 +4,20 @@ import { Alert } from "@mui/material";
 import AlteraVisualizacaoDataYYYYMM from "../funcoes/alteraVisualizacaoDataYYYMM";
 
 interface Props {
-    open: boolean,
-    onClose: any,
-    observacao: any
+    onClose: () => void,
+    // observacao: any
+    onSubmit: any
+    open: boolean;
+    mes: string | undefined | any
+    mensagem: any
 }
 
-interface Observacao {
-    responsavel: string,
-    paganete: string,
-    onSubmit: any,
-    mensagem: string
-}
+// interface Observacao {
+//     responsavel: string,
+//     paganete: string,
+//     onSubmit: any,
+//     mensagem: string
+// }
 
 export default function App({ open, onClose, onSubmit, mes, mensagem }: Props) {
 

@@ -42,9 +42,9 @@ export default function DespesasComPatrimonios() {
     }, [tokenUsuario]);
 
     // Agrupar e somar as despesas por patrimônio
-    const despesasAgrupadas = despesas.reduce((acc, despesa) => {
+    const despesasAgrupadas = despesas.reduce<{ idPatrimonio: string; nomePatrimonio: string; valorTotal: number; }[]>((acc, despesa) => {
         const { idPatrimonio, valor, Patrimonio } = despesa;
-        const patrimonioExistente = acc.find((item) => item.idPatrimonio === idPatrimonio);
+        const patrimonioExistente = acc.find(item => item.idPatrimonio === idPatrimonio);
 
         if (patrimonioExistente) {
             patrimonioExistente.valorTotal += valor;

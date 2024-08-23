@@ -270,7 +270,7 @@ export default function Acoes({ tipoInvestimento }: any) {
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
                     </div>
                     <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
-                    {messageResposta && <Alert severity={messageTipoAlert}>{messageResposta}</Alert>}
+                    {messageResposta && <Alert severity={messageTipoAlert as any}>{messageResposta}</Alert>}
                     <ModalNovaInstituicao
                         open={modalOpenBanco}
                         onClose={() => setModalOpenBanco(false)}

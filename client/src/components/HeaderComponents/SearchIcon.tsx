@@ -1,11 +1,19 @@
 import React from "react";
+
+interface Props {
+  size?: number;
+  strokeWidth?: number;
+  width?: number;
+  height?: number;
+}
+
 export const SearchIcon = ({
   size = 24,
   strokeWidth = 1.5,
   width,
   height,
   ...props
-}) => (
+}: Props) => (
   <svg
     aria-hidden="true"
     fill="none"

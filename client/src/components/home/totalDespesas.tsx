@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import currency from '../Currency';
 import useVisibility from '../hooks/useVisibility';
 import { GiPayMoney } from "react-icons/gi";
+import Link from 'next/link';
 interface Despesa {
     valorGasto: number;
 }
@@ -33,13 +34,15 @@ export default function TotalDespesas() {
 
 
     return (
-        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
-            <CardHeader className='font-semibold'>
-                Despesas Mês Atual
-            </CardHeader>
-            <CardBody>
-                <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <GiPayMoney size={40} className='text-orange-500' /></p>
-            </CardBody>
-        </Card>
+        <Link href="/pages/despesas/listadespesas">
+            <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
+                <CardHeader className='font-semibold'>
+                    Despesas Mês Atual
+                </CardHeader>
+                <CardBody>
+                    <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <GiPayMoney size={40} className='text-orange-500' /></p>
+                </CardBody>
+            </Card>
+        </Link>
     )
 }

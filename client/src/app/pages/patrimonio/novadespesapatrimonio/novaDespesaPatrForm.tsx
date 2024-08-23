@@ -5,6 +5,11 @@ const initialValues = {
     tipodespesa: '',
     valorgasto: '',
     dataaquisicao: today(getLocalTimeZone()),
+    compradorpagador: '',
+    responsavel: '',
+    litros: '',
+    kmatual: '',
+    kmantigo: '',
 };
 
 const validationSchema = Yup.object().shape({
@@ -12,6 +17,11 @@ const validationSchema = Yup.object().shape({
     tipodespesa: Yup.string().required('Tipo é obrigatório'),
     valorgasto: Yup.string().required('Valor é obrigatório'),
     dataaquisicao: Yup.date().required('Data é obrigatório'),
+    compradorpagador: Yup.string().optional(),
+    responsavel: Yup.string().optional(),
+    litros: Yup.string().optional(),
+    kmatual: Yup.string().optional(),
+    kmantigo: Yup.string().optional(),
 });
 
 export {

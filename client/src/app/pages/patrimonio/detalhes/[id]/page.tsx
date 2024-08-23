@@ -5,12 +5,8 @@ import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Divider, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Tooltip, Select, SelectItem, Card, Checkbox, } from "@nextui-org/react";
 import { PlusIcon } from '@/components/iconesCompartilhados/PlusIcon';
 import { SearchIcon } from '@/components/iconesCompartilhados/SearchIcon';
-import { EditIcon } from '@/components/iconesCompartilhados/EditIcon';
 import { DeleteIcon } from '@/components/iconesCompartilhados/DeleteIcon';
-import { EyeIcon } from '@/components/iconesCompartilhados/EyeIcon';
-import Paper from '@mui/material/Paper';
 import currency from '@/components/Currency';
-import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import ModalObservacao from '@/components/ModalObservacaoGastos';
 import ModalObservacaoInativacao from '@/components/ModalObservacaoInativacao';
@@ -62,32 +58,35 @@ interface Despesa {
     Patrimonio: Patrimonio;
     TipoDespesa: TipoDespesa;
 }
+
+interface ModalDeleteProps {
+    openClose: boolean,
+    objeto: any
+}
+
 export default function DetalhesDosGastos({ params }: any) {
-    const [isSelected, setIsSelected] = React.useState(false);
+
+    const INITIAL_VISIBLE_COLUMNS = ["nomePatrimonio", "nomeDespesa", "tipoPatrimonio", "valor", "dataAquisicao", "actions"];
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
     const { visibility } = useVisibility()
     const { tokenUsuario } = useToken()
-    const Router = useRouter();
-    const [dados, setDados] = useState([]);
-    console.log("🚀 ~ DetalhesDosGastos ~ dados", dados)
+    const [dados, setDados] = useState<Despesa[]>([]);
     const [filtroInativo, setFiltroInativo] = useState('todos');
-    console.log("🚀 ~ DetalhesDosGastos ~ filtroInativo", filtroInativo)
-    const [nome, setNome] = useState([]);
     const [filterValue, setFilterValue] = useState("");
     const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
-    const [visibleColumns, setVisibleColumns] = useState<string>(new Set(["nomePatrimonio", "nomeDespesa", "tipoPatrimonio", "valor", "dataAquisicao", "actions"]));
+    const [visibleColumns, setVisibleColumns] = useState<any>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState("all");
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [observacao, setObservacao] = useState(false);
+    const [observacao, setObservacao] = useState<any>();
     const [sortDescriptor, setSortDescriptor] = useState<any>({
         column: "age",
         direction: "ascending",
     });
 
+
     const [message, setMessage] = useState("");
-    const [modalInfo, setModalInfo] = useState({ show: false, objeto: null });
-    const [modalDelete, setModalDelete] = useState({ openClose: false, objeto: null });
-    console.log("🚀 ~ DetalhesDosGastos ~ modalDelete", modalDelete)
+    const [modalInfo, setModalInfo] = useState<any>({ show: false, objeto: null });
+    const [modalDelete, setModalDelete] = useState<ModalDeleteProps>({ openClose: false, objeto: null });
 
     const [tempoPatrimonio, setTempoPatrimonio] = useState({
         anos: 0,
@@ -105,7 +104,7 @@ export default function DetalhesDosGastos({ params }: any) {
 
     useEffect(() => {
         buscaPatrimonios();
-    }, [nome, filtroInativo]);
+    }, [filtroInativo]);
 
 
     const deleteDespesa = async () => {
@@ -136,7 +135,7 @@ export default function DetalhesDosGastos({ params }: any) {
     const filteredItems = useMemo(() => {
         let filteredUsers = [...dados];
         if (hasSearchFilter) {
-            filteredUsers = filteredUsers.filter((item) =>
+            filteredUsers = filteredUsers.filter((item: any) =>
                 item.TipoDespesa.nomeDespesa.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
@@ -146,11 +145,11 @@ export default function DetalhesDosGastos({ params }: any) {
 
             filteredUsers = filteredUsers.filter(item => item.inativo === inativoStatus);
         }
-        if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-            filteredUsers = filteredUsers.filter((user) =>
-                Array.from(statusFilter).includes(user.status)
-            );
-        }
+        // if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
+        //     filteredUsers = filteredUsers.filter((user) =>
+        //         Array.from(statusFilter).includes(user.status)
+        //     );
+        // }
 
         return filteredUsers;
     }, [dados, filterValue, statusFilter, hasSearchFilter]);
@@ -169,7 +168,7 @@ export default function DetalhesDosGastos({ params }: any) {
     }, [page, filteredItems, rowsPerPage]);
 
     const sortedItems = useMemo(() => {
-        return [...items].sort((a, b) => {
+        return [...items].sort((a: any, b: any) => {
             const first = a[sortDescriptor.column];
             const second = b[sortDescriptor.column];
             const cmp = first < second ? -1 : first > second ? 1 : 0;
@@ -203,7 +202,7 @@ export default function DetalhesDosGastos({ params }: any) {
 
     }
 
-    const renderCell = useCallback((despesa, columnKey: any) => {
+    const renderCell = useCallback((despesa: any, columnKey: any) => {
         const cellValue = despesa[columnKey];
 
         switch (columnKey) {
@@ -301,7 +300,7 @@ export default function DetalhesDosGastos({ params }: any) {
         }
     }, [page]);
 
-    const onRowsPerPageChange = useCallback((e) => {
+    const onRowsPerPageChange = useCallback((e: any) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
@@ -475,8 +474,8 @@ export default function DetalhesDosGastos({ params }: any) {
                         )}
                     </TableHeader>
                     <TableBody emptyContent={"Não há investimentos"} items={sortedItems}>
-                        {(item) => (
-                            <TableRow className={` ${item.inativo ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item._id}>
+                        {(item: any) => (
+                            <TableRow className={` ${item.inativo ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item.id}>
                                 {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                             </TableRow>
                         )}

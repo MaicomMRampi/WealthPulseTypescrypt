@@ -45,19 +45,23 @@ interface Modal {
     show: boolean,
     objeto: any
 }
+interface ModalDelete {
+    openClose: boolean,
+    objeto: any
+}
 
 
 export default function App() {
     const { tokenUsuario } = useToken()
     const Router = useRouter()
     const [filterValue, setFilterValue] = useState("");
-    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-    const [visibleColumns, setVisibleColumns] = useState<string>(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
+    const [visibleColumns, setVisibleColumns] = useState<any>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [openModalProventos, setOpenModalProventos] = useState(false)
     const [statusFilter, setStatusFilter] = useState("all");
-    const [modalDelete, setModalDelete] = useState({ openClose: false, objeto: null });
+    const [modalDelete, setModalDelete] = useState<ModalDelete>({ openClose: false, objeto: null });
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortDescriptor, setSortDescriptor] = useState({
+    const [sortDescriptor, setSortDescriptor] = useState<any>({
         column: "age",
         direction: "ascending",
     });
@@ -115,15 +119,15 @@ export default function App() {
         let filteredUsers = [...dados];
 
         if (hasSearchFilter) {
-            filteredUsers = filteredUsers.filter((item) =>
+            filteredUsers = filteredUsers.filter((item: any) =>
                 item.nomePatrimonio.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
-        if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-            filteredUsers = filteredUsers.filter((user) =>
-                Array.from(statusFilter).includes(user.status)
-            );
-        }
+        // if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
+        //     filteredUsers = filteredUsers.filter((user: any) =>
+        //         Array.from(statusFilter).includes(user.status)
+        //     );
+        // }
 
         return filteredUsers;
     }, [dados, filterValue, statusFilter, hasSearchFilter]);
@@ -147,7 +151,7 @@ export default function App() {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = React.useCallback((patrimonio, columnKey) => {
+    const renderCell = React.useCallback((patrimonio: any, columnKey: string) => {
         const mandaRota = (id: number) => {
             Router.push(`/pages/patrimonio/detalhes/${id}`)
         }
@@ -251,7 +255,7 @@ export default function App() {
                         onValueChange={onSearchChange}
                     />
                     <div className="flex gap-3">
-                        <Button fullWidth color="success" variant="solid" endContent={<PlusIcon size={20} />}>
+                        <Button fullWidth color="success" variant="solid" endContent={<PlusIcon height={20} width={20} size={20} />}>
                             <Link href="/pages/patrimonio/cadastropatrimonio"> Novo patrimônio</Link>
                         </Button>
                     </div>
@@ -314,7 +318,7 @@ export default function App() {
 
     return (
 
-        <div key={visibility} className="px-4 w-full" prefech={true}>
+        <div key={String(visibility)} className="px-4 w-full" >
             <TitlePage title="Meus patrimônios" />
             <div className="rounded-lg bg-BgCardPadrao    mt-12 ">
                 <Table
@@ -345,9 +349,9 @@ export default function App() {
                         )}
                     </TableHeader>
                     <TableBody emptyContent={"Não há patrimônios"} items={sortedItems}>
-                        {(item) => (
-                            <TableRow className="hover:text-primaryTableText" key={item._id}>
-                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                        {(item: any) => (
+                            <TableRow className="hover:text-primaryTableText" key={item.id}>
+                                {(columnKey: any) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                             </TableRow>
                         )}
                     </TableBody>
@@ -357,6 +361,7 @@ export default function App() {
                     onClose={() => setModalDelete({ ...modalDelete, openClose: false })}
                     objeto={modalDelete.objeto}
                     confirmaEsclusao={deletaPatrimonio}
+
                 />
 
             </div>

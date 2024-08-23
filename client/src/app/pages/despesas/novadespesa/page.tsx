@@ -16,7 +16,12 @@ import useToken from '@/components/hooks/useToken'
 import { Alert } from '@mui/material'
 import TitlePage from '@/components/tituloPaginas'
 import useVisibilityCampo from '@/components/hooks/useVisibilityCampos';
+
+
 export default function NovaDespesa() {
+
+
+
     const { visibilityCampo } = useVisibilityCampo()
     console.log("🚀 ~ NovaDespesa ~ visibilityCampo", visibilityCampo)
     const [modalOpen, setModalOpen] = useState(false);
@@ -24,8 +29,8 @@ export default function NovaDespesa() {
     const [message, setMessage] = useState<string>()
     const [messageDespesa, setMessageDespesa] = useState<string>()
     const [messageForm, setMessageForm] = useState<string>()
-    const [categoria, setCategoria] = useState()
-    const [formaPagamento, setformaPagamento] = useState()
+    const [categoria, setCategoria] = useState<any>()
+    const [formaPagamento, setformaPagamento] = useState<any>()
     const [messageTipo, setMessageTipo] = useState<String>()
     const { tokenUsuario } = useToken()
     // ====================Chama valores do Back end===
@@ -251,7 +256,7 @@ export default function NovaDespesa() {
                                     isInvalid={touched.categoria && errors.categoria ? true : false}
                                 >
                                     {categoria && categoria.length > 0 ? (
-                                        categoria.map((row) => (
+                                        categoria.map((row: any) => (
                                             <SelectItem
                                                 classNames={{
                                                     wrapper: "w-full sm:max-w-[44%] rounded-lg bg-default-100 text-default-400",
@@ -277,7 +282,7 @@ export default function NovaDespesa() {
                                     isInvalid={touched.formadepagamento && errors.formadepagamento ? true : false}
                                 >
                                     {formaPagamento && formaPagamento.length > 0 ? (
-                                        formaPagamento.map((row) => (
+                                        formaPagamento.map((row: any) => (
                                             <SelectItem
                                                 classNames={{
                                                     wrapper: "w-full sm:max-w-[44%] rounded-lg bg-default-100 text-default-400",
@@ -289,7 +294,7 @@ export default function NovaDespesa() {
                                             </SelectItem>
                                         ))
                                     ) : (
-                                        <SelectItem disabled key="no-options">
+                                        <SelectItem key="no-options">
                                             Nenhuma forma de pagamento disponível
                                         </SelectItem>
                                     )}
@@ -344,7 +349,7 @@ export default function NovaDespesa() {
                                 <ButtonVoltar className="md:w-full bg-slate-100" />
                             </div>
 
-                            <h1 className='text-center py-5'>{messageDespesa ? <Alert color={messageTipo}>{messageDespesa}</Alert> : null} </h1>
+                            <h1 className='text-center py-5'>{messageDespesa ? <Alert color={messageTipo as "success" | "error" | "warning" | "info"}>{messageDespesa}</Alert> : null} </h1>
                             <FormadePagamentoNova
                                 messagemTipo={messageTipo}
                                 message={messageForm}

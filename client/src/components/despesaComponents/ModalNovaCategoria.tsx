@@ -10,12 +10,12 @@ interface ModalNovaCategoriaProps {
     open: boolean;
     onClose: () => void;
     onSubmit: (values: any) => void;
-    message: string;
-    messageTipo: string;
+    message: any;
+    messagemTipo: any;
 }
 
 
-export default function App({ open, onClose, onSubmit, message, messageTipo }: ModalNovaCategoriaProps) {
+export default function App({ open, onClose, onSubmit, message, messagemTipo }: ModalNovaCategoriaProps) {
     const initialValues = {
         categoria: '',
     };

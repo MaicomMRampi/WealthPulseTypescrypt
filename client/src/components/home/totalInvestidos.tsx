@@ -7,6 +7,7 @@ import useVisibility from '../hooks/useVisibility';
 import currency from '../Currency';
 import { api } from '@/lib/api';
 import { useTheme } from "next-themes";
+import Link from 'next/link';
 
 type Props = {
     valorInvestido: number
@@ -39,16 +40,18 @@ export default function TotalInvestidos() {
 
 
     return (
-        <Card
-            fullWidth
-            className="bg-BgCardPadrao p-4 text-textCards"
-        >
-            <CardHeader className='font-semibold'>
-                Total investidos
-            </CardHeader>
-            <CardBody>
-                <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <IoBarChartSharp size={40} className='text-green-500' /></p>
-            </CardBody>
-        </Card>
+        <Link href="/pages/investimentos/listainvestimentos">
+            <Card
+                fullWidth
+                className="bg-BgCardPadrao p-4 text-textCards"
+            >
+                <CardHeader className='font-semibold'>
+                    Total investidos
+                </CardHeader>
+                <CardBody>
+                    <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <IoBarChartSharp size={40} className='text-green-500' /></p>
+                </CardBody>
+            </Card>
+        </Link>
     )
 }

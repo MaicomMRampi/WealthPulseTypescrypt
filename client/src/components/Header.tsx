@@ -114,7 +114,7 @@ export default function App() {
                     </NavbarBrand>
                 </NavbarContent>
 
-                <Menu className="hidden sm:flex" setActive={setActive} >
+                <Menu setActive={setActive} >
                     <Link className="cursor-pointer font-semibold" href={"/"}>Inicio</Link>
 
                     <MenuItem setActive={setActive} active={active} item="Patrimônio">

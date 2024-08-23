@@ -143,7 +143,7 @@ export default function SignUp() {
                                 </Button>
                                 <div>
                                     {message ? (
-                                        <Alert severity={messageTipo}>{message}</Alert>
+                                        <Alert severity={messageTipo as any}>{message}</Alert>
                                     ) : null}
                                 </div>
 

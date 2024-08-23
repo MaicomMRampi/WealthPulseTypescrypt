@@ -6,6 +6,7 @@ import useToken from '../hooks/useToken';
 import { api } from '@/lib/api';
 import currency from '../Currency';
 import AlteraVisualizacaoData from '../funcoes/alteraVisualizacaoData';
+import Link from 'next/link';
 
 
 type Despesa = {
@@ -37,26 +38,27 @@ export default function TotalContas() {
     }, [tokenUsuario]);
 
     return (
-
-        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards flex items-center">
-            <h2 className='font-semibold text-center'>Contas a vencer</h2>
-            <CardBody>
-                {despesas.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {despesas.map((despesa, index) => (
-                            <Card key={index} className="w-full">
-                                <CardBody className="space-y-2">
-                                    <h3 className="text-lg font-bold">{despesa.estabelecimento}</h3>
-                                    <p className="text-base text-green-400">{visibility ? currency(despesa.valor) : '****'}</p>
-                                    <p className="text-sm text-gray-300">{AlteraVisualizacaoData(despesa.dataVencimento)}</p>
-                                </CardBody>
-                            </Card>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-gray-400">Nenhuma conta a vencer</p>
-                )}
-            </CardBody>
-        </Card>
+        <Link href="/pages/contas/listaconta">
+            <Card fullWidth className="bg-BgCardPadrao w-full h-full p-4 text-textCards flex items-center">
+                <h2 className='font-semibold text-center'>Contas a vencer</h2>
+                <CardBody>
+                    {despesas.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            {despesas.map((despesa, index) => (
+                                <Card key={index} className="w-full">
+                                    <CardBody className="space-y-2">
+                                        <h3 className="text-lg font-bold">{despesa.estabelecimento}</h3>
+                                        <p className="text-base text-green-400">{visibility ? currency(despesa.valor) : '****'}</p>
+                                        <p className="text-sm text-gray-300">{AlteraVisualizacaoData(despesa.dataVencimento)}</p>
+                                    </CardBody>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-400">Nenhuma conta a vencer</p>
+                    )}
+                </CardBody>
+            </Card>
+        </Link>
     );
 }

@@ -1,13 +1,24 @@
 "use client"
-import { Button, Card, Divider, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
-import React, { useEffect, useState } from 'react'
+import { Button, Card, Divider, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
+import React, { useEffect, useState } from 'react';
 import useVisibility from '../hooks/useVisibility';
 import useToken from '../hooks/useToken';
 import currency from '../Currency';
 import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
-export default function UltimasDespesas() { // Nome do componente com a primeira letra maiúscula
+type Porcentagem = {
+    total: number;
+    porcentagem: number;
+    orcamentoUsuario: number;
+};
+
+type PieData = {
+    name: string;
+    value: number;
+};
+
+export default function UltimasDespesas() {
     const valorTotal = 6000;
     const porcentagemAlcancada = 30; // Porcentagem alcançada
     const valorAlcancado = (valorTotal * porcentagemAlcancada) / 100;
@@ -20,7 +31,11 @@ export default function UltimasDespesas() { // Nome do componente com a primeira
 
     const { visibility } = useVisibility();
     const { tokenUsuario } = useToken();
-    const [orcamentoMensal, setOrcamentoMensal] = useState<string>("");
+    const [orcamentoMensal, setOrcamentoMensal] = useState<Porcentagem>({
+        total: 0,
+        porcentagem: 0,
+        orcamentoUsuario: 0,
+    });
 
     const [dataControleMensal, setDataControleMensal] = useState<string>(dataInicioControle);
 
@@ -37,7 +52,7 @@ export default function UltimasDespesas() { // Nome do componente com a primeira
         fetchOrcamento();
     }, [dataControleMensal, tokenUsuario]);
 
-    const data = [
+    const data: PieData[] = [
         { name: 'Usado', value: valorAlcancado },
         { name: 'Restante', value: valorRestante },
     ];
@@ -45,7 +60,7 @@ export default function UltimasDespesas() { // Nome do componente com a primeira
     const COLORS = ['#cb3cff', '#0e43fb', '#00c2ff', '#FF8042'];
 
     return (
-        <Card fullWidth className=" bg-BgCardPadrao p-4 text-textCards ">
+        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
             <h2 className='font-semibold text-center'>Porcentagem Gasto Mês</h2>
             <div className='w-full h-full flex flex-col items-center justify-center'>
                 <PieChart width={200} height={200}>
@@ -76,5 +91,5 @@ export default function UltimasDespesas() { // Nome do componente com a primeira
                 </div>
             </div>
         </Card>
-    )
+    );
 }

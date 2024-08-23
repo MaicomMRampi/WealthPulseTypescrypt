@@ -22,9 +22,9 @@ const validationSchema = yup.object().shape({
     email: yup.string().email("Digite um E-mail Válido").required('Campo E-mail Obrigatório'),
 
 
-    confirmaSenha: yup.
-        string()
-        .oneOf([yup.ref('senha'), null], 'As senhas não coincidem')
+    confirmaSenha: yup
+        .string()
+        .oneOf([yup.ref('senha'), undefined], 'As senhas não coincidem')
         .required('Campo Obrigatório')
 });
 
