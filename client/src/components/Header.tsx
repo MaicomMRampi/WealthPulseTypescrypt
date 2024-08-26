@@ -29,7 +29,6 @@ export default function App() {
     const [active, setActive] = useState<string | null>(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { tokenUsuario } = useToken()
-    console.log("🚀 ~ App ~ tokenUsuario", tokenUsuario)
     const { toggleVisibility, visibility } = useVisibility()
     const { toggleVisibilityCampo, visibilityCampo } = useVisibilityCampo()
     const router = useRouter();
@@ -39,22 +38,16 @@ export default function App() {
     const pathname = usePathname()
 
     const menuItems = [
-        {
-            pagina: "Inicio",
-            link: "/",
-        },
-
-        {
-            pagina: "Patrimônio",
-            link: "/pages/patrimonio/cadastropatrimonio",
-        },
-
-        {
-            pagina: "Lista de Patrimônios",
-            link: "/pages/patrimonio/listapatrimonio",
-        },
-
-
+        { pagina: "Inicio", link: "/" },
+        { pagina: "Cadastro De Patrimônio", link: "/pages/patrimonio/cadastropatrimonio" },
+        { pagina: "Lista De Patrimônios", link: "/pages/patrimonio/listapatrimonio" },
+        { pagina: "Nova Despesa de Patrimônios", link: "/pages/patrimonio/novadespesapatrimonio" },
+        { pagina: "Meus Investimentos", link: "/pages/investimentos/listainvestimento" },
+        { pagina: "Novos Investimentos", link: "/pages/investimentos/novoinvestimento" },
+        { pagina: "Minhas Contas", link: "/pages/contas/listaconta" },
+        { pagina: "Nova Conta", link: "/pages/contas/novaconta" },
+        { pagina: "Minhas Despesas", link: "/pages/despesas/listadespesa" },
+        { pagina: "Nova Despesa", link: "/pages/despesas/novadespesa" },
     ];
 
 
@@ -113,7 +106,6 @@ export default function App() {
                         {/* <Link href="/"><Image src="/imagens/logoAjustada.png" alt="logo" width={125} height={150} /></Link> */}
                     </NavbarBrand>
                 </NavbarContent>
-
                 <Menu setActive={setActive} >
                     <Link className="cursor-pointer font-semibold" href={"/"}>Inicio</Link>
 
@@ -144,9 +136,6 @@ export default function App() {
                         </div>
                     </MenuItem>
                 </Menu>
-
-
-
                 <NavbarContent as="div" className="items-center flex gap-6 " justify="end">
                     <p className="cursor-pointer"> {visibility ? <MdVisibility onClick={handleVisibility} size={28} /> : <MdVisibilityOff onClick={handleVisibility} size={28} />}</p>
                     <Switch
@@ -164,25 +153,23 @@ export default function App() {
                     <Dropdown placement="bottom-end">
                         <DropdownTrigger>
                             <Avatar
-                                isBordered
                                 as="button"
                                 className="transition-transform"
                                 color="secondary"
                                 name="Jason Hughes"
                                 size="sm"
-                                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                                src={`http://localhost:3333/uploads/${tokenUsuario?.imageUrl}`}
                             />
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Profile Actions" variant="flat">
                             <DropdownItem key="profile" className="h-14 gap-2">
-                                <p className="font-semibold">Logado com </p>
                                 <p className="font-semibold">{tokenUsuario?.email}</p>
                             </DropdownItem>
-                            <DropdownItem key="settings">My Settings</DropdownItem>
+                            <DropdownItem key="settings"><Link href={'/pages/editarcadastro'}>Editar usuário</Link></DropdownItem>
+                            <DropdownItem key="configurations">Configurations</DropdownItem>
                             <DropdownItem key="team_settings">Team Settings</DropdownItem>
                             <DropdownItem key="analytics">Analytics</DropdownItem>
                             <DropdownItem key="system">System</DropdownItem>
-                            <DropdownItem key="configurations">Configurations</DropdownItem>
                             <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
                             <DropdownItem key="logout" color="danger" onClick={() => handleLogout()}>
                                 Sair
@@ -192,14 +179,9 @@ export default function App() {
                 </NavbarContent>
             </div>
             <NavbarMenu >
-                {menuItems.map((item, index: any) => (
-                    <NavbarMenuItem key={`${item}-${index}`}>
-                        <Link
-                            className="text-primaryTableText"
-                            onClick={() => setIsMenuOpen(false)}
-                            href={item.link}
-
-                        >
+                {menuItems.map((item, index) => (
+                    <NavbarMenuItem onClick={() => setIsMenuOpen(false)} key={index} isActive={pathname === item.link}>
+                        <Link className="p-4 text-lg text-gray-700 hover:bg-gray-200 transition-colors" href={item.link}>
                             {item.pagina}
                         </Link>
                     </NavbarMenuItem>

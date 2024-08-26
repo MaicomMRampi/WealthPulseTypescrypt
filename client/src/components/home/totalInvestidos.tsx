@@ -40,18 +40,18 @@ export default function TotalInvestidos() {
 
 
     return (
-        <Link href="/pages/investimentos/listainvestimentos">
-            <Card
-                fullWidth
-                className="bg-BgCardPadrao p-4 text-textCards"
-            >
+        <Card
+            fullWidth
+            className="bg-BgCardPadrao p-4 text-textCards"
+        >
+            <Link href="/pages/investimentos/listainvestimentos">
                 <CardHeader className='font-semibold'>
                     Total investidos
                 </CardHeader>
                 <CardBody>
                     <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <IoBarChartSharp size={40} className='text-green-500' /></p>
                 </CardBody>
-            </Card>
-        </Link>
+            </Link>
+        </Card >
     )
 }

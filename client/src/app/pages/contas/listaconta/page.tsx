@@ -372,6 +372,7 @@ export default function ListaConta() {
         setFilterValue("");
         setPage(1);
     }, []);
+    const porcentagem = orcamentoMensal?.porcentagem ?? 0;
 
     const headerTable = useMemo(() => {
         return (
@@ -411,7 +412,7 @@ export default function ListaConta() {
                             indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
                         }}
                         label="Controle de orçamento"
-                        value={parseInt(orcamentoMensal.porcentagem)}
+                        value={parseInt(porcentagem)}
                         showValueLabel={true}
                     />
                     <Tooltip color="warning" content="Soma entre despesas e contas" placement="right-end">

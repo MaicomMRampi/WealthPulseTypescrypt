@@ -15,6 +15,7 @@ import {
     Progress,
     Card
 } from "@nextui-org/react";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import currency from "@/components/Currency";
 import Link from "next/link";
@@ -142,6 +143,11 @@ export default function ListaDespesa() {
         });
         setDespesaSelect(response.data);
     };
+
+
+    const PDFDownloadLink = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink), { ssr: false });
+
+    // Agora utilize o PDFDownloadLink no componente como de costume
 
     const dadosAgrupados = Despesa
         ? Despesa.reduce((acc: any, item: any) => {

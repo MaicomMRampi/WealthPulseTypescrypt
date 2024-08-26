@@ -37,8 +37,6 @@ export default function Home() {
                     <UltimasDespesas />
                     <DespesasComPatrimonios />
                 </div>
-
-
             </div >
         </>
     );

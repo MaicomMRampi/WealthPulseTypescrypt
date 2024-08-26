@@ -34,15 +34,15 @@ export default function TotalDespesas() {
 
 
     return (
-        <Link href="/pages/despesas/listadespesas">
-            <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
+        <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards w-full">
+            <Link href="/pages/despesas/listadespesas">
                 <CardHeader className='font-semibold'>
                     Despesas Mês Atual
                 </CardHeader>
                 <CardBody>
                     <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <GiPayMoney size={40} className='text-orange-500' /></p>
                 </CardBody>
-            </Card>
-        </Link>
+            </Link>
+        </Card>
     )
 }

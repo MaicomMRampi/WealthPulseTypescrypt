@@ -233,9 +233,7 @@ export default function NovaDespesa() {
                                         name="mescorrespondente"
                                         onChange={handleChange}
                                     />
-                                    {errors.mescorrespondente ? <p className="text-red-500 text-xs pt-1">{errors.mescorrespondente}</p> : null}
                                 </div>
-
                                 <I18nProvider locale="pt-BR">
                                     <DatePicker
                                         name="dataaquisicao"

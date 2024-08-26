@@ -11,6 +11,31 @@ const formatDate = require('../utils/convertData')
 const prisma = require('../utils/dbConnect')
 const jwt = require('jsonwebtoken');
 const e = require('express')
+const multer = require('multer')
+const path = require('path');
+
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // Define o diretório de destino
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        // Obtém o nome original do arquivo e sua extensão
+        const ext = path.extname(file.originalname);
+        const name = path.basename(file.originalname, ext);
+
+        // Define o nome do arquivo a ser salvo (somente nome e extensão)
+        cb(null, `${name}${ext}`);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+
+
+
 
 // =====================Login ============
 
@@ -62,7 +87,7 @@ router.post('/api/postusers', async (req, res) => {
         const { nome, cpf, email, senha } = req.body
 
         const nomeFormatado = nome.toUpperCase().trim()
-        const emailFormatado = email.toUpperCase().trim()
+        const emailFormatado = email.trim()
         const senhaCripto = await crypto(senha)
         const emailExists = await prisma.usuario.findUnique({ where: { email: emailFormatado } });
         const cpfExists = await prisma.usuario.findUnique({ where: { cpf } });
@@ -92,32 +117,54 @@ router.post('/api/postusers', async (req, res) => {
     }
 
 })
-
-
-
-router.get('/api/buscanome', async (req, res) => {
-    const email = req.query.email
-
-    const buscaNome = await prisma.usuario.findUnique({ where: { email } })
-    res.status(200).json({
-        nome: buscaNome.nome,
-        email: buscaNome.email
-    })
-})
-router.get('/api/usuarioedicao', async (req, res) => {
-    const email = req.query.email
-
-    const buscaNome = await prisma.usuario.findUnique({ where: { email: email } })
-    res.status(200).json(buscaNome)
-})
-
-
-
-
-router.post('api/upload', async (req, res) => {
+router.post('/api/atualizacadastro', async (req, res) => {
     const dados = req.body
 
-})
+    try {
+        const response = await prisma.usuario.update({
+            where: {
+                id: parseInt(dados.id)
+            },
+            data: {
+                nome: dados.values.nome,
+                email: dados.values.email,
+                valorOrcamentoMensal: converteString(dados.values.valorOrcamentoMensal)
+            }
+        })
+        res.status(200).json({ message: 'Atualizado com sucesso!' });
+    } catch (error) {
+
+    }
+});
+router.post('/api/upload', upload.single('image'), async (req, res) => {
+    const file = req.file;
+    const userId = req.body.id;
+    if (!file) {
+        return res.status(400).send('Nenhum arquivo enviado.');
+    }
+
+    // Nome do arquivo e extensão
+    const fileName = file.filename;
+
+    const fileExtension = path.extname(file.originalname).slice(1);
+
+    const salvaUrlImagen = await prisma.usuario.update({
+        where: {
+            id: parseInt(userId)
+        },
+        data: {
+            imageUrl: `${fileName}`
+        }
+    })
+
+    res.status(200).json({
+        message: 'Upload realizado com sucesso!',
+        fileName: fileName, // Nome do arquivo salvo
+        fileExtension: fileExtension // Extensão do arquivo
+    });
+});
+
+
 
 // === patrimônio============
 
@@ -354,7 +401,7 @@ router.post('/api/trocarsenha', async (req, res) => {
 
 router.post('/api/novonome', async (req, res) => {
     const dados = req.body;
-    console.log("🚀 ~ router.post ~ dados", dados)
+
     try {
         const nome = dados.nomefundo.toUpperCase().trim();
         const idUser = parseInt(dados.id); // Obtenha o ID do usuário da requisição
@@ -501,7 +548,7 @@ router.post('/api/dividendos', async (req, res) => {
 // ================INVESTIMENTOS======================
 router.post('/api/novoinvestimento', async (req, res) => {
     const dados = req.body;
-    console.log("🚀 ~ router.post ~ dados", dados);
+
 
     switch (dados.dados.tipoInvestimento) {
         case 'acao': {
@@ -519,7 +566,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Adicionei o campo 'tipo' aqui
                     }
                 });
-                console.log("🚀 ~ router.post ~ novaAcao", novaAcao);
+
                 res.status(200).json({ message: 'Ação Cadastrada com Sucesso!' });
             } catch (error) {
                 console.error('Erro ao Cadastrar Investimento:', error);
@@ -543,7 +590,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento
                     }
                 });
-                console.log("🚀 ~ router.post ~ novaFii", novaFii);
+
                 res.status(200).json({ message: 'FII Cadastrado com Sucesso!' });
             } catch (error) {
                 console.error('Erro ao Cadastrar FII:', error);
@@ -569,7 +616,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento
                     }
                 });
-                console.log("🚀 ~ router.post ~ novaRendaFixa", novaRendaFixa);
+
                 res.status(200).json({ message: 'Investimento de Renda Fixa Cadastrado com Sucesso!' });
             } catch (error) {
                 console.error('Erro ao Cadastrar Renda Fixa:', error);
@@ -593,7 +640,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento 'cripto'
                     }
                 });
-                console.log("🚀 ~ router.post ~ novaCripto", novaCripto);
+
                 res.status(200).json({ message: 'Criptomoeda Cadastrada com Sucesso!' });
             } catch (error) {
                 console.error('Erro ao Cadastrar Criptomoeda:', error);
@@ -616,7 +663,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento 'fundo'
                     }
                 });
-                console.log("🚀 ~ router.post ~ novoFundo", novoFundo);
+
                 res.status(200).json({ message: 'Fundo de Investimento Cadastrado com Sucesso!' });
             } catch (error) {
                 console.error('Erro ao Cadastrar Fundo de Investimento:', error);
@@ -639,7 +686,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Tipo de investimento 'previdencia'
                     }
                 });
-                console.log("🚀 ~ router.post ~ novaPrevidencia", novaPrevidencia);
+
                 res.status(200).json({ message: 'Plano de Previdência Cadastrado com Sucesso!' });
             } catch (error) {
                 console.error('Erro ao Cadastrar Plano de Previdência:', error);
@@ -662,7 +709,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Tipo de investimento 'debentures'
                     }
                 });
-                console.log("🚀 ~ router.post ~ novaDebenture", novaDebenture);
+
                 res.status(200).json({ message: 'Debênture Cadastrada com Sucesso!' });
             } catch (error) {
                 console.error('Erro ao Cadastrar Debênture:', error);
@@ -1151,7 +1198,7 @@ router.get('/api/buscacontaproximavencer', async (req, res) => {
     const diaAtual = dataAtual.getDate();
     const dataAtualFormatada = `${anoAtual}/${mesAtual < 10 ? `0${mesAtual}` : mesAtual}/${diaAtual < 10 ? `0${diaAtual}` : diaAtual}`;
 
-    console.log("🚀 ~ router.get ~ dataAtualFormatada", dataAtualFormatada)
+
     // Adiciona 10 dias à data atual
     dataAtual.setDate(dataAtual.getDate() + 10);
     const anoFim = dataAtual.getFullYear();
@@ -1159,7 +1206,7 @@ router.get('/api/buscacontaproximavencer', async (req, res) => {
     const diaFim = dataAtual.getDate();
     const dataFimFormatada = `${anoFim}/${mesFim < 10 ? `0${mesFim}` : mesFim}/${diaFim < 10 ? `0${diaFim}` : diaFim}`;
 
-    console.log("🚀 ~ router.get ~ dataFimFormatada", dataFimFormatada)
+
     try {
         const buscaConta = await prisma.Contas.findMany({
             where: {
@@ -1171,7 +1218,7 @@ router.get('/api/buscacontaproximavencer', async (req, res) => {
                 pago: 0
             }
         });
-        console.log("🚀 ~ router.get ~ buscaConta", buscaConta)
+
         res.json(buscaConta);
     } catch (error) {
         console.error('Erro ao buscar contas:', error);
@@ -1277,7 +1324,7 @@ router.delete('/api/deletaConta', async (req, res) => {
 // controle de orçamento mensal 
 router.post('/api/controleorcamento', async (req, res) => {
     const dados = req.body;
-    console.log("🚀 ~ router.post ~ dados", dados);
+
 
     try {
         const buscaContas = await prisma.Contas.findMany({
@@ -1289,7 +1336,7 @@ router.post('/api/controleorcamento', async (req, res) => {
                 valor: true
             }
         });
-        console.log("🚀 ~ router.post ~ buscaContas", buscaContas);
+
 
         const buscaDespesas = await prisma.Despesas.findMany({
             where: {
@@ -1300,7 +1347,7 @@ router.post('/api/controleorcamento', async (req, res) => {
                 valorGasto: true
             }
         });
-        console.log("🚀 ~ router.post ~ buscaDespesas", buscaDespesas);
+
 
         const buscaControleUsuario = await prisma.Usuario.findUnique({
             where: {

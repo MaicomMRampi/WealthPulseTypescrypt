@@ -3,9 +3,9 @@ import { Button, Card, Divider, Table, TableBody, TableCell, TableColumn, TableH
 import React, { useEffect, useState } from 'react';
 import useVisibility from '../hooks/useVisibility';
 import useToken from '../hooks/useToken';
-import currency from '../Currency';
 import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import currency from '../Currency';
 
 type Porcentagem = {
     total: number;
@@ -19,11 +19,6 @@ type PieData = {
 };
 
 export default function UltimasDespesas() {
-    const valorTotal = 6000;
-    const porcentagemAlcancada = 30; // Porcentagem alcançada
-    const valorAlcancado = (valorTotal * porcentagemAlcancada) / 100;
-    const valorRestante = valorTotal - valorAlcancado;
-
     const dataAtual = new Date();
     const mesVenc = dataAtual.getMonth() + 1;
     const anoVenc = dataAtual.getFullYear();
@@ -53,11 +48,11 @@ export default function UltimasDespesas() {
     }, [dataControleMensal, tokenUsuario]);
 
     const data: PieData[] = [
-        { name: 'Usado', value: valorAlcancado },
-        { name: 'Restante', value: valorRestante },
+        { name: 'Usado', value: orcamentoMensal.total },
+        { name: 'Restante', value: orcamentoMensal.orcamentoUsuario - orcamentoMensal.total },
     ];
 
-    const COLORS = ['#cb3cff', '#0e43fb', '#00c2ff', '#FF8042'];
+    const COLORS = ['#ff00007a', '#0e43fb', '#00c2ff', '#FF8042'];
 
     return (
         <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
@@ -78,7 +73,9 @@ export default function UltimasDespesas() {
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                        formatter={(value: number) => currency(value)} // Formata o valor no tooltip
+                    />
                 </PieChart>
 
                 <div className="text-center mt-4">
