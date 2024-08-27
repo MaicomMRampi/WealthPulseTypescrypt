@@ -360,6 +360,24 @@ router.get('/api/buscatipodespesa', async (req, res) => {
         res.status(500).json({ message: 'Erro ao buscar patrimônio.' }); // Retorna uma resposta de erro
     }
 })
+router.delete('/api/deletatipodespesa', async (req, res) => {
+    const data = req.body;
+    console.log("🚀 ~ router.delete ~ data", data);
+
+    try {
+        const deletaBanco = await prisma.TipoDespesa.delete({
+            where: {
+                idUser: parseInt(data.id),
+                id: parseInt(data.idBanco)
+            }
+        });
+        res.status(200).json({ message: 'Tipo Despesa Deletado ' });
+    } catch (error) {
+        console.log("🚀 ~ router.delete ~ error", error);
+        res.status(400).json({ message: 'Tipo despesa sendo usada' });
+    }
+});
+
 
 
 
@@ -431,8 +449,30 @@ router.post('/api/novonome', async (req, res) => {
     }
 });
 router.get('/api/buscanomefundonovo', async (req, res) => {
-    const nome = await prisma.nomeFundoImobiliario.findMany();
+    const id = req.query.id
+
+    const nome = await prisma.NomeFundoImobiliario.findMany({
+        where: { idUser: parseInt(id) },
+    });
     res.json(nome);
+});
+router.delete('/api/deletanomefundonovo', async (req, res) => {
+    const data = req.body
+    console.log("🚀 ~ router.delete ~ data", data)
+
+    try {
+        const deletaBanco = await prisma.NomeFundoImobiliario.delete({
+            where: {
+                idUser: parseInt(data.id),
+                id: parseInt(data.idBanco)
+
+            }
+        })
+        res.status(200).json({ message: 'Banco Deletado ' })
+    } catch (error) {
+        console.log("🚀 ~ router.delete ~ error", error)
+        res.status(400).json({ message: 'Erro ao Cadastrar' })
+    }
 });
 
 
@@ -467,6 +507,24 @@ router.get('/api/buscanomeacao', async (req, res) => {
         where: { idUser: parseInt(id) },
     });
     res.json(nome);
+});
+router.delete('/api/deletanomeacao', async (req, res) => {
+    const data = req.body
+    console.log("🚀 ~ router.delete ~ data", data)
+
+    try {
+        const deletaBanco = await prisma.nomeacao.delete({
+            where: {
+                idUser: parseInt(data.id),
+                id: parseInt(data.idBanco)
+
+            }
+        })
+        res.status(200).json({ message: 'Banco Deletado ' })
+    } catch (error) {
+        console.log("🚀 ~ router.delete ~ error", error)
+        res.status(400).json({ message: 'Erro ao Cadastrar' })
+    }
 });
 
 
@@ -875,10 +933,22 @@ router.get('/api/buscacategoria', async (req, res) => {
     res.json(buscaCategoria)
 });
 router.delete('/api/deletacategoria', async (req, res) => {
-    const id = req.body.id
-    const deletaCategoria = await prisma.formapagamento.delete({ where: { id: id } })
+    const data = req.body
+    console.log("🚀 ~ router.delete ~ data", data)
 
-    res.status(200).json("deletado")
+    try {
+        const deletaBanco = await prisma.categoria.delete({
+            where: {
+                idUser: parseInt(data.id),
+                id: parseInt(data.idBanco)
+
+            }
+        })
+        res.status(200).json({ message: 'Banco Deletado ' })
+    } catch (error) {
+        console.log("🚀 ~ router.delete ~ error", error)
+        res.status(400).json({ message: 'Erro ao Cadastrar' })
+    }
 });
 //=========================================================
 
@@ -919,9 +989,22 @@ router.get('/api/buscaformapagamento', async (req, res) => {
     res.json(buscaFormapagamento)
 });
 router.delete('/api/deletaformapagamento', async (req, res) => {
-    const id = req.body.id
-    const deletaCategoria = await prisma.formapagamento.delete({ where: { id: id } })
-    res.status(200).json("deletado")
+    const data = req.body
+    console.log("🚀 ~ router.delete ~ data", data)
+
+    try {
+        const deletaBanco = await prisma.FormaPagamento.delete({
+            where: {
+                idUser: parseInt(data.id),
+                id: parseInt(data.idBanco)
+
+            }
+        })
+        res.status(200).json({ message: 'Banco Deletado ' })
+    } catch (error) {
+        console.log("🚀 ~ router.delete ~ error", error)
+        res.status(400).json({ message: 'Erro ao Cadastrar' })
+    }
 });
 //=========================================================
 
@@ -1412,6 +1495,22 @@ router.get('/api/buscabanco', async (req, res) => {
             }
         })
         res.json(buscaBanco)
+    } catch (error) {
+        res.status(400).json({ message: 'Erro ao Cadastrar' })
+    }
+});
+router.delete('/api/deletabanco', async (req, res) => {
+    const data = req.body
+    console.log("🚀 ~ router.delete ~ data", data)
+    try {
+        const deletaBanco = await prisma.banco.delete({
+            where: {
+                idUser: parseInt(data.id),
+                id: parseInt(data.idBanco)
+
+            }
+        })
+        res.status(200).json({ message: 'Banco Deletado ' })
     } catch (error) {
         res.status(400).json({ message: 'Erro ao Cadastrar' })
     }

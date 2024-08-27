@@ -7,10 +7,12 @@ import {
     DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Switch,
     NavbarMenu,
     NavbarMenuItem,
-    NavbarMenuToggle
+    NavbarMenuToggle,
+    Divider
 } from "@nextui-org/react";
 import { AcmeLogo } from "@/components/HeaderComponents/AcmeLogo";
 import { SearchIcon } from "@/components/HeaderComponents/SearchIcon";
+import { Accordion, AccordionItem } from "@nextui-org/react";
 import { MoonIcon } from "@/components/HeaderComponents/MoonIcon";
 import { SunIcon } from "@/components/HeaderComponents/SunIcon";
 import useToken from "./hooks/useToken";
@@ -165,12 +167,15 @@ export default function App() {
                             <DropdownItem key="profile" className="h-14 gap-2">
                                 <p className="font-semibold">{tokenUsuario?.email}</p>
                             </DropdownItem>
+                            <DropdownItem key="configurations">Configurações</DropdownItem>
+                            <DropdownItem key="configurations">  <Divider /></DropdownItem>
                             <DropdownItem key="settings"><Link href={'/pages/editarcadastro'}>Editar usuário</Link></DropdownItem>
-                            <DropdownItem key="configurations">Configurations</DropdownItem>
-                            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                            <DropdownItem key="analytics">Analytics</DropdownItem>
-                            <DropdownItem key="system">System</DropdownItem>
-                            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+                            <DropdownItem key="team_settings"><Link href={'/pages/editarinstituicao'}>Editar Instituição</Link></DropdownItem>
+                            <DropdownItem key="team_settings"><Link href={'/pages/editarcategoria'}>Editar Categoria</Link></DropdownItem>
+                            <DropdownItem key="analytics"><Link href={'/pages/editarnomesinvestimentos'}>Editar Nome dos Investimentos</Link></DropdownItem>
+                            <DropdownItem key="analytics"><Link href={'/pages/editarformadepagamento'}>Editar Forma de Pagamento</Link></DropdownItem>
+                            <DropdownItem key="analytics"><Link href={'/pages/editartipodespesa'}>Editar Tipo Depesa Patrimônio</Link></DropdownItem>
+                            <DropdownItem key="configurations">  <Divider /></DropdownItem>
                             <DropdownItem key="logout" color="danger" onClick={() => handleLogout()}>
                                 Sair
                             </DropdownItem>
