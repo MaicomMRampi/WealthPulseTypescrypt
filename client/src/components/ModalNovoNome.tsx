@@ -25,7 +25,6 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: P
     });
 
     const mandaValorAtualizado = async (values: any) => {
-        console.log("🚀 ~ mandaValorAtualizado ~ values", values)
         try {
             onSubmit(values);
         } catch (error) {

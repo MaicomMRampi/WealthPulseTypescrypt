@@ -5,7 +5,6 @@ import { useState } from "react";
 
 export default function App({ open, onClose, observacao, onSubmit }) {
     const [observacaoNomeDespesa, setObservacaoNomeDespesa] = useState('');
-    console.log("🚀 ~ App ~ observacaoNomeDespesa", observacaoNomeDespesa)
     const handleSubmit = () => {
         onSubmit(observacaoNomeDespesa);
         onClose();

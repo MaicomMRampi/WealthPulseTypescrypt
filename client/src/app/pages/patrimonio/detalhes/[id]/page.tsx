@@ -141,7 +141,6 @@ export default function DetalhesDosGastos({ params }: any) {
         }
         if (filtroInativo !== 'todos') {
             const inativoStatus = filtroInativo === 'true' ? 1 : 0;
-            console.log("🚀 ~ filteredItems ~ inativoStatus", inativoStatus)
 
             filteredUsers = filteredUsers.filter(item => item.inativo === inativoStatus);
         }
@@ -182,7 +181,6 @@ export default function DetalhesDosGastos({ params }: any) {
     }
 
     const openObservação = (despesa: Despesa, valor: number) => {
-        console.log("🚀 ~ DetalhesDosGastos ~ valor", valor)
         setOpenModalObservacao(!openModalObservacao);
         const adicionaValorNasDespesas = {
             ...despesa,
@@ -192,8 +190,6 @@ export default function DetalhesDosGastos({ params }: any) {
     }
 
     const confirmaInativacao = async (values: any) => {
-        console.log("🚀 ~ confirmaInativacao ~ values", values)
-
         const response = await api.put('/inativarpatrimonio', {
             observacao: values,
             dados: modalInfo.objeto.id
@@ -320,7 +316,6 @@ export default function DetalhesDosGastos({ params }: any) {
     }, []);
 
     const filtroPorStatus = useCallback((status: string) => {
-        console.log("🚀 ~ filtroPorStatus ~ status", status)
 
         const filtro = dados.filter
     }, []);

@@ -4,8 +4,6 @@ const converteString = (string) => {
         return NaN; // Retorna NaN se o valor não for uma string
     }
 
-    console.log("🚀 ~ converteString ~ string", string);
-
     // Remove espaços extras (se houver)
     string = string.trim();
 
@@ -14,8 +12,6 @@ const converteString = (string) => {
 
     // Converter para número mantendo todos os decimais
     const valorNumber = parseFloat(valorFormatado);
-
-    console.log("🚀 ~ Valor convertido:", valorNumber);
     return valorNumber;
 }
 

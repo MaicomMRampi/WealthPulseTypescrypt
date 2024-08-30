@@ -4,8 +4,6 @@ function calcularTempo(dataAquisicao: string) {
 
     const agora = new Date();
     const data = new Date(dataAquisicao);
-    console.log("🚀 ~ calcularTempo ~ data", data)
-
     const anos = agora.getFullYear() - data.getFullYear();
     const meses = agora.getMonth() - data.getMonth();
     const dias = agora.getDate() - data.getDate();

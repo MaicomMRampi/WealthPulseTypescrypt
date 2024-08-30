@@ -83,7 +83,6 @@ export default function ListaConta() {
 
     const [dataControleMensal, setDataControleMensal] = useState<string>(dataInicioControle);
     const [orcamentoMensal, setOrcamentoMensal] = useState<any>();
-    console.log("🚀 ~ MinhasContas ~ orcamentoMensal", orcamentoMensal)
     const [message, setMessage] = useState()
     const [mesFatura, setMesFatura] = useState<string>();
     const [opemModalFatura, setOpenModalFatura] = useState(false);

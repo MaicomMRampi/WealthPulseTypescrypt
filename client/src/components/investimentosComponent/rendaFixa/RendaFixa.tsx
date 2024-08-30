@@ -32,7 +32,6 @@ export default function RendaFixa({ tipoInvestimento }: any) {
             dados: valorParaBack,
             token: tokenUsuario?.id,
         });
-        console.log("🚀 ~ handleSubmit ~ response", response)
 
         if (response.status === 200) {
             setMessageResposta('Investimento Cadastrado com Sucesso');

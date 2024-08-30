@@ -48,7 +48,7 @@ export default function TotalContas() {
                                 <Card key={index} className="w-full">
                                     <CardBody className="space-y-2">
                                         <h3 className="text-lg font-bold">{despesa.estabelecimento}</h3>
-                                        <p className="text-base text-green-400">{visibility ? currency(despesa.valor) : '****'}</p>
+                                        <p className="text-base text-green-400">{visibility && despesa.valor ? currency(despesa.valor) : '****'}</p>
                                         <p className="text-sm text-gray-300">{AlteraVisualizacaoData(despesa.dataVencimento)}</p>
                                     </CardBody>
                                 </Card>

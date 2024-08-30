@@ -30,7 +30,6 @@ export default function EditarCadastro() {
 
         try {
             const response = await api.post('/upload', formData);
-            console.log("Upload bem-sucedido:", response.data);
         } catch (error) {
             console.error("Erro no upload:", error);
         }

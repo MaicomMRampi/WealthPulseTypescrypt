@@ -3,18 +3,36 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import useToken from './hooks/useToken';
+import { api } from '@/lib/api';
+
 
 const LayoutAdmin = ({ children }: any) => {
     const { tokenUsuario } = useToken();
     const router = useRouter();
     const pathname = usePathname();
     const [usuarioLogado, setUsuarioLogado] = useState(false);
+    const [dadosPagamento, setDadosPagamento] = useState<any>();
+    console.log("🚀 ~ LayoutAdmin ~ dadosPagamento", dadosPagamento)
+
+
+    const agora = new Date();
+    const verificaPagamento = async () => {
+        if (tokenUsuario?.dataExpiracao < agora) {
+            const criaLinhaParaPagamento = await api.post('/criapagamento',
+                tokenUsuario?.id
+            )
+        }
+
+
+    }
+
+
 
     useEffect(() => {
+        verificaPagamento();
         if (pathname !== '/pages/register') {
             const token = localStorage.getItem('token');
             if (token && tokenUsuario) {
-                console.log("🚀 ~ useEffect ~ token", token);
                 try {
                     const decodedToken: any = jwtDecode(token);
                     // Verifica se o token está expirado comparando a data atual com a data de expiração do token
@@ -36,7 +54,13 @@ const LayoutAdmin = ({ children }: any) => {
                 router.push('/pages/login');
             }
         }
+
+
+
+
     }, [pathname, router, tokenUsuario]);
+
+    // VALIDA PAGAMENTOS 
 
     // Renderização condicional com base no estado de usuário logado
     if (!usuarioLogado && pathname !== '/pages/register') {

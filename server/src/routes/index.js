@@ -10,9 +10,9 @@ const bcrypt = require('bcryptjs')
 const formatDate = require('../utils/convertData')
 const prisma = require('../utils/dbConnect')
 const jwt = require('jsonwebtoken');
-const e = require('express')
+const ex = require('express')
 const multer = require('multer')
-const path = require('path');
+const path = require('path')
 
 
 
@@ -34,7 +34,134 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
+//=====================MERCADO PAGO API=====================
+const createCharge = async ({ accessToken, paymentData }) => {
+    console.log("🚀 ~ createCharge ~ paymentData", paymentData);
+    console.log("🚀 ~ createCharge ~ accessToken", accessToken);
+    const axios = require('axios');
 
+    try {
+        const paymentConfig = {
+            transaction_amount: 0.01, // Valor total da compra
+            payment_method_id: 'pix',
+            payer: {
+                first_name: paymentData.name,
+                email: paymentData.email,
+            },
+        };
+
+        const data = JSON.stringify(paymentConfig);
+        console.log("🚀 ~ createCharge ~ data", data);
+
+        const config = {
+            method: 'post',
+            url: 'https://api.mercadopago.com/v1/payments',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Idempotency-Key': paymentData.id, // Controle para não repetir 2x a mesma cobrança
+                Authorization: `Bearer ${accessToken}`,
+            },
+            data: data,
+        };
+
+        const response = await axios(config);
+        console.log("🚀 ~ createCharge ~ response", response.data);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+};
+
+const verifyPaymentStatus = async ({ idPagamento, accessToken }) => {
+    const axios = require('axios')
+    const id = idPagamento
+    const tokenMercadoPago = accessToken
+    console.log("🚀 ~ verifyPaymentStatus ~ id", tokenMercadoPago)
+
+    try {
+        if (!id) throw new Error('Id da cobrança vazio')
+        if (!tokenMercadoPago) {
+            throw new Error('Erro ao verificar o status do pagamento')
+        }
+        const response = await axios.get(`https://api.mercadopago.com/v1/payments/${id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${tokenMercadoPago}`
+                }
+            })
+
+        return response.data
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+router.get('/api/verificapagamento', async (req, res) => {
+    const accessToken = req.query.accessToken
+    const idPagamento = req.query.idPagamento
+    try {
+        if (!accessToken || !idPagamento) {
+            return res.status(400).json({ error: 'Dados inválidos.' });
+        }
+        console.log("token", accessToken, idPagamento)
+        const paymentResponse = await verifyPaymentStatus({ idPagamento, accessToken });
+        if (!paymentResponse) {
+            return res.status(500).json({ error: 'Erro ao Verificar pagamento.' });
+        }
+        res.status(200).json(paymentResponse);
+    } catch (err) {
+        console.error("Erro na rota /api/verificar pagamento:", err);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+
+});
+router.post('/api/geracobranca', async (req, res) => {
+    const { accessToken, paymentData } = req.body
+
+    try {
+        if (!accessToken || !paymentData) {
+            return res.status(400).json({ error: 'Dados inválidos.' });
+        }
+        const paymentResponse = await createCharge({ accessToken, paymentData });
+        if (!paymentResponse) {
+            return res.status(500).json({ error: 'Erro ao gerar a cobrança.' });
+        }
+        res.status(200).json(paymentResponse);
+    } catch (err) {
+        console.error("Erro na rota /api/geracobranca:", err);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+});
+
+
+
+
+// =============================================
+
+router.post('/api/criapagamento', async (req, res) => {
+    try {
+        const idUsuario = req.body
+
+        const pagamentoCreate = await prisma.UsuarioPagamento.create({
+            data: {
+                idUser: idUsuario,
+                metodoPagamento: 'Pix',
+                dataCadastroUsuario: new Date(),
+                dataExpiracao: firstPay,
+                dataExpiracaoFree: avaliacaoGratuita,
+                testeFree: 1,
+            }
+        })
+
+        res.status(200).json({ message: 'Pagamento Executado' })
+
+    } catch (error) {
+
+    }
+});
 
 
 // =====================Login ============
@@ -68,7 +195,10 @@ router.post('/api/login', async (req, res) => {
             usuario: {
                 nome: user.nome,
                 email: user.email,
-                id: user.id
+                id: user.id,
+                openModal: user.openModal,
+
+
             },
             expirarEm: token.expiresIn
         });
@@ -81,11 +211,19 @@ router.post('/api/login', async (req, res) => {
 
 // +++++++++++++++++API DO USUARIO+++++++++++++++++++++++++++++++
 router.post('/api/postusers', async (req, res) => {
+    const dadosCadastro = req.body
+    console.log("🚀 ~ router.post ~ dadosCadastro", dadosCadastro)
 
+
+    const avaliacaoGratuita = new Date();
+    avaliacaoGratuita.setDate(avaliacaoGratuita.getDate() + 15);
+    const firstPay = new Date();
+    firstPay.setMonth(firstPay.getMonth() + 1);
+
+    // INSERE DADOS NA TABELA DE PAGAMENTO USUARIOS//
 
     try {
         const { nome, cpf, email, senha } = req.body
-
         const nomeFormatado = nome.toUpperCase().trim()
         const emailFormatado = email.trim()
         const senhaCripto = await crypto(senha)
@@ -93,30 +231,40 @@ router.post('/api/postusers', async (req, res) => {
         const cpfExists = await prisma.usuario.findUnique({ where: { cpf } });
         if (emailExists) {
             return res.status(401).json({ message: 'E-mail Já Cadastrado' })
-
         }
         if (cpfExists) {
             return res.status(401).json({ message: 'CPF Já Cadastrado' })
-
         }
-
         const novoUsuario = await prisma.usuario.create({
             data: {
                 nome: nomeFormatado,
                 cpf,
                 email: emailFormatado,
                 senha: senhaCripto.toString('hex'),
+                openModal: 1,
+                dataExpiracao: firstPay,
+                datacadastro: new Date(),
+                statusFinanceiro: 1,
             },
         });
+        console.log("🚀 ~ router.post ~ novoUsuario", novoUsuario)
 
-
+        const pagamentoCreate = await prisma.UsuarioPagamento.create({
+            data: {
+                idUser: novoUsuario.id,
+                metodoPagamento: 'Pix',
+                dataExpiracao: firstPay,
+                status: 1,
+            }
+        })
         res.status(200).json({ message: 'Usuário Salvo com Sucesso !' });
     } catch (error) {
         console.error("Erro ao criar produto:", error);
 
     }
-
 })
+
+
 router.post('/api/atualizacadastro', async (req, res) => {
     const dados = req.body
 
@@ -162,6 +310,18 @@ router.post('/api/upload', upload.single('image'), async (req, res) => {
         fileName: fileName, // Nome do arquivo salvo
         fileExtension: fileExtension // Extensão do arquivo
     });
+});
+router.put('/api/fechamodalboasvindas', async (req, res) => {
+    const id = req.body.id
+    const atualizaValorModal = await prisma.Usuario.update({
+        where: {
+            id: id
+        },
+        data: {
+            openModal: 0
+        }
+    })
+
 });
 
 
@@ -353,7 +513,7 @@ router.get('/api/buscatipodespesa', async (req, res) => {
     try {
         const dados = req.query.id;
         const buscaTipoDespesa = await prisma.TipoDespesa.findMany({ where: { idUser: parseInt(dados) } })
-        console.log("tipo despesas", buscaTipoDespesa);
+
         res.status(200).json(buscaTipoDespesa);
     } catch (error) {
         console.error("🚀 ~ router.get ~ error", error); // Loga o erro no console
@@ -362,7 +522,7 @@ router.get('/api/buscatipodespesa', async (req, res) => {
 })
 router.delete('/api/deletatipodespesa', async (req, res) => {
     const data = req.body;
-    console.log("🚀 ~ router.delete ~ data", data);
+
 
     try {
         const deletaBanco = await prisma.TipoDespesa.delete({
@@ -373,7 +533,7 @@ router.delete('/api/deletatipodespesa', async (req, res) => {
         });
         res.status(200).json({ message: 'Tipo Despesa Deletado ' });
     } catch (error) {
-        console.log("🚀 ~ router.delete ~ error", error);
+
         res.status(400).json({ message: 'Tipo despesa sendo usada' });
     }
 });
@@ -458,7 +618,7 @@ router.get('/api/buscanomefundonovo', async (req, res) => {
 });
 router.delete('/api/deletanomefundonovo', async (req, res) => {
     const data = req.body
-    console.log("🚀 ~ router.delete ~ data", data)
+
 
     try {
         const deletaBanco = await prisma.NomeFundoImobiliario.delete({
@@ -470,7 +630,7 @@ router.delete('/api/deletanomefundonovo', async (req, res) => {
         })
         res.status(200).json({ message: 'Banco Deletado ' })
     } catch (error) {
-        console.log("🚀 ~ router.delete ~ error", error)
+
         res.status(400).json({ message: 'Erro ao Cadastrar' })
     }
 });
@@ -510,7 +670,7 @@ router.get('/api/buscanomeacao', async (req, res) => {
 });
 router.delete('/api/deletanomeacao', async (req, res) => {
     const data = req.body
-    console.log("🚀 ~ router.delete ~ data", data)
+
 
     try {
         const deletaBanco = await prisma.nomeacao.delete({
@@ -522,7 +682,7 @@ router.delete('/api/deletanomeacao', async (req, res) => {
         })
         res.status(200).json({ message: 'Banco Deletado ' })
     } catch (error) {
-        console.log("🚀 ~ router.delete ~ error", error)
+
         res.status(400).json({ message: 'Erro ao Cadastrar' })
     }
 });
@@ -934,7 +1094,7 @@ router.get('/api/buscacategoria', async (req, res) => {
 });
 router.delete('/api/deletacategoria', async (req, res) => {
     const data = req.body
-    console.log("🚀 ~ router.delete ~ data", data)
+
 
     try {
         const deletaBanco = await prisma.categoria.delete({
@@ -946,7 +1106,7 @@ router.delete('/api/deletacategoria', async (req, res) => {
         })
         res.status(200).json({ message: 'Banco Deletado ' })
     } catch (error) {
-        console.log("🚀 ~ router.delete ~ error", error)
+
         res.status(400).json({ message: 'Erro ao Cadastrar' })
     }
 });
@@ -990,7 +1150,7 @@ router.get('/api/buscaformapagamento', async (req, res) => {
 });
 router.delete('/api/deletaformapagamento', async (req, res) => {
     const data = req.body
-    console.log("🚀 ~ router.delete ~ data", data)
+
 
     try {
         const deletaBanco = await prisma.FormaPagamento.delete({
@@ -1002,7 +1162,7 @@ router.delete('/api/deletaformapagamento', async (req, res) => {
         })
         res.status(200).json({ message: 'Banco Deletado ' })
     } catch (error) {
-        console.log("🚀 ~ router.delete ~ error", error)
+
         res.status(400).json({ message: 'Erro ao Cadastrar' })
     }
 });
@@ -1501,7 +1661,7 @@ router.get('/api/buscabanco', async (req, res) => {
 });
 router.delete('/api/deletabanco', async (req, res) => {
     const data = req.body
-    console.log("🚀 ~ router.delete ~ data", data)
+
     try {
         const deletaBanco = await prisma.banco.delete({
             where: {

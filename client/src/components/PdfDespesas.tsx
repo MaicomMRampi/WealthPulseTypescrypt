@@ -131,8 +131,6 @@ interface Props {
 }
 
 const PdfDespesas = ({ despesas, totalFatura, usuario }: Props) => {
-    console.log("🚀 ~ PdfDespesas ~ despesas", despesas)
-
     const dadosAgrupadosLocal = despesas.reduce((acc: any, item: Despesa) => {
         const { categoria: { nomeCategoria }, valorGasto } = item;
 

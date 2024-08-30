@@ -110,13 +110,11 @@ export default function ListaDespesa() {
 
 
     const opemModalFechaFatura = (mes: string) => {
-        console.log("🚀 ~ opemModalFechaFatura ~ mes", mes)
         setMesFatura(mes)
         setOpenModalFatura(true)
     }
 
     const pagFatura = async () => {
-        console.log('MEs fatura apor confirmare', mesFatura)
         const response = await api.post(`/fecharfatura`, {
             idUsuario: tokenUsuario?.id,
             fatura: mesFatura

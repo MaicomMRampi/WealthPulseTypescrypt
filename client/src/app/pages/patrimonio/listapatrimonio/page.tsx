@@ -107,8 +107,6 @@ export default function App() {
     const [page, setPage] = React.useState(1);
 
     const hasSearchFilter = Boolean(filterValue);
-    console.log("🚀 ~ App ~ hasSearchFilter", hasSearchFilter)
-
     const headerColumns = React.useMemo(() => {
         if (visibleColumns === "all") return columns;
 
@@ -156,7 +154,6 @@ export default function App() {
             Router.push(`/pages/patrimonio/detalhes/${id}`)
         }
         const cellValue = patrimonio[columnKey];
-        console.log("🚀 ~ renderCell ~ cellValue", cellValue)
 
         switch (columnKey) {
             case "nomePatrimonio":

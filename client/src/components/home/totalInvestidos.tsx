@@ -15,7 +15,6 @@ type Props = {
 
 export default function TotalInvestidos() {
     const { theme, setTheme } = useTheme();
-    console.log("🚀 ~ Home ~ theme", theme)
     const { visibility } = useVisibility()
     const { tokenUsuario } = useToken()
     const [dados, setDados] = useState<Props[]>([])

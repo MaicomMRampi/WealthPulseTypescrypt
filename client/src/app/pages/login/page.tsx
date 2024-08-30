@@ -31,7 +31,6 @@ interface FormValues {
 export default function SignIn() {
 
     const { setTokenUsuario, tokenUsuario } = useToken();
-    console.log("🚀 ~ SignIn ~ tokenUsuario", tokenUsuario)
     const [message, setMessage] = useState<string>('');
     const [messageTipo, setMessageTipo] = useState<any>('');
     const router = useRouter();
@@ -44,7 +43,6 @@ export default function SignIn() {
             if (response.status === 200) {
                 localStorage.setItem("token", response.data.token);
                 const decodedToken: any = jwtDecode(response.data.token);
-                console.log("🚀 ~ handleSubmit ~ decodedToken", decodedToken)
                 setTokenUsuario(decodedToken.userId);
                 setMessageTipo("success");
                 setMessage("Usuario Logado com Sucesso");

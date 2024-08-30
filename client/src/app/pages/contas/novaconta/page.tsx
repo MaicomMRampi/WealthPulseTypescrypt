@@ -31,8 +31,6 @@ export default function NovaConta() {
     };
 
     const handleSubmit = async (values: any) => {
-        console.log("🚀 ~ handleSubmit ~ values", values);
-
         const response = await api.post('/novaconta', {
             dados: values,
             idUsuario: tokenUsuario?.id,

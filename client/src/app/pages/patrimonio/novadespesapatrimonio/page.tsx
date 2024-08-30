@@ -41,7 +41,6 @@ export default function App() {
                 }
             });
             setDados(response.data);
-            console.log("🚀 ~ buscaPatrimonios ~ response", response);
         } catch (error) {
             console.error("🚀 ~ buscaPatrimonios ~ error", error);
 
@@ -55,7 +54,6 @@ export default function App() {
                 }
             });
             setDadosDespesas(response.data);
-            console.log("🚀 ~ buscaPatrimonios ~ response", response);
         } catch (error) {
             console.error("🚀 ~ buscaPatrimonios ~ error", error);
 
@@ -88,7 +86,6 @@ export default function App() {
 
 
     const novoTipoDespesa = async (value: object) => {
-        console.log("🚀 ~ novoTipoDespesa ~ value", value)
         try {
             const response = await api.post(`/novotipodespesa`, {
                 value,

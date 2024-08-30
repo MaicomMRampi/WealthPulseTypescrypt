@@ -19,11 +19,7 @@ import useVisibilityCampo from '@/components/hooks/useVisibilityCampos';
 
 
 export default function NovaDespesa() {
-
-
-
     const { visibilityCampo } = useVisibilityCampo()
-    console.log("🚀 ~ NovaDespesa ~ visibilityCampo", visibilityCampo)
     const [modalOpen, setModalOpen] = useState(false);
     const [ModalOpenForm, setModalOpenForm] = useState(false);
     const [message, setMessage] = useState<string>()

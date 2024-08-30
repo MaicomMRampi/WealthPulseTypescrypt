@@ -51,7 +51,6 @@ export default function App({ tipoInvestimento }: any) {
             dados: valorParaBack,
             token: tokenUsuario?.id,
         });
-        console.log("🚀 ~ handleSubmit ~ response", response)
 
         if (response.status === 200) {
             setMessageResposta('Investimento Cadastrado com Sucesso');
@@ -74,8 +73,6 @@ export default function App({ tipoInvestimento }: any) {
                 values,
                 token: tokenUsuario?.id,
             })
-            console.log("🚀 ~ handleSubmitModalBanco ~ response", response)
-
             if (response.status === 200) {
                 setmessageTipoAlert("success")
                 buscaBanco()

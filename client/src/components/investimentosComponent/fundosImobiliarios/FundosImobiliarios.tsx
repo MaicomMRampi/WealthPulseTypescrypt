@@ -44,9 +44,12 @@ export default function App({ tipoInvestimento }: any) {
 
     const buscarNome = async () => {
         try {
-            const response = await api.get(`/buscanomefundonovo`)
+            const response = await api.get(`/buscanomefundonovo`, {
+                params: {
+                    id: tokenUsuario?.id,
+                }
+            })
             setDadosNomeFundo(response.data)
-            console.log("🚀 ~ buscarNome ~ response", response)
         } catch (error) {
             console.error('Erro ao buscar nome:', error);
         }
@@ -66,7 +69,6 @@ export default function App({ tipoInvestimento }: any) {
             dados: valorParaBack,
             token: tokenUsuario?.id,
         });
-        console.log("🚀 ~ handleSubmit ~ response", response)
 
         if (response.status === 200) {
             setMessageResposta('Investimento Cadastrado com Sucesso');
@@ -131,7 +133,6 @@ export default function App({ tipoInvestimento }: any) {
                 nomefundo,
                 id: tokenUsuario?.id
             })
-            console.log("🚀 ~ handleSubmitNome ~ response", response)
             if (response.status === 200) {
                 // setMessageBancoTipo("success")
                 buscarNome()

@@ -9,6 +9,11 @@ interface User {
     nome: string;
     senha: string;
     valorOrcamentoMensal: number | null;
+    dataProximoPagamento: any,
+    statusPagamento: number,
+    dataExpiracaoAcesso: any
+    openModal: number,
+    dataExpiracao: any
 }
 
 interface BearState {

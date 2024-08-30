@@ -20,7 +20,6 @@ export default function Acoes({ tipoInvestimento }: any) {
     const [modalOpenAcao, setModalOpenAcao] = useState<boolean>(false);
     const [dados, setDados] = useState([])
     const [banco, setBanco] = useState([])
-    console.log("🚀 ~ Acoes ~ dados", dados)
     const { tokenUsuario } = useToken()
     const acoes = [
         {
@@ -165,7 +164,6 @@ export default function Acoes({ tipoInvestimento }: any) {
             dados: valorParaBack,
             token: tokenUsuario?.id,
         });
-        console.log("🚀 ~ handleSubmit ~ response", response)
 
         if (response.status === 200) {
             setMessageResposta('Investimento Cadastrado com Sucesso');
