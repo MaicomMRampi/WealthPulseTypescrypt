@@ -1086,7 +1086,32 @@ router.get('/api/lucratividade', async (req, res) => {
         where: { idUser: parseInt(id) }
 
     })
-    console.log("🚀 ~ router.get ~ buscaLucratividade", buscaLucratividade)
+    res.status(200).json(buscaLucratividade)
+})
+router.post('/api/addjuros', async (req, res) => {
+    try {
+        const dados = req.body
+        console.log("🚀 ~ router.post ~ dados", dados)
+        const convertData = formatDate(dados.values.datapagamento)
+        const valorConvertido = converteString(dados.values.valorjuros)
+        const criaValorTabelaGanhosInvestimentos = await prisma.GanhosInvestimentos.create({
+            data: {
+                idUser: parseInt(dados.dadosInvestimento.idUser),
+                nomeInvestimento: dados.dadosInvestimento.nomeInvestimento.toUpperCase().trim(),
+                dataDoRendimento: convertData,
+                valor: valorConvertido,
+                tipoDeInvestimento: dados.dadosInvestimento.tipoDeInvestimento
+
+            }
+        })
+        res.status(200).json({ message: 'Cadastrado com sucesso!' })
+    } catch (error) {
+
+        console.error(error)
+        res.status(400).json({ message: 'Erro ao salvar provento' })
+
+    }
+
 })
 
 

@@ -151,9 +151,9 @@ model Investimento {
 }
 
 model GanhosInvestimentos {
-  id                 Int       @id @default(autoincrement())
+  id                 Int     @id @default(autoincrement())
   nomeInvestimento   String?
-  dataDoRendimento   DateTime?
+  dataDoRendimento   String?
   valor              Float?
   idUser             Int?
   tipoDeInvestimento String?

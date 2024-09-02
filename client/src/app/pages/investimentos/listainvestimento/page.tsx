@@ -35,6 +35,7 @@ import currency from "@/components/Currency";
 import useVisibility from "@/components/hooks/useVisibility";
 import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData";
 import ModalDetalhesFii from "@/components/ModalDetalhesFii";
+import ModalJuros from "@/components/ModalJuros";
 import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 
 type Dados = {
@@ -48,9 +49,12 @@ type Column = {
 
 export default function App() {
     const [total, setTotal] = useState(0)
+    const [juros, setJuros] = useState<any>()
+    console.log("🚀 ~ App ~ juros", juros)
     const [dadosFiltro, setDadosFiltro] = useState<any>([])
     const [dados, setDados] = useState<any>([])
     const [modalDetalhes, setModalDetalhes] = useState(false)
+    const [modalJuros, setModalJuros] = useState(false)
     const INITIAL_VISIBLE_COLUMNS = ["nome", "dataCompra", "instituicao", "valorInvestido", "actions"];
     const { tokenUsuario } = useToken()
     const [nomePagina, setNomePagina] = useState("Minhas Rendas Fixas");
@@ -111,13 +115,14 @@ export default function App() {
                 id: tokenUsuario?.id
             }
         })
-        setTotal(response.data)
+        console.log("🚀 ~ buscaLucratividade ~ response", response)
+        setJuros(response.data)
     }
 
     useEffect(() => {
         buscaLucratividade()
         buscaInvestimentos()
-    }, [])
+    }, [statusFilter])
 
     const [page, setPage] = React.useState(1);
 
@@ -131,9 +136,25 @@ export default function App() {
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
+    const selectedFilter = Array.from(statusFilter)[0] as string;
+
+    // Novo useEffect para atualizar os juros
+    useEffect(() => {
+        const selectedFilter = Array.from(statusFilter)[0] as string;
+        if (selectedFilter !== 'todos') {
+            // Filtra os juros com base no tipo de investimento selecionado
+            const jurosFiltrados = juros.filter((item: any) => item.tipoDeInvestimento === selectedFilter);
+            setJuros(jurosFiltrados);
+        } else {
+            setJuros([]);
+            buscaLucratividade();  // Recarrega todos os juros
+        }
+    }, [statusFilter, dados]); // Observa mudanças em statusFilter e dados
+
+
+
     const filteredItems = React.useMemo(() => {
         let filteredUsers = [...dados];
-
         if (hasSearchFilter) {
             filteredUsers = filteredUsers.filter((investimento: any) =>
                 investimento.nome.toLowerCase().includes(filterValue.toLowerCase()),
@@ -141,19 +162,20 @@ export default function App() {
         }
 
         if (statusFilter) {
-            const selectedFilter = Array.from(statusFilter)[0] as string;
 
             if (selectedFilter != "todos") {
                 filteredUsers = filteredUsers.filter((investimento) =>
                     investimento.tipo === selectedFilter
                 )
+
             } else {
                 filteredUsers = filteredUsers.filter((investimento) =>
                     investimento.tipo != selectedFilter
                 )
-            }
-        }
 
+            }
+
+        }
         setDadosFiltro(filteredUsers)
         const somaValores =
             filteredUsers &&
@@ -161,7 +183,11 @@ export default function App() {
         setTotal(somaValores)
 
         return filteredUsers;
-    }, [dados, filterValue, statusFilter]);
+    }, [dados, filterValue, statusFilter, selectedFilter]);
+
+
+
+
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
     const items = React.useMemo(() => {
@@ -272,6 +298,7 @@ export default function App() {
                                     <p>Tipo de Investimento</p>
                                 </Button>
                             </DropdownTrigger>
+
                             <DropdownMenu
                                 disallowEmptySelection
                                 aria-label="Table Columns"
@@ -293,6 +320,16 @@ export default function App() {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
+                        {Array.from(statusFilter)[0] as string === "todos" || Array.from(statusFilter)[0] as string === "acao" || Array.from(statusFilter)[0] as string === "fii" ?
+                            <Button
+                                endContent={<ChevronDownIcon className="text-small" />}
+                                variant="solid"
+                                onClick={() => setModalJuros(true)}
+                            >
+                                <p>Juros Ganhos</p>
+                            </Button>
+                            : null
+                        }
                         {Array.from(statusFilter)[0] as string === "fii" ?
                             <Button
                                 color="warning"
@@ -304,18 +341,6 @@ export default function App() {
                             </Button>
                             : null
                         }
-
-                        {Array.from(statusFilter)[0] as string === "fii" ?
-                            <Button
-                                endContent={<ChevronDownIcon className="text-small" />}
-                                className="bg-buttonAzulEscuro text-white"
-                                variant="solid"
-                            >
-                                <p>Dividendos</p>
-                            </Button>
-                            : null
-                        }
-
                         <Dropdown>
                             <DropdownTrigger>
                                 <Button
@@ -323,7 +348,7 @@ export default function App() {
                                     className="bg-buttonCinzaPadrao text-black"
                                     variant="solid"
                                 >
-                                    <h2 className="text-lg">Colunas</h2>
+                                    Colunas
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -448,7 +473,11 @@ export default function App() {
                 data={dadosFiltro}
                 open={modalDetalhes}
                 onClose={() => setModalDetalhes(false)}
-
+            />
+            <ModalJuros
+                data={juros}
+                open={modalJuros}
+                onClose={() => setModalJuros(false)}
             />
         </div>
 
