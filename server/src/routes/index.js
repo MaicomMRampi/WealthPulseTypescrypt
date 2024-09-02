@@ -579,22 +579,23 @@ router.post('/api/trocarsenha', async (req, res) => {
 
 router.post('/api/novonome', async (req, res) => {
     const dados = req.body;
-
     try {
         const nome = dados.nomefundo.toUpperCase().trim();
         const idUser = parseInt(dados.id); // Obtenha o ID do usuário da requisição
-
-        const buscaNome = await prisma.NomeFundoImobiliario.findUnique({
+        const buscaNome = await prisma.NomeFundoImobiliario.findMany({
             where: {
                 nomeFundo: nome,
                 idUser: idUser // Inclua o ID do usuário na consulta
-            }
+            },
+            take: 1
         });
 
-        if (buscaNome) {
+        // Verifica se já existe um registro com o mesmo nome e idUser
+        if (buscaNome.length > 0 && buscaNome[0].idUser === idUser) {
             return res.status(400).json({ message: 'Nome Já Cadastrado' });
         }
 
+        // Se não existir, insere o novo registro
         const insereNome = await prisma.NomeFundoImobiliario.create({
             data: {
                 nomeFundo: nome,
@@ -608,6 +609,7 @@ router.post('/api/novonome', async (req, res) => {
         console.error("Erro ao salvar nome:", error);
     }
 });
+
 router.get('/api/buscanomefundonovo', async (req, res) => {
     const id = req.query.id
 
@@ -784,6 +786,15 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Adicionei o campo 'tipo' aqui
                     }
                 });
+                const criaValorTabelaGanhosInvestimentos = await prisma.GanhosInvestimentos.create({
+                    data: {
+                        idUser: parseInt(dados.token),
+                        nomeInvestimento: dados.dados.nome.toUpperCase().trim(),
+                        dataDoRendimento: new Date(),
+                        valor: 0.00,
+                        tipoDeInvestimento: dados.dados.tipoInvestimento
+                    }
+                })
 
                 res.status(200).json({ message: 'Ação Cadastrada com Sucesso!' });
             } catch (error) {
@@ -808,6 +819,16 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento
                     }
                 });
+                const criaValorTabelaGanhosInvestimentos = await prisma.GanhosInvestimentos.create({
+                    data: {
+                        idUser: parseInt(dados.token),
+                        nomeInvestimento: dados.dados.nome.toUpperCase().trim(),
+                        dataDoRendimento: new Date(),
+                        valor: 0.00,
+                        tipoDeInvestimento: dados.dados.tipoInvestimento
+
+                    }
+                })
 
                 res.status(200).json({ message: 'FII Cadastrado com Sucesso!' });
             } catch (error) {
@@ -1054,6 +1075,27 @@ router.put('/api/vendacotasfii', async (req, res) => {
 });
 
 // ==================================================
+
+//====================JUROS FINANCEIROS=====================
+
+router.get('/api/lucratividade', async (req, res) => {
+    const id = req.query.id
+    console.log("🚀 ~ router.get ~ id", id)
+
+    const buscaLucratividade = await prisma.GanhosInvestimentos.findMany({
+        where: { idUser: parseInt(id) }
+
+    })
+    console.log("🚀 ~ router.get ~ buscaLucratividade", buscaLucratividade)
+})
+
+
+
+//=====================================================
+
+
+
+
 
 
 
@@ -1631,8 +1673,11 @@ router.post('/api/banco', async (req, res) => {
     try {
 
         const nomeUppercase = dados.values.instituicao.toUpperCase().trim();
-        const verificaNome = await prisma.banco.findUnique({ where: { nomeBanco: nomeUppercase } });
-        if (verificaNome) {
+        const verificaNome = await prisma.banco.findMany({ where: { nomeBanco: nomeUppercase, idUser: parseInt(dados.token) }, take: 1 });
+        console.log("🚀 ~ router.post ~ verificaNome", verificaNome)
+
+
+        if (verificaNome.length > 0 && verificaNome[0].idUser === dados.token) {
             return res.status(400).json({ message: 'Banco Já Cadastrado ' })
         }
         const novoBanco = await prisma.banco.create({

@@ -68,6 +68,9 @@ export default function App() {
     useEffect(() => {
         const selectedFilter = Array.from(statusFilter)[0] as string;
         switch (selectedFilter) {
+            case "todos":
+                setNomePagina("Todos")
+                break;
             case "acao":
                 setNomePagina("Minhas Ações")
                 break;
@@ -102,8 +105,17 @@ export default function App() {
         })
         setDados(response.data)
     }
+    const buscaLucratividade = async () => {
+        const response = await api.get('/lucratividade', {
+            params: {
+                id: tokenUsuario?.id
+            }
+        })
+        setTotal(response.data)
+    }
 
     useEffect(() => {
+        buscaLucratividade()
         buscaInvestimentos()
     }, [])
 

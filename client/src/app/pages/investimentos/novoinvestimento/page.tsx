@@ -13,7 +13,6 @@ export default function App() {
     const [tipoInvestimento, setTipoInvestimento] = useState("acao");
     return (
         <div className="pt-8 flex flex-col gap-3 md:w-[60%] xs:w-full px-4 mx-auto">
-
             <Select
                 // value={value}
                 name="tipoInvestimento"

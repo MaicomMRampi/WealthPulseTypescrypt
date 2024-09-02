@@ -38,7 +38,7 @@ model UsuarioPagamento {
 
 model Banco {
   id        Int    @id @default(autoincrement())
-  nomeBanco String @unique
+  nomeBanco String
   idUser    Int
 }
 
@@ -126,27 +126,37 @@ model Nomeacao {
 
 model NomeFundoImobiliario {
   id        Int    @id @default(autoincrement())
-  nomeFundo String @unique
+  nomeFundo String
   idUser    Int
 }
 
 model Investimento {
-  id             Int     @id @default(autoincrement())
-  idUser         Int
-  tipo           String // campo para discriminar o tipo de investimento (ex: "acao", "fii", "rendaFixa", etc.)
-  nome           String // Nome genérico para qualquer tipo de investimento
-  quantidade     Float? // Quantidade de ações, cotas, ou criptomoedas
-  valorPago      Float? // Quantidade de ações, cotas, ou criptomoedas
-  tipoTitulo     String? // Tipo de título (para renda fixa e debêntures)
-  valorInvestido Float // Valor investido
-  taxaJuros      Float? // Taxa de juros (para renda fixa, debêntures, etc.)
-  dataCompra     String // Data de compra
-  valorAtualFii  Float? // Valor atual do FII
-  dataVencimento String? // Data de vencimento (para títulos de renda fixa e debêntures)
-  ticker         String? // Ticker de ação ou FII
-  instituicao    String? // Instituição financeira (para renda fixa, previdência, etc.)
-  tipoPlano      String? // Tipo de plano (para previdência privada: PGBL, VGBL)
-  tipoFundo      String? // Tipo de fundo (para fundos de investimento)
+  id              Int     @id @default(autoincrement())
+  idUser          Int
+  tipo            String // campo para discriminar o tipo de investimento (ex: "acao", "fii", "rendaFixa", etc.)
+  nome            String // Nome genérico para qualquer tipo de investimento
+  quantidade      Float? // Quantidade de ações, cotas, ou criptomoedas
+  valorPago       Float? // Quantidade de ações, cotas, ou criptomoedas
+  tipoTitulo      String? // Tipo de título (para renda fixa e debêntures)
+  valorInvestido  Float // Valor investido
+  taxaJuros       Float? // Taxa de juros (para renda fixa, debêntures, etc.)
+  dataCompra      String // Data de compra
+  valorAtualFii   Float? // Valor atual do FII
+  dataVencimento  String? // Data de vencimento (para títulos de renda fixa e debêntures)
+  ticker          String? // Ticker de ação ou FII
+  instituicao     String? // Instituição financeira (para renda fixa, previdência, etc.)
+  tipoPlano       String? // Tipo de plano (para previdência privada: PGBL, VGBL)
+  tipoFundo       String? // Tipo de fundo (para fundos de investimento)
+  previsaoDeGanho Float? // Previsão de ganho (para fundos de investimento)
+}
+
+model GanhosInvestimentos {
+  id                 Int       @id @default(autoincrement())
+  nomeInvestimento   String?
+  dataDoRendimento   DateTime?
+  valor              Float?
+  idUser             Int?
+  tipoDeInvestimento String?
 }
 
 model Patrimonio {

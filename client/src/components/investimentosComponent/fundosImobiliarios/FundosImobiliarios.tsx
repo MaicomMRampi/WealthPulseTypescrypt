@@ -18,7 +18,7 @@ import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
 import ModalNovoNome from '@/components/ModalNovoNome';
 export default function App({ tipoInvestimento }: any) {
     const [messageBanco, setMessageBanco] = useState<string>()
-    const [messageBancoTipo, setMessageBancoTipo] = useState()
+    const [messageBancoTipo, setMessageBancoTipo] = useState<string>()
     const [banco, setBanco] = useState([])
     const { tokenUsuario } = useToken()
     const [messageTipoAlert, setmessageTipoAlert] = useState<string>()
@@ -134,22 +134,28 @@ export default function App({ tipoInvestimento }: any) {
                 id: tokenUsuario?.id
             })
             if (response.status === 200) {
-                // setMessageBancoTipo("success")
+                setMessageBancoTipo("success")
                 buscarNome()
                 setMessageBanco(response.data.message)
                 setTimeout(() => {
                     setMessageBanco("")
                     setModalNovoNome(false)
                 }, 2000)
+            } else {
+                setMessageBanco("Nome Já cadastrado ")
+                setTimeout(() => {
+                    setMessageBanco("")
+                    setModalNovoNome(false)
+                }, 2000)
             }
         } catch (error) {
-            // setMessageBancoTipo("error")
-            // setMessageBanco('Nome já existe.')
+            setMessageBancoTipo("error")
+            setMessageBanco('Nome já existe.')
             console.error('Erro salvar nome:', error);
             buscarNome()
             setTimeout(() => {
-                // setMessageBanco("")
-                // setIsOpen(false)
+                setMessageBanco("")
+                setModalNovoNome(false)
             }, 2000)
         }
 

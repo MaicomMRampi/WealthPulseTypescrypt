@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
 
 export default function RendaFixa({ tipoInvestimento }: any) {
+
     const [banco, setBanco] = useState([])
     const { tokenUsuario } = useToken()
     const [messageTipoAlert, setmessageTipoAlert] = useState<string>()
@@ -235,7 +236,7 @@ export default function RendaFixa({ tipoInvestimento }: any) {
                                     isInvalid={touched.dataCompra && !!errors.dataCompra}
                                     name="dataCompra"
                                     hideTimeZone
-                                    minValue={today(getLocalTimeZone())}
+                                    // minValue={today(getLocalTimeZone())}
                                     label="Data da Compra"
                                     onChange={(val) => setFieldValue("dataCompra", val)}
                                     defaultValue={today(getLocalTimeZone())}
@@ -248,8 +249,24 @@ export default function RendaFixa({ tipoInvestimento }: any) {
                                 value={values.taxaJuros}
                                 onChange={handleChange}
                             />
+
+                            {/* <Select
+                                // value={value}
+                                name="tipoderendimento"
+                                fullWidth
+                                label="Tipo de taxa de juros "
+                                onChange={handleChange}
+                                value={tipoInvestimento}
+                            >
+                                <SelectItem key={'acao'} value="acao">Ao mês</SelectItem>
+                                <SelectItem key={"fii"} value="fii">Ao </SelectItem>
+                                <SelectItem key={"rendaFixa"} value="rendaFixa">Renda Fixa</SelectItem>
+                                <SelectItem key={"cripto"} value="cripto">Criptomoedas</SelectItem>
+                                <SelectItem key={"fundo"} value="fundo">Fundos de Investimento</SelectItem>
+                                <SelectItem key={"previdencia"} value="previdencia">Previdência Privada</SelectItem>
+                                <SelectItem key={"debentures"} value="debentures">Debêntures</SelectItem>
+                            </Select> */}
                         </div>
-                        {JSON.stringify(errors)}
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
                         <ButtonEnviarDadosPadrao onSubmit={handleSubmit} />
                         {messageResposta && <Alert severity={messageTipoAlert as 'success' | 'info' | 'warning' | 'error'}>{messageResposta}</Alert>}
