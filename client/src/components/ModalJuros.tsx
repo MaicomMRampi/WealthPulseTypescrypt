@@ -10,9 +10,10 @@ interface Props {
     open: boolean
     onClose: () => void
     data: any
+    funcao: any
 }
 
-export default function BasicModal({ open, onClose, data }: Props) {
+export default function BasicModal({ open, onClose, data, funcao }: Props) {
     const [openModal, setOpenModal] = useState(false)
     const [investimento, setInvestimento] = useState<any>(data)
 
@@ -111,6 +112,7 @@ export default function BasicModal({ open, onClose, data }: Props) {
                 open={openModal}
                 onClose={() => setOpenModal(false)}
                 object={investimento}
+                funcao={funcao}
             />
         </div>
     )

@@ -478,6 +478,7 @@ export default function App() {
                 data={juros}
                 open={modalJuros}
                 onClose={() => setModalJuros(false)}
+                funcao={buscaLucratividade}
             />
         </div>
 

@@ -13,6 +13,7 @@ import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
 import ModalNovaAcao from "./ModalNovaAção";
 import useToken from '@/components/hooks/useToken';
 import { Alert } from '@mui/material';
+import { useRouter } from 'next/navigation';
 export default function Acoes({ tipoInvestimento }: any) {
     const [messageTipoAlert, setmessageTipoAlert] = useState<string>()
     const [messageResposta, setMessageResposta] = useState<string>()
@@ -20,6 +21,7 @@ export default function Acoes({ tipoInvestimento }: any) {
     const [modalOpenAcao, setModalOpenAcao] = useState<boolean>(false);
     const [dados, setDados] = useState([])
     const [banco, setBanco] = useState([])
+    const router = useRouter()
     const { tokenUsuario } = useToken()
     const acoes = [
         {
@@ -173,6 +175,7 @@ export default function Acoes({ tipoInvestimento }: any) {
             setmessageTipoAlert('error');
         }
         setTimeout(() => {
+            router.push('/pages/investimentos/listainvestimento')
             setMessageResposta('');
             setmessageTipoAlert('');
 

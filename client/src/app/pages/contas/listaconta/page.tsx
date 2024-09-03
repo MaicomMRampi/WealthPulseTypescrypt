@@ -584,7 +584,7 @@ export default function ListaConta() {
                                         </TableColumn>
                                     )}
                                 </TableHeader>
-                                <TableBody emptyContent={"Sem Despesas"} items={sortedItems}>
+                                <TableBody emptyContent={"Sem Contas"} items={sortedItems}>
                                     {(item) => (
                                         <TableRow className={` ${item.pago === 1 ? 'text-default-500 ' : 'hover:text-primaryTableText'}`} key={item.id}>
                                             {(columnKey) => (

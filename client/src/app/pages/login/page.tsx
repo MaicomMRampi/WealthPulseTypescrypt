@@ -1,12 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { UseBoundStore } from 'zustand';
-import Image from 'next/image';
 import { Formik } from 'formik';
 import { initialValues, validationSchema } from './formControl';
 import { useRouter } from 'next/navigation';
 import { cpfMask } from '@/components/Mask';
-import { Avatar, Button, Popover, PopoverContent, PopoverTrigger, Input, useTooltip } from '@nextui-org/react';
+import { Avatar, Button, Input } from '@nextui-org/react';
 import { EyeFilledIcon } from "@/components/iconesCompartilhados/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "@/components/iconesCompartilhados/EyeSlashFilledIcon";
 import Link from 'next/link';
@@ -14,6 +12,8 @@ import { api } from '@/lib/api';
 import { jwtDecode } from 'jwt-decode';
 import useToken from '@/components/hooks/useToken';
 import { Alert } from '@mui/material';
+import ModalAlteraSenha from '@/components/ModalAlteraSenha';
+import emailjs from '@emailjs/browser';
 function Copyright(props: any) {
     return (
         <h1 {...props}>
@@ -29,7 +29,7 @@ interface FormValues {
 };
 
 export default function SignIn() {
-
+    const [modalSenha, setOpenModalSenha] = useState<boolean>(false)
     const { setTokenUsuario, tokenUsuario } = useToken();
     const [message, setMessage] = useState<string>('');
     const [messageTipo, setMessageTipo] = useState<any>('');
@@ -62,6 +62,66 @@ export default function SignIn() {
         }
     };
 
+    const sendEmail = async (data: any) => {
+        try {
+            const res = await emailjs.send(
+                'service_ud9ddr9',
+                'template_5pdkkl7',
+                {
+                    nome: data.nome,
+                    mensagem: `Olá ${data.nome}, sua nova senha é: ${data.senhaNova}`,
+                    email: data.email,
+                },
+                'Fetw8HHG805JuaITp'
+            );
+
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+
+
+    const enviaEmailComAsenha = async (values: any) => {
+        const send = await sendEmail(values);
+        if (send) {
+            setMessage('Mensagem enviada com sucesso!');
+
+        } else {
+            setMessage('Erro ao enviar a mensagem, tente novamente mais tarde!');
+        }
+        setTimeout(() => {
+            setMessage('');
+        }, 3000);
+
+    }
+
+
+
+
+    const alteraSenha = async (cpf: string) => {
+        console.log(cpf)
+
+        const response = await api.put('/esqueceusenha', {
+            cpf
+        })
+        if (response.status === 200) {
+            console.log("🚀 ~ alteraSenha ~ response", response)
+            enviaEmailComAsenha(response.data)
+
+        }
+
+        setTimeout(() => {
+
+            setOpenModalSenha(false)
+        })
+        console.log("🚀 ~ alteraSenha ~ response", response)
+    }
+
+
+
+
     return (
         <div className="w-full min-h-screen bg-cover flex justify-center items-center bg-[url('/imagens/rm378-09.jpg')]">
             <div className=" p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -86,7 +146,6 @@ export default function SignIn() {
                             <div className="flex flex-col gap-4">
                                 <Input
                                     autoComplete="off"
-                                    errorMessage={touched.cpf && errors.cpf}
                                     fullWidth
                                     onChange={(event) => {
                                         const { name, value } = event.target;
@@ -96,15 +155,15 @@ export default function SignIn() {
                                     className='text-white'
                                     onBlur={handleChange}
                                     name='cpf'
+                                    isInvalid={!!touched.cpf && !!errors.cpf}
                                     variant="bordered"
                                     placeholder="Digite seu CPF"
                                     value={values.cpf}
                                     maxLength={14}
                                 />
-                                {errors.cpf && <p className="text-red-500 text-xs italic">{errors.cpf}</p>}
                                 <Input
                                     size="lg"
-                                    errorMessage={touched.senha && errors.senha}
+                                    isInvalid={!!touched.senha && !!errors.senha}
                                     fullWidth
                                     onChange={handleChange}
                                     onBlur={handleChange}
@@ -123,7 +182,6 @@ export default function SignIn() {
                                     }
                                     type={isVisible ? "text" : "password"}
                                 />
-                                {errors.senha && <p className="text-red-500 text-xs italic">{errors.senha}</p>}
                                 <Button
                                     fullWidth
                                     type="submit"
@@ -134,7 +192,7 @@ export default function SignIn() {
                                 </Button>
                                 <div className="grid grid-cols-2">
                                     <div>
-                                        <Link href="">Esqueceu a Senha?</Link>
+                                        <Link onClick={() => setOpenModalSenha(true)} href="">Esqueceu a Senha?</Link>
                                     </div>
                                     <div className='text-right'>
                                         <Link href="/pages/register">Registre-se Aqui</Link>
@@ -153,6 +211,11 @@ export default function SignIn() {
                     )}
                 </Formik>
             </div>
+            <ModalAlteraSenha
+                isOpen={modalSenha}
+                onClose={() => setOpenModalSenha(false)}
+                onSubmit={alteraSenha}
+            />
         </div>
     );
 }

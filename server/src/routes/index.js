@@ -168,6 +168,7 @@ router.post('/api/criapagamento', async (req, res) => {
 
 router.post('/api/login', async (req, res) => {
     const data = req.body.values; // Ajuste para acessar corretamente os dados do corpo da requisição
+    console.log("🚀 ~ router.post ~ data", data)
 
     try {
         const user = await prisma.usuario.findUnique({
@@ -175,10 +176,12 @@ router.post('/api/login', async (req, res) => {
                 cpf: data.cpf, // Buscar pelo CPF fornecido na requisição
             },
         });
+        console.log("🚀 ~ router.post ~ user", user)
         if (!user) {
             return res.status(404).json({ erro: 'Usuário não encontrado' });
         }
         const comparaSenha = await bcrypt.compareSync(data.senha, user.senha)
+        console.log("🚀 ~ router.post ~ comparaSenha", comparaSenha)
         if (!comparaSenha) {
             return res.status(401).json({ erro: 'Senha incorreta' });
         }
@@ -547,33 +550,6 @@ router.delete('/api/deletatipodespesa', async (req, res) => {
 
 
 
-// =============Trocar Senha ==========
-
-router.post('/api/trocarsenha', async (req, res) => {
-    const dados = req.body;
-    try {
-        await dbConnect();
-
-        const buscaUsuario = await UsuariosSchema.findOne({ email: dados.usuario.email });
-        if (!buscaUsuario) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-
-        const confereSenha = await bcrypt.compare(dados.values.senhaatual, buscaUsuario.senha);
-        if (confereSenha) {
-
-            const novaSenhaCriptografada = await crypto(dados.values.novasenha);
-
-            await UsuariosSchema.updateOne({ _id: buscaUsuario._id }, { $set: { senha: novaSenhaCriptografada } });
-            return res.status(200).json({ message: 'Senha Alterada com Sucesso' });
-        } else {
-            return res.status(400).json({ message: 'Senha Incorreta' });
-        }
-    } catch (error) {
-        console.error('Erro ao Trocar Senha:', error);
-        return res.status(500).json({ message: 'Erro ao Trocar Senha' });
-    }
-});
 
 // ==============  FUNDOS IMOBILIARIOS ==========
 
@@ -768,6 +744,11 @@ router.post('/api/dividendos', async (req, res) => {
 // ================INVESTIMENTOS======================
 router.post('/api/novoinvestimento', async (req, res) => {
     const dados = req.body;
+    const dataATual = new Date()
+    const ano = dataATual.getFullYear()
+    const mes = dataATual.getMonth() + 1
+    const dia = dataATual.getDate()
+    const dataAtualFormatada = `${ano}/${mes < 10 ? `0${mes}` : mes}/${dia < 10 ? `0${dia}` : dia}`
 
 
     switch (dados.dados.tipoInvestimento) {
@@ -790,7 +771,7 @@ router.post('/api/novoinvestimento', async (req, res) => {
                     data: {
                         idUser: parseInt(dados.token),
                         nomeInvestimento: dados.dados.nome.toUpperCase().trim(),
-                        dataDoRendimento: new Date(),
+                        dataDoRendimento: dataAtualFormatada,
                         valor: 0.00,
                         tipoDeInvestimento: dados.dados.tipoInvestimento
                     }
@@ -819,11 +800,13 @@ router.post('/api/novoinvestimento', async (req, res) => {
                         tipo: dados.dados.tipoInvestimento // Adicionando o tipo de investimento
                     }
                 });
+
+
                 const criaValorTabelaGanhosInvestimentos = await prisma.GanhosInvestimentos.create({
                     data: {
                         idUser: parseInt(dados.token),
                         nomeInvestimento: dados.dados.nome.toUpperCase().trim(),
-                        dataDoRendimento: new Date(),
+                        dataDoRendimento: dataAtualFormatada,
                         valor: 0.00,
                         tipoDeInvestimento: dados.dados.tipoInvestimento
 
@@ -1118,10 +1101,46 @@ router.post('/api/addjuros', async (req, res) => {
 
 //=====================================================
 
+//===================ALTERAÇÃO DE SENHA=============================
+
+router.put('/api/esqueceusenha', async (req, res) => {
+    try {
+        const cpf = req.body
+        console.log("🚀 ~ router.put ~ cpf", cpf)
+        const buscaUsuario = await prisma.Usuario.findUnique({
+            where: {
+                cpf: cpf.cpf
+            }
+        })
+        if (!buscaUsuario) {
+            return res.status(400).json({ message: 'CPF Invalido' })
+        }
+        const senhaSemCripto = Math.floor(1000 + Math.random() * 9000);
+        const senhaCriptografada = await crypto(senhaSemCripto.toString())
 
 
 
+        const updateSenha = await prisma.Usuario.update({
+            where: {
+                id: buscaUsuario.id
+            },
+            data: {
+                senha: senhaCriptografada.toString()
+            }
+        })
 
+        res.json({
+            email: buscaUsuario.email,
+            nome: buscaUsuario.nome,
+            senhaNova: senhaSemCripto
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: 'Erro ao processar a alteração de senha' })
+    }
+})
+//
 
 
 // +++++++++++++++++++++++++Categoria+++++++++++++++++++++++++++++++++++++++++

@@ -121,6 +121,7 @@ export default function EditarCadastro() {
                                         label="Orçamento Mensal"
                                         name="valorOrcamentoMensal"
                                         value={values.valorOrcamentoMensal}
+                                        isInvalid={touched?.valorOrcamentoMensal && !!errors?.valorOrcamentoMensal}
                                         startContent={<span className="text-white text-small">R$</span>}
                                         onChange={(event) => {
                                             const { name, value } = event.target;
@@ -132,6 +133,7 @@ export default function EditarCadastro() {
                             </div>
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} />
                         </div>
+                        {JSON.stringify(errors)}
                         <div className='pt-4'>
                             {
                                 message &&

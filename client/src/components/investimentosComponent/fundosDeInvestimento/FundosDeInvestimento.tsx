@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
 
 export default function App({ tipoInvestimento }: any) {
+    const router = useRouter()
     const [banco, setBanco] = useState([])
     const { tokenUsuario } = useToken()
     const [messageTipoAlert, setmessageTipoAlert] = useState<string>()
@@ -60,6 +61,7 @@ export default function App({ tipoInvestimento }: any) {
             setmessageTipoAlert('error');
         }
         setTimeout(() => {
+            router.push('/pages/investimentos/listainvestimento')
             setMessageResposta('');
             setmessageTipoAlert('');
 

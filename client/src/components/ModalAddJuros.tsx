@@ -21,14 +21,16 @@ import {
 } from "@internationalized/date";
 import { I18nProvider } from "@react-aria/i18n";
 import { PlusIcon } from "./iconesCompartilhados/PlusIcon";
+import { Alert } from "@mui/material";
 
 type Props = {
     open: boolean;
     onClose: any;
     object: any;
+    funcao: any;
 };
 
-export default function App({ open, onClose, object }: Props) {
+export default function App({ open, onClose, object, funcao }: Props) {
     const [message, setMessage] = useState("");
 
     const initialValues = {
@@ -47,7 +49,17 @@ export default function App({ open, onClose, object }: Props) {
                 values,
                 dadosInvestimento: object,
             });
+
             setMessage("Provento adicionado com sucesso!");
+            if (response.status === 200) {
+                funcao();
+            }
+
+            setTimeout(() => {
+                setMessage("");
+                onClose();
+            }, 3000);
+
         } catch (error) {
             console.error("Erro ao adicionar proventos", error);
             setMessage("Falha ao adicionar proventos. Tente novamente.");
@@ -150,7 +162,7 @@ export default function App({ open, onClose, object }: Props) {
                                             </Button>
                                         </ModalFooter>
                                         {message && (
-                                            <p className="text-green-500 text-center">{message}</p>
+                                            <Alert severity="success">{message}</Alert>
                                         )}
                                     </>
                                 )}

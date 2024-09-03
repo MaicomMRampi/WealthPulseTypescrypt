@@ -11,12 +11,13 @@ import { DatePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
 import { I18nProvider } from '@react-aria/i18n'
 import { Alert } from "@mui/material";
-import TitlePage from "@/components/tituloPaginas";
-import { useRouter } from "next/navigation";
-import patrimonios from "./tipoPatrimonio";
+import { useRouter } from 'next/navigation';
+
+
 import ModalNovaInstituicao from "@/components/ModalNovaInstituicao";
 import ModalNovoNome from '@/components/ModalNovoNome';
 export default function App({ tipoInvestimento }: any) {
+    const router = useRouter()
     const [messageBanco, setMessageBanco] = useState<string>()
     const [messageBancoTipo, setMessageBancoTipo] = useState<string>()
     const [banco, setBanco] = useState([])
@@ -71,6 +72,7 @@ export default function App({ tipoInvestimento }: any) {
         });
 
         if (response.status === 200) {
+
             setMessageResposta('Investimento Cadastrado com Sucesso');
             setmessageTipoAlert('success');
         } else {
@@ -78,6 +80,7 @@ export default function App({ tipoInvestimento }: any) {
             setmessageTipoAlert('error');
         }
         setTimeout(() => {
+            router.push('/pages/investimentos/listainvestimento')
             setMessageResposta('');
             setmessageTipoAlert('');
 
