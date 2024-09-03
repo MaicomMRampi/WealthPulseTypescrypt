@@ -129,66 +129,68 @@ export default function App({ tipoInvestimento }: any) {
                     touched,
                 }: any) => (
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
-                        <Input
-                            fullWidth
-                            name="nome"
-                            autoComplete="off"
-                            isInvalid={touched.nome && !!errors.nome}
-                            label="Nome do Plano"
-                            value={values.nome}
-                            onChange={handleChange}
-                        />
-                        <Select
-                            name="tipoPlano"
-                            isInvalid={touched.tipoPlano && !!errors.tipoPlano}
-                            fullWidth
-                            label="Tipo de Plano"
-                            onChange={handleChange}
-                        >
-                            <SelectItem key={1} value="PGBL">PGBL</SelectItem>
-                            <SelectItem key={2} value="VGBL">VGBL</SelectItem>
-                        </Select>
-                        <Input
-                            fullWidth
-                            name="valorInvestido"
-                            label="Valor Investido"
-                            isInvalid={touched.valorInvestido && !!errors.valorInvestido}
-                            onBlur={handleChange}
-                            value={values.valorInvestido}
-                            onChange={(event) => {
-                                const { name, value } = event.target;
-                                if (name === 'valorInvestido') {
-                                    const maskedValue = valorMask(value);
-                                    setFieldValue(name, maskedValue);
-                                } else {
-                                    setFieldValue(name, value);
-                                }
-                            }}
-                            startContent={<span className="text-white text-small">R$</span>}
-                        />
-                        <Select
-                            name="instituicao"
-                            fullWidth
-                            value={values.instituicao}
-                            label="Instituição Financeira"
-                            onChange={handleChange}
-                            isInvalid={touched.instituicao && !!errors.instituicao}
-                        >
-                            {banco.map((item: any) => (
-                                <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
-                                    {item.nomeBanco}
-                                </SelectItem>
-                            ))}
-                        </Select>
-                        <I18nProvider locale="pt-BR">
-                            <DatePicker
-                                name="dataCompra"
-                                label="Data de Contratação"
-                                onChange={(val) => setFieldValue("dataCompra", val)}
-                                hideTimeZone
-                                defaultValue={today(getLocalTimeZone())}
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                            <Input
+                                fullWidth
+                                name="nome"
+                                autoComplete="off"
+                                isInvalid={touched.nome && !!errors.nome}
+                                label="Nome do Plano"
+                                value={values.nome}
+                                onChange={handleChange}
                             />
-                        </I18nProvider>
+                            <Select
+                                name="tipoPlano"
+                                isInvalid={touched.tipoPlano && !!errors.tipoPlano}
+                                fullWidth
+                                label="Tipo de Plano"
+                                onChange={handleChange}
+                            >
+                                <SelectItem key={1} value="PGBL">PGBL</SelectItem>
+                                <SelectItem key={2} value="VGBL">VGBL</SelectItem>
+                            </Select>
+                            <Input
+                                fullWidth
+                                name="valorInvestido"
+                                label="Valor Investido"
+                                isInvalid={touched.valorInvestido && !!errors.valorInvestido}
+                                onBlur={handleChange}
+                                value={values.valorInvestido}
+                                onChange={(event) => {
+                                    const { name, value } = event.target;
+                                    if (name === 'valorInvestido') {
+                                        const maskedValue = valorMask(value);
+                                        setFieldValue(name, maskedValue);
+                                    } else {
+                                        setFieldValue(name, value);
+                                    }
+                                }}
+                                startContent={<span className="text-white text-small">R$</span>}
+                            />
+                            <Select
+                                name="instituicao"
+                                fullWidth
+                                value={values.instituicao}
+                                label="Instituição Financeira"
+                                onChange={handleChange}
+                                isInvalid={touched.instituicao && !!errors.instituicao}
+                            >
+                                {banco.map((item: any) => (
+                                    <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
+                                        {item.nomeBanco}
+                                    </SelectItem>
+                                ))}
+                            </Select>
+                            <I18nProvider locale="pt-BR">
+                                <DatePicker
+                                    name="dataCompra"
+                                    label="Data de Contratação"
+                                    onChange={(val) => setFieldValue("dataCompra", val)}
+                                    hideTimeZone
+                                    defaultValue={today(getLocalTimeZone())}
+                                />
+                            </I18nProvider>
+                        </div>
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
                         <ButtonEnviarDadosPadrao onSubmit={handleSubmit} />
                         {messageResposta && <Alert severity={messageTipoAlert as 'success' | 'info' | 'warning' | 'error'}>{messageResposta}</Alert>}

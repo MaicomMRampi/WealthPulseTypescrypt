@@ -16,9 +16,11 @@ import useToken from '@/components/hooks/useToken'
 import { Alert } from '@mui/material'
 import TitlePage from '@/components/tituloPaginas'
 import useVisibilityCampo from '@/components/hooks/useVisibilityCampos';
+import { useRouter } from 'next/navigation';
 
 
 export default function NovaDespesa() {
+    const router = useRouter()
     const { visibilityCampo } = useVisibilityCampo()
     const [modalOpen, setModalOpen] = useState(false);
     const [ModalOpenForm, setModalOpenForm] = useState(false);
@@ -60,19 +62,17 @@ export default function NovaDespesa() {
 
     // ====================Manda os Valores para o Backend=================================
     const handleSubmit = async (values: any) => {
-
         try {
             const response = await api.post(`/novadespesa`, {
                 values,
                 id: tokenUsuario?.id
             })
-
             setMessageDespesa(response.data.message)
-
             if (response.status === 200) {
                 setMessageTipo("success")
                 setMessageDespesa(response.data.message)
                 setTimeout(() => {
+                    router.push("/pages/despesas/listadespesa")
                     setMessageDespesa("")
                 }, 4000)
                 // buscaCategoria()
@@ -82,7 +82,6 @@ export default function NovaDespesa() {
         } catch (error) {
             setMessageTipo("error")
         }
-
     }
 
     const handleModalSubmit = async (categoria: any) => {

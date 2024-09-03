@@ -23,16 +23,6 @@ export default function Acoes({ tipoInvestimento }: any) {
     const [banco, setBanco] = useState([])
     const router = useRouter()
     const { tokenUsuario } = useToken()
-    const acoes = [
-        {
-            simbolo: 'AAPL',
-            empresa: 'Apple Inc.',
-            precoAtual: 185.25,
-            quantidade: 50,
-            setor: 'Tecnologia',
-            dataCompra: '2024-01-15',
-        },
-    ]
 
     const buscaAcoes = async () => {
         if (!tokenUsuario) return
@@ -200,72 +190,74 @@ export default function Acoes({ tipoInvestimento }: any) {
                 touched,
             }: any) => (
                 <form className='w-full gap-4 flex flex-col' onSubmit={handleSubmit}>
-                    <Select
-                        name="nome"
-                        fullWidth
-                        label="Nome da Ação"
-                        onChange={handleChange}
-                        value={values.nome}
-                        isInvalid={touched.nome && !!errors.nome}
-                    >
-                        {/* Supondo que você tenha uma lista de ações */}
-                        {dados.map((item: any) => (
-                            <SelectItem value={item.nomeAcao} key={item.nomeAcao}>
-                                {item.nomeAcao}
-                            </SelectItem>
-                        ))}
-                    </Select>
-                    <Select
-                        name="instituicao"
-                        fullWidth
-                        label="Instituição Financeira"
-                        onChange={handleChange}
-                        isInvalid={touched.instituicao && !!errors.instituicao}
-                    >
-                        {banco.map((item: any) => (
-                            <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
-                                {item.nomeBanco}
-                            </SelectItem>
-                        ))}
-                    </Select>
-                    <Input
-                        fullWidth
-                        isInvalid={touched.quantidade && !!errors.quantidade}
-                        name="quantidade"
-                        label="Quantidade de Ações"
-                        value={values.quantidade}
-                        autoComplete='off'
-                        type='number'
-                        onChange={handleChange}
-                    />
-                    <Input
-                        fullWidth
-                        isInvalid={touched.precoCompra && !!errors.precoCompra}
-                        name="precoCompra"
-                        label="Preço de Compra por Ação"
-                        value={values.precoCompra}
-                        onBlur={handleChange}
-                        onChange={(event) => {
-                            const { name, value } = event.target;
-                            if (name === 'precoCompra') {
-                                const maskedValue = valorMask(value);
-                                setFieldValue(name, maskedValue);
-                            } else {
-                                setFieldValue(name, value);
-                            }
-                        }}
-                        startContent={<span className="text-white text-small">R$</span>}
-                    />
-                    <I18nProvider locale="pt-BR">
-                        <DatePicker
-                            isInvalid={touched.dataCompra && !!errors.dataCompra}
-                            name="dataCompra"
-                            label="Data da Compra"
-                            onChange={(val) => setFieldValue("dataCompra", val)}
-                            hideTimeZone
-                            defaultValue={today(getLocalTimeZone())}
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        <Select
+                            name="nome"
+                            fullWidth
+                            label="Nome da Ação"
+                            onChange={handleChange}
+                            value={values.nome}
+                            isInvalid={touched.nome && !!errors.nome}
+                        >
+                            {/* Supondo que você tenha uma lista de ações */}
+                            {dados.map((item: any) => (
+                                <SelectItem value={item.nomeAcao} key={item.nomeAcao}>
+                                    {item.nomeAcao}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        <Select
+                            name="instituicao"
+                            fullWidth
+                            label="Instituição Financeira"
+                            onChange={handleChange}
+                            isInvalid={touched.instituicao && !!errors.instituicao}
+                        >
+                            {banco.map((item: any) => (
+                                <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
+                                    {item.nomeBanco}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        <Input
+                            fullWidth
+                            isInvalid={touched.quantidade && !!errors.quantidade}
+                            name="quantidade"
+                            label="Quantidade de Ações"
+                            value={values.quantidade}
+                            autoComplete='off'
+                            type='number'
+                            onChange={handleChange}
                         />
-                    </I18nProvider>
+                        <Input
+                            fullWidth
+                            isInvalid={touched.precoCompra && !!errors.precoCompra}
+                            name="precoCompra"
+                            label="Preço de Compra por Ação"
+                            value={values.precoCompra}
+                            onBlur={handleChange}
+                            onChange={(event) => {
+                                const { name, value } = event.target;
+                                if (name === 'precoCompra') {
+                                    const maskedValue = valorMask(value);
+                                    setFieldValue(name, maskedValue);
+                                } else {
+                                    setFieldValue(name, value);
+                                }
+                            }}
+                            startContent={<span className="text-white text-small">R$</span>}
+                        />
+                        <I18nProvider locale="pt-BR">
+                            <DatePicker
+                                isInvalid={touched.dataCompra && !!errors.dataCompra}
+                                name="dataCompra"
+                                label="Data da Compra"
+                                onChange={(val) => setFieldValue("dataCompra", val)}
+                                hideTimeZone
+                                defaultValue={today(getLocalTimeZone())}
+                            />
+                        </I18nProvider>
+                    </div>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <Button className="bg-buttonCinzaPadrao text-black" fullWidth onClick={() => opemModalAcao()}>Nova Ação</Button>
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>

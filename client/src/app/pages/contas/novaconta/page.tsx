@@ -37,13 +37,13 @@ export default function NovaConta() {
         });
 
         if (response.status === 200) {
-            setMessage('Patrimônio Cadastrado com Sucesso');
+            setMessage('Conta Cadastrado com Sucesso');
             setMessageTipo('success');
             setTimeout(() => {
-                // router.push('/pages/patrimonio/listapatrimonio');
+                router.push('/pages/contas/listaconta');
             }, 2000);
         } else {
-            setMessage('Erro ao Cadastrar Patrimônio');
+            setMessage('Erro ao Cadastrar Conta');
             setMessageTipo('error');
         }
         setTimeout(() => {

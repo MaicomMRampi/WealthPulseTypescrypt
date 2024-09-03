@@ -183,80 +183,82 @@ export default function App({ tipoInvestimento }: any) {
                     touched,
                 }: any) => (
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
-                        <Select
-                            fullWidth
-                            name="nome"
-                            label="Nome do Fundo"
-                            autoComplete="off"
-                            isInvalid={touched.nome && !!errors.nome}
-                            value={values.nome}
-                            onChange={handleChange}
-                        >
-                            {dadosNomeFundo && dadosNomeFundo.map((item: any) => (
-                                <SelectItem value={item.nomeFundo} key={item.nomeFundo}>
-                                    {item.nomeFundo}
-                                </SelectItem>
-                            ))}
-                        </Select>
-                        <Input
-                            fullWidth
-                            name="quantidade"
-                            autoComplete="off"
-                            isInvalid={touched.quantidade && !!errors.quantidade}
-                            type="number"
-                            label="Quantidade de Cotas"
-                            value={values.quantidadeCotas}
-                            onChange={handleChange}
-                        />
-                        <Select
-                            name="instituicao"
-                            fullWidth
-                            value={values.instituicao}
-                            label="Instituição Financeira"
-                            onChange={handleChange}
-                            isInvalid={touched.instituicao && !!errors.instituicao}
-                        >
-
-                            {banco.map((item: any) => (
-                                <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
-                                    {item.nomeBanco}
-                                </SelectItem>
-                            ))}
-                        </Select>
-
-                        <Input
-                            fullWidth
-                            name="valorPago"
-                            label="Preço de Compra por Cota"
-                            value={values.valorPago}
-                            isInvalid={errors.valorPago && touched.valorPago}
-                            onBlur={handleChange}
-                            onChange={(event) => {
-                                const { name, value } = event.target;
-                                if (name === 'valorPago') {
-                                    const maskedValue = valorMask(value);
-                                    setFieldValue(name, maskedValue);
-                                } else {
-                                    setFieldValue(name, value);
-                                }
-                            }}
-                            startContent={
-                                <div className="pointer-events-none flex items-center">
-                                    <span className="text-white text-small">R$</span>
-                                </div>
-                            }
-                        />
-
-                        <I18nProvider locale="pt-BR">
-                            <DatePicker
-                                name="dataCompra"
-                                isInvalid={touched.dataCompra && !!errors.dataCompra}
-                                hideTimeZone
-                                label="Data da Compra"
-                                onChange={(val) => setFieldValue("dataCompra", val)}
-                                defaultValue={today(getLocalTimeZone())}
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                            <Select
+                                fullWidth
+                                name="nome"
+                                label="Nome do Fundo"
+                                autoComplete="off"
+                                isInvalid={touched.nome && !!errors.nome}
+                                value={values.nome}
+                                onChange={handleChange}
+                            >
+                                {dadosNomeFundo && dadosNomeFundo.map((item: any) => (
+                                    <SelectItem value={item.nomeFundo} key={item.nomeFundo}>
+                                        {item.nomeFundo}
+                                    </SelectItem>
+                                ))}
+                            </Select>
+                            <Input
+                                fullWidth
+                                name="quantidade"
+                                autoComplete="off"
+                                isInvalid={touched.quantidade && !!errors.quantidade}
+                                type="number"
+                                label="Quantidade de Cotas"
+                                value={values.quantidadeCotas}
+                                onChange={handleChange}
                             />
-                        </I18nProvider>
+                            <Select
+                                name="instituicao"
+                                fullWidth
+                                value={values.instituicao}
+                                label="Instituição Financeira"
+                                onChange={handleChange}
+                                isInvalid={touched.instituicao && !!errors.instituicao}
+                            >
+
+                                {banco.map((item: any) => (
+                                    <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
+                                        {item.nomeBanco}
+                                    </SelectItem>
+                                ))}
+                            </Select>
+
+                            <Input
+                                fullWidth
+                                name="valorPago"
+                                label="Preço de Compra por Cota"
+                                value={values.valorPago}
+                                isInvalid={errors.valorPago && touched.valorPago}
+                                onBlur={handleChange}
+                                onChange={(event) => {
+                                    const { name, value } = event.target;
+                                    if (name === 'valorPago') {
+                                        const maskedValue = valorMask(value);
+                                        setFieldValue(name, maskedValue);
+                                    } else {
+                                        setFieldValue(name, value);
+                                    }
+                                }}
+                                startContent={
+                                    <div className="pointer-events-none flex items-center">
+                                        <span className="text-white text-small">R$</span>
+                                    </div>
+                                }
+                            />
+
+                            <I18nProvider locale="pt-BR">
+                                <DatePicker
+                                    name="dataCompra"
+                                    isInvalid={touched.dataCompra && !!errors.dataCompra}
+                                    hideTimeZone
+                                    label="Data da Compra"
+                                    onChange={(val) => setFieldValue("dataCompra", val)}
+                                    defaultValue={today(getLocalTimeZone())}
+                                />
+                            </I18nProvider>
+                        </div>
                         <Button fullWidth className="bg-buttonAzulEscuro text-white" onClick={() => setModalNovoNome(true)}>Novo nome Fii</Button>
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
                         <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />

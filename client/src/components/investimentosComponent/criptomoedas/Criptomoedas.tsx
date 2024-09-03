@@ -128,68 +128,69 @@ export default function App({ tipoInvestimento }: any) {
                     touched,
                 }: any) => (
                     <form className="w-full gap-4 flex flex-col" onSubmit={handleSubmit}>
-                        <Input
-                            fullWidth
-                            name="nome"
-                            autoComplete="off"
-                            isInvalid={errors && errors.nome && touched.nome}
-                            label="Nome da Criptomoeda"
-                            value={values.nomeCripto}
-                            onChange={handleChange}
-                        />
-                        <Input
-                            fullWidth
-                            name="quantidade"
-                            autoComplete="off"
-                            isInvalid={touched.quantidade && !!errors.quantidade}
-                            type="number"
-                            label="Quantidade "
-                            value={values.quantidade}
-                            onChange={handleChange}
-                        />
-                        <Select
-                            isInvalid={touched.instituicao && !!errors.instituicao}
-                            name="instituicao"
-                            fullWidth
-                            value={values.instituicao}
-                            label="Instituição Financeira"
-                            onChange={handleChange}
-                        >
-
-                            {banco.map((item: any) => (
-                                <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
-                                    {item.nomeBanco}
-                                </SelectItem>
-                            ))}
-                        </Select>
-                        <Input
-                            fullWidth
-                            isInvalid={touched.valorPago && errors.valorPago}
-                            name="valorPago"
-                            label="Valor Investido"
-                            value={values.valorPago}
-                            onBlur={handleChange}
-                            onChange={(event) => {
-                                const { name, value } = event.target;
-                                if (name === 'valorPago') {
-                                    const maskedValue = valorMask(value);
-                                    setFieldValue(name, maskedValue);
-                                } else {
-                                    setFieldValue(name, value);
-                                }
-                            }}
-                            startContent={<span className="text-white text-small">R$</span>}
-                        />
-                        <I18nProvider locale="pt-BR">
-                            <DatePicker
-                                name="dataCompra"
-                                label="Data da Compra"
-                                defaultValue={today(getLocalTimeZone())}
-                                minValue={today(getLocalTimeZone())}
-                                onChange={(val) => setFieldValue("dataCompra", val)}
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                            <Input
+                                fullWidth
+                                name="nome"
+                                autoComplete="off"
+                                isInvalid={errors && errors.nome && touched.nome}
+                                label="Nome da Criptomoeda"
+                                value={values.nomeCripto}
+                                onChange={handleChange}
                             />
-                        </I18nProvider>
-                        {JSON.stringify(errors)}
+                            <Input
+                                fullWidth
+                                name="quantidade"
+                                autoComplete="off"
+                                isInvalid={touched.quantidade && !!errors.quantidade}
+                                type="number"
+                                label="Quantidade "
+                                value={values.quantidade}
+                                onChange={handleChange}
+                            />
+                            <Select
+                                isInvalid={touched.instituicao && !!errors.instituicao}
+                                name="instituicao"
+                                fullWidth
+                                value={values.instituicao}
+                                label="Instituição Financeira"
+                                onChange={handleChange}
+                            >
+
+                                {banco.map((item: any) => (
+                                    <SelectItem value={item.nomeBanco} key={item.nomeBanco}>
+                                        {item.nomeBanco}
+                                    </SelectItem>
+                                ))}
+                            </Select>
+                            <Input
+                                fullWidth
+                                isInvalid={touched.valorPago && errors.valorPago}
+                                name="valorPago"
+                                label="Valor Investido"
+                                value={values.valorPago}
+                                onBlur={handleChange}
+                                onChange={(event) => {
+                                    const { name, value } = event.target;
+                                    if (name === 'valorPago') {
+                                        const maskedValue = valorMask(value);
+                                        setFieldValue(name, maskedValue);
+                                    } else {
+                                        setFieldValue(name, value);
+                                    }
+                                }}
+                                startContent={<span className="text-white text-small">R$</span>}
+                            />
+                            <I18nProvider locale="pt-BR">
+                                <DatePicker
+                                    name="dataCompra"
+                                    label="Data da Compra"
+                                    defaultValue={today(getLocalTimeZone())}
+                                    minValue={today(getLocalTimeZone())}
+                                    onChange={(val) => setFieldValue("dataCompra", val)}
+                                />
+                            </I18nProvider>
+                        </div>
                         <Button fullWidth className="bg-buttonAzulClaro text-white" onClick={() => opemModalInstituicao()}>Nova Instituição</Button>
                         <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
                         {messageResposta && <Alert severity={messageTipoAlert as 'success' | 'info' | 'warning' | 'error'}>{messageResposta}</Alert>}
