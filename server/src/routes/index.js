@@ -1410,13 +1410,14 @@ router.post('/api/buscadespesadata', async (req, res) => {
 
 router.delete('/api/deletadespesa', async (req, res) => {
     try {
-        const { idDespesa } = req.body;
+        const id = req.query.id
+        console.log("🚀 ~ router.delete ~ id", id)
 
         await prisma.despesas.delete({
-            where: { id: parseInt(idDespesa) },
+            where: { id: parseInt(id) },
         });
 
-        res.status(200).json("deletado");
+        res.status(200).json({ message: 'Despesa deletada' });
     } catch (error) {
         console.error('Erro ao deletar despesa:', error);
         res.status(500).json({ message: 'Erro interno do servidor' });

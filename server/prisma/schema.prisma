@@ -97,7 +97,6 @@ model Despesas {
   dataAquisicao      String
   categoria          Categoria       @relation(fields: [categoriaId], references: [id])
   FormaPagamento     FormaPagamento? @relation(fields: [formaDePagamentoId], references: [id])
-  formaPagamentoId   Int?
 }
 
 model Dividendo {

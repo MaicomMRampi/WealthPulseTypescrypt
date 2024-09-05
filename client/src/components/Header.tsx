@@ -168,6 +168,8 @@ export default function App() {
                                 <HoveredLink href="/pages/pagamento">Pagamento</HoveredLink>
                             </div>
                         </MenuItem>
+                        <Link className="cursor-pointer font-semibold text-orange-500" href={"/pages/ajuda"}>Ajuda</Link>
+
                     </Menu>
                     <NavbarContent as="div" className="items-center flex gap-6 " justify="end">
                         <p className="cursor-pointer"> {visibility ? <MdVisibility onClick={handleVisibility} size={28} /> : <MdVisibilityOff onClick={handleVisibility} size={28} />}</p>

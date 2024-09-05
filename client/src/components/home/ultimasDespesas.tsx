@@ -41,7 +41,7 @@ export default function UltimasDespesas() {
                         <>
                             <div className='w-full flex justify-between pt-4'>
                                 <div>
-                                    <p>{row.local.toUpperCase()}</p>
+                                    <p>{row.local?.toUpperCase()}</p>
                                 </div>
                                 <div>
                                     {visibility ? currency(row.valorGasto) : "****"}

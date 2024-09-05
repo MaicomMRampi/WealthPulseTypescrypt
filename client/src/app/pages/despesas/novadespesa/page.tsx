@@ -1,5 +1,5 @@
 "use client"
-import { Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react'
+import { Button, Input, Select, SelectItem, Textarea, Tooltip } from '@nextui-org/react'
 import React from 'react'
 import { DatePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
@@ -17,7 +17,7 @@ import { Alert } from '@mui/material'
 import TitlePage from '@/components/tituloPaginas'
 import useVisibilityCampo from '@/components/hooks/useVisibilityCampos';
 import { useRouter } from 'next/navigation';
-
+import { FiHelpCircle } from "react-icons/fi";
 
 export default function NovaDespesa() {
     const router = useRouter()
@@ -188,10 +188,10 @@ export default function NovaDespesa() {
                     touched,
                     resetForm
                 }) => (
-                    <div className="w-full">
+                    <div className="md:w-[60%] xs:w-full  mx-auto">
                         <form onSubmit={handleSubmit}>
                             <TitlePage title="Nova Despesa" />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4  px-4">
                                 <Input
                                     className=""
                                     isInvalid={touched.responsavel && errors.responsavel ? true : false}
@@ -210,7 +210,7 @@ export default function NovaDespesa() {
                                     autoComplete="pagante"
 
                                 />
-                                <div>
+                                <div className='flex items-center justify-center gap-4'>
                                     <input
                                         value={values.mescorrespondente}
                                         placeholder={"Mês Correspondente da Fatura"}
@@ -228,6 +228,11 @@ export default function NovaDespesa() {
                                         name="mescorrespondente"
                                         onChange={handleChange}
                                     />
+                                    <Tooltip className="" content="Insira o mês correspondente da despesa">
+                                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                            <FiHelpCircle size={30} />
+                                        </span>
+                                    </Tooltip>
                                 </div>
                                 <I18nProvider locale="pt-BR">
                                     <DatePicker
@@ -309,6 +314,7 @@ export default function NovaDespesa() {
                                             setFieldValue(name, value);
                                         }
                                     }}
+                                    startContent={<span className="text-white text-small">R$</span>}
                                 />
                                 <Input
                                     fullWidth
@@ -326,8 +332,10 @@ export default function NovaDespesa() {
                                 />
 
                             </div>
-
-                            <div className="w-full grid-cols-12 md:grid-cols-3 flex flex-col gap-4 md:flex-row p-4 ">
+                            <div className="w-full grid-cols-12 md:grid-cols-4 flex flex-col gap-4 md:flex-row p-4 ">
+                                <Button className="bg-buttonCinzaPadrao text-white" fullWidth onClick={() => opemModalCategoria()} >Nova Categoria</Button>
+                                <Button className="bg-buttonAzulClaro text-white" fullWidth onClick={() => opemModalCategoriaForma()} >Nova Forma de Pagamento</Button>
+                                <ButtonVoltar className="md:w-full bg-slate-100" />
                                 <Button
                                     type="submit"
                                     fullWidth
@@ -335,11 +343,7 @@ export default function NovaDespesa() {
                                 >
                                     Salvar
                                 </Button>
-                                <Button className="bg-buttonCinzaPadrao text-white" fullWidth onClick={() => opemModalCategoria()} >Nova Categoria</Button>
-                                <Button className="bg-buttonAzulClaro text-white" fullWidth onClick={() => opemModalCategoriaForma()} >Nova Forma de Pagamento</Button>
-                                <ButtonVoltar className="md:w-full bg-slate-100" />
                             </div>
-
                             <h1 className='text-center py-5'>{messageDespesa ? <Alert color={messageTipo as "success" | "error" | "warning" | "info"}>{messageDespesa}</Alert> : null} </h1>
                             <FormadePagamentoNova
                                 messagemTipo={messageTipo}

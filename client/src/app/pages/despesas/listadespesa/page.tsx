@@ -39,6 +39,7 @@ import TitlePage from "@/components/tituloPaginas";
 import AlteraVisualizacaoDataYYYYMM from "@/components/funcoes/alteraVisualizacaoDataYYYMM";
 import ButtonVoltar from "@/components/ButtonVoltar";
 import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
+import ModalDelete from "@/components/ModalDelete"
 
 interface Acumulador {
     [key: string]: {
@@ -59,8 +60,12 @@ interface Item {
     pago: number;
 }
 
+interface ModalDelete {
+    openClose: boolean;
+    objeto: any;
+}
+
 export default function ListaDespesa() {
-    const [message, setMessage] = useState()
     const [mesFatura, setMesFatura] = useState<string>();
     const [opemModalFatura, setOpenModalFatura] = useState(false);
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
@@ -69,7 +74,7 @@ export default function ListaDespesa() {
     const [selectedIndex, setSelectedIndex] = useState(0); // Inicia com -1 para nenhum item selecionado
     const [Despesa, setDespesa] = useState<any>();
     const [DespesaSelect, setDespesaSelect] = useState<any>([]);
-
+    const [modalDelete, setModalDelete] = useState<any>({ openClose: false, objeto: null });
     const [filterValue, setFilterValue] = useState<string>("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(1);
@@ -77,10 +82,9 @@ export default function ListaDespesa() {
         column: "dataGasto",
         direction: "ascending",
     });
-    const [modalInfo, setModalInfo] = useState({
-        show: false,
-        objeto: {}
-    })
+    const [message, setMessage] = useState("");
+    const [messageTipo, setMessageTipo] = useState<string>()
+
     const { tokenUsuario } = useToken()
 
     const buscaDespesaMesAtual = async () => {
@@ -141,6 +145,36 @@ export default function ListaDespesa() {
         });
         setDespesaSelect(response.data);
     };
+
+    const handleDelete = async () => {
+
+        try {
+            const response = await api.delete('/deletadespesa', {
+                params: {
+                    id: modalDelete.objeto,
+                },
+            });
+            if (response.status === 200) {
+                setMessage(response.data.message);
+                setMessageTipo('success');
+                buscaDespesa();
+                buscaDespesaMesAtual();
+            }
+            setTimeout(() => {
+                setMessage('');
+                setModalDelete({ openClose: false, objeto: null });
+
+            }, 2000);
+        } catch (error: any) {
+            setMessage(error.response.data.message);
+            setMessageTipo('error');
+            setTimeout(() => {
+                setMessage('');
+                setModalDelete({ openClose: false, objeto: null });
+            }, 2000);
+        }
+
+    }
 
 
     const PDFDownloadLink = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink), { ssr: false });
@@ -241,14 +275,14 @@ export default function ListaDespesa() {
                                 <EyeIcon />
                             </span>
                         </Tooltip>
-                        <Tooltip className="" content="Editar">
+                        {/* <Tooltip className="" content="Editar">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EditIcon className="text-[#93fad6]" />
                             </span>
-                        </Tooltip>
+                        </Tooltip> */}
                         {despesa.fechada === 0 ? (
                             <Tooltip className="" color="danger" content="Deletar">
-                                <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                <span onClick={() => setModalDelete({ openClose: true, objeto: despesa.id })} className="text-lg text-danger cursor-pointer active:opacity-50">
                                     <DeleteIcon className="text-red-500" />
                                 </span>
                             </Tooltip>
@@ -495,9 +529,14 @@ export default function ListaDespesa() {
                 onSubmit={() => pagFatura()}
                 mensagem={message}
             />
+            <ModalDelete
+                isOpen={modalDelete.openClose}
+                onClose={() => setModalDelete({ openClose: false, objeto: null })}
+                message={message}
+                confirmaEsclusao={handleDelete}
+                objeto={modalDelete.objeto}
+                messageTipo={messageTipo}
+            />
         </>
-
-
-
     );
 }
