@@ -5,8 +5,6 @@ type Props = {
 };
 
 const createCharge = async ({ accessToken, paymentData }: Props) => {
-    console.log("🚀 ~ createCharge ~ paymentData", paymentData)
-    console.log("🚀 ~ createCharge ~ accessToken", accessToken)
     const axios = require('axios');
 
     try {
@@ -21,8 +19,6 @@ const createCharge = async ({ accessToken, paymentData }: Props) => {
         };
 
         const data = JSON.stringify(paymentConfig);
-        console.log("🚀 ~ createCharge ~ data", data)
-
         const config = {
             method: 'post',
             url: 'https://api.mercadopago.com/v1/payments',
@@ -35,7 +31,6 @@ const createCharge = async ({ accessToken, paymentData }: Props) => {
         };
 
         const response = await axios(config);
-        console.log("🚀 ~ createCharge ~ response", response.data)
         return response.data;
     } catch (err) {
         console.error(err);

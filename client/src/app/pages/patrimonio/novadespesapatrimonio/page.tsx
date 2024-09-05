@@ -142,12 +142,20 @@ export default function App() {
                                     label="Patrimônio"
                                     onChange={handleChange}
                                 >
-                                    {dados.map((item: any) => (
-                                        <MenuItem
-                                            onClick={() => setTipoBem(item)} value={tipobem} key={item.id}>
-                                            {item.nomePatrimonio}
-                                        </MenuItem>
-                                    ))}
+                                    {dados.length > 0 ? (
+                                        dados.map((item: any) => (
+                                            <MenuItem
+                                                onClick={() => setTipoBem(item)}
+                                                value={item.id} // Certifique-se de que está usando o valor correto aqui
+                                                key={item.id}
+                                            >
+                                                {item.nomePatrimonio}
+                                            </MenuItem>
+                                        ))
+                                    ) : (
+                                        <MenuItem>Nenhum Patrimônio Cadastrado</MenuItem>
+                                    )}
+
                                 </Select>
 
                                 <Select

@@ -16,13 +16,13 @@ export default function App({ isOpen, onClose, onSubmit, message, messageTipo }:
     const [value, setValue] = useState('');
     return (
         <>
-            <Modal className="bg-black rounded-lg " backdrop="opaque" isOpen={isOpen} onClose={onClose} hideCloseButton={true}>
+            <Modal className="bg-BgCardPadrao rounded-lg " backdrop="opaque" isOpen={isOpen} onClose={onClose} hideCloseButton={true}>
                 <ModalContent>
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col w-full text-md font-extrabold ">Deseja Adicionar um Novo Tipo de Despesa?</ModalHeader>
                             <ModalBody>
-                                <Input onChange={(e) => setValue(e.target.value)} minLength={4} label="Novo tipo de despesa" />
+                                <Input variant="bordered" onChange={(e) => setValue(e.target.value)} minLength={4} label="Novo tipo de despesa" />
                             </ModalBody>
                             <ModalFooter className="gap-6">
                                 <Button variant="light" color="danger" onPress={onClose}>

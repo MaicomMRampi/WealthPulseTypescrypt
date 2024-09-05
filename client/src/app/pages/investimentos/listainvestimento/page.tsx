@@ -13,12 +13,8 @@ import {
     Dropdown,
     DropdownMenu,
     DropdownItem,
-    Chip,
-    User,
     Pagination,
     Selection,
-    ChipProps,
-    SortDescriptor,
     Card
 } from "@nextui-org/react";
 import TitlePage from "@/components/tituloPaginas";
@@ -37,6 +33,7 @@ import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData"
 import ModalDetalhesFii from "@/components/ModalDetalhesFii";
 import ModalJuros from "@/components/ModalJuros";
 import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
+import ModalDelete from "@/components/ModalDelete";
 
 type Dados = {
     tipo: string
@@ -47,10 +44,15 @@ type Column = {
     sortable?: boolean; // Aqui, a propriedade sortable é opcional
 };
 
+type ModalDelete = {
+    openClose: any
+    objeto: any
+}
+
 export default function App() {
     const [total, setTotal] = useState(0)
     const [juros, setJuros] = useState<any>()
-    console.log("🚀 ~ App ~ juros", juros)
+    const [modalDelete, setModalDelete] = useState<ModalDelete>({ openClose: false, objeto: null });
     const [dadosFiltro, setDadosFiltro] = useState<any>([])
     const [dados, setDados] = useState<any>([])
     const [modalDetalhes, setModalDetalhes] = useState(false)
@@ -67,6 +69,8 @@ export default function App() {
         column: "age",
         direction: "ascending",
     });
+    const [message, setMessage] = useState("");
+    const [messageTipo, setMessageTipo] = useState<string>()
     const { visibility } = useVisibility()
 
     useEffect(() => {
@@ -115,7 +119,6 @@ export default function App() {
                 id: tokenUsuario?.id
             }
         })
-        console.log("🚀 ~ buscaLucratividade ~ response", response)
         setJuros(response.data)
     }
 
@@ -127,7 +130,35 @@ export default function App() {
     const [page, setPage] = React.useState(1);
 
 
+    const deletaInvestimento = async () => {
 
+        try {
+            const response = await api.delete('/deletainvestimento', {
+                params: {
+                    id: modalDelete.objeto,
+                },
+            });
+            if (response.status === 200) {
+                setMessage(response.data.message);
+                setMessageTipo('success');
+                buscaLucratividade();
+                buscaInvestimentos()
+            }
+            setTimeout(() => {
+                setMessage('');
+                setModalDelete({ openClose: false, objeto: null });
+
+            }, 2000);
+        } catch (error: any) {
+            setMessage(error.response.data.message);
+            setMessageTipo('error');
+            setTimeout(() => {
+                setMessage('');
+                setModalDelete({ openClose: false, objeto: null });
+            }, 2000);
+        }
+
+    }
     const hasSearchFilter = Boolean(filterValue);
 
     const headerColumns = React.useMemo(() => {
@@ -241,10 +272,9 @@ export default function App() {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                                <DropdownItem><DeleteIcon /></DropdownItem>
+                                <DropdownItem onClick={() => setModalDelete({ openClose: true, objeto: investimento.id })}>Deletar</DropdownItem>
                                 <DropdownItem>Detalhes</DropdownItem>
                                 <DropdownItem>Editar</DropdownItem>
-                                <DropdownItem>Deletar</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </div>
@@ -480,6 +510,15 @@ export default function App() {
                 onClose={() => setModalJuros(false)}
                 funcao={buscaLucratividade}
             />
+            <ModalDelete
+                isOpen={modalDelete.openClose}
+                onClose={() => setModalDelete({ openClose: false, objeto: null })}
+                confirmaEsclusao={deletaInvestimento}
+                message={message}
+                messageTipo={messageTipo}
+                objeto={''}
+            />
+
         </div>
 
     );

@@ -1,21 +1,27 @@
-import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
-import { MdDangerous } from "react-icons/md";
-import { api } from "@/lib/api";
+import React from "react"
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react"
+import { MdDangerous } from "react-icons/md"
+import { api } from "@/lib/api"
+import { Alert } from "@mui/material"
 
 interface ObjetoInvestimento {
 
-    [key: string]: any; // Caso existam outras propriedades que não foram especificadas
+    [key: string]: any // Caso existam outras propriedades que não foram especificadas
 }
 
 interface Props {
-    isOpen: boolean; onClose: () => void; objeto: null; confirmaEsclusao: () => Promise<void>; message?: string
+    isOpen: boolean
+    onClose: any
+    objeto: any
+    confirmaEsclusao: any
+    message: string,
+    messageTipo: any
 }
 
-export default function ModalDele({ isOpen, onClose, objeto, confirmaEsclusao, message }: Props) {
+export default function ModalDele({ isOpen, onClose, objeto, confirmaEsclusao, message, messageTipo }: Props) {
     return (
         <>
-            <Modal className="bg-black rounded-lg" backdrop="opaque" isOpen={isOpen} onClose={onClose} hideCloseButton={true}>
+            <Modal className="bg-BgCardPadrao rounded-lg" backdrop="opaque" isOpen={isOpen} onClose={onClose} hideCloseButton={true}>
                 <ModalContent>
                     {() => (
                         <>
@@ -23,18 +29,18 @@ export default function ModalDele({ isOpen, onClose, objeto, confirmaEsclusao, m
                             <ModalBody>
                             </ModalBody>
                             <ModalFooter className="gap-6">
-                                <Button variant="light" className="text-green-500" onPress={onClose}>
+                                <Button variant="bordered" color="primary" onPress={onClose}>
                                     Cancelar
                                 </Button>
                                 <Button variant="ghost" color="danger" onClick={confirmaEsclusao} className="text-red-500">
                                     Excluir
                                 </Button>
                             </ModalFooter>
-                            <p className="text-green-700">{message ? message : ""}</p>
+                            {message ? <Alert severity={messageTipo ? messageTipo : 'success' as any}>{message}</Alert> : null}
                         </>
                     )}
                 </ModalContent>
             </Modal>
         </>
-    );
+    )
 }

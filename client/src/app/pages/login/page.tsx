@@ -101,22 +101,17 @@ export default function SignIn() {
 
 
     const alteraSenha = async (cpf: string) => {
-        console.log(cpf)
-
         const response = await api.put('/esqueceusenha', {
             cpf
         })
         if (response.status === 200) {
-            console.log("🚀 ~ alteraSenha ~ response", response)
             enviaEmailComAsenha(response.data)
-
         }
 
         setTimeout(() => {
 
             setOpenModalSenha(false)
         })
-        console.log("🚀 ~ alteraSenha ~ response", response)
     }
 
 

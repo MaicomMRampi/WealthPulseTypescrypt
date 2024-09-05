@@ -69,6 +69,7 @@ export default function App() {
     const [modalInfo, setModalInfo] = useState<Modal>({ show: false, objeto: null })
     const { visibility } = useVisibility()
     const [dados, setDados] = useState([]);
+    const [messageTipo, setMessageTipo] = useState<string>()
 
 
     const buscaPatrimonios = async () => {
@@ -87,20 +88,39 @@ export default function App() {
 
 
     const deletaPatrimonio = async () => {
-        const response = await api.delete('/deletedespesas', {
-            params: {
-                id: modalDelete.objeto.id,
-            },
-        });
-        if (response.status === 200) {
-            setMessage(response.data.message);
-            buscaPatrimonios();
-            setTimeout(() => {
-                setModalInfo({ show: false, objeto: null });
-                setMessage("");
-            }, 2000);
+        try {
+            const response = await api.delete('/deletapatrimonio', {
+                params: {
+                    id: modalDelete.objeto.id,
+                },
+            });
+            if (response.status === 200) {
+                setMessage(response.data.message);
+                buscaPatrimonios();
+                setTimeout(() => {
+                    setModalInfo({ show: false, objeto: null });
+                    setMessage("");
+                }, 2000);
+            }
+        } catch (error: any) {
+            setMessageTipo('error')
+            // Verifica se existe uma resposta da API
+            if (error.response) {
+                // A API retornou um status e uma mensagem de erro
+                setMessage(error.response.data.error);
+            } else {
+                // Caso o erro seja do lado cliente ou de rede
+                setMessage("Erro ao deletar patrimônio.");
+            }
+
+            // Define a mensagem de erro no estado da aplicação
         }
+        setTimeout(() => {
+            setModalDelete({ openClose: false, objeto: null });
+            setMessage("");
+        }, 2000);
     };
+
 
 
 
@@ -358,9 +378,9 @@ export default function App() {
                     onClose={() => setModalDelete({ ...modalDelete, openClose: false })}
                     objeto={modalDelete.objeto}
                     confirmaEsclusao={deletaPatrimonio}
-
+                    message={message}
+                    messageTipo={messageTipo}
                 />
-
             </div>
         </div>
     );

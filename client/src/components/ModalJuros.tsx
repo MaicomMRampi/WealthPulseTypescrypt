@@ -36,16 +36,12 @@ export default function BasicModal({ open, onClose, data, funcao }: Props) {
         return acc;
     }, {});
     const arrayAgrupado = dadosAgrupados ? Object.values(dadosAgrupados) : [];
-    console.log("🚀 ~ BasicModal ~ arrayAgrupado", arrayAgrupado)
-
-
 
     if (!data) {
         return <div>Carregando...</div>
     }
 
     const opemModalJuros = (index: any) => {
-        console.log("🚀 ~ opemModalJuros ~ index", index)
         setInvestimento(arrayAgrupado[index])
         setOpenModal(true)
 

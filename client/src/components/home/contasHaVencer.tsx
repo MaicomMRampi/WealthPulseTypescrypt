@@ -55,7 +55,7 @@ export default function TotalContas() {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-gray-400">Nenhuma conta a vencer dentro de 10 dias</p>
+                        <p className="text-gray-400 text-center font-semibold">Nenhuma conta a vencer dentro de 10 dias</p>
                     )}
                 </CardBody>
             </Card>

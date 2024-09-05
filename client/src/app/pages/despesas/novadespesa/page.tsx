@@ -213,7 +213,7 @@ export default function NovaDespesa() {
                                 <div>
                                     <input
                                         value={values.mescorrespondente}
-                                        placeholder={errors.mescorrespondente ? "Mês Correspondente da Fatura (Erro)" : "Mês Correspondente da Fatura"}
+                                        placeholder={"Mês Correspondente da Fatura"}
                                         className={`w-full rounded-xl h-[54px] 
                                             ${errors.mescorrespondente
                                                 ? !visibilityCampo
@@ -271,7 +271,6 @@ export default function NovaDespesa() {
                                     name="formadepagamento"
                                     onChange={handleChange}
                                     value={values.formadepagamento}
-                                    errorMessage={touched.formadepagamento && errors.formadepagamento ? errors.formadepagamento : undefined}
                                     isInvalid={touched.formadepagamento && errors.formadepagamento ? true : false}
                                 >
                                     {formaPagamento && formaPagamento.length > 0 ? (
@@ -301,7 +300,6 @@ export default function NovaDespesa() {
                                     autoComplete="valorgasto"
                                     value={values.valorgasto}
                                     onBlur={handleChange}
-                                    errorMessage={touched.valorgasto && errors.valorgasto ? errors.valorgasto : undefined}
                                     onChange={(event) => {
                                         const { name, value } = event.target;
                                         if (name === 'valorgasto') {

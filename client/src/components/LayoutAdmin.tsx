@@ -12,9 +12,6 @@ const LayoutAdmin = ({ children }: any) => {
     const pathname = usePathname();
     const [usuarioLogado, setUsuarioLogado] = useState(false);
     const [dadosPagamento, setDadosPagamento] = useState<any>();
-    console.log("🚀 ~ LayoutAdmin ~ dadosPagamento", dadosPagamento)
-
-
     const agora = new Date();
     const verificaPagamento = async () => {
         if (tokenUsuario?.dataExpiracao < agora) {

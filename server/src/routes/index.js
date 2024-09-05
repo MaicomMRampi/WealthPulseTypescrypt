@@ -36,8 +36,6 @@ const upload = multer({ storage: storage });
 
 //=====================MERCADO PAGO API=====================
 const createCharge = async ({ accessToken, paymentData }) => {
-    console.log("🚀 ~ createCharge ~ paymentData", paymentData);
-    console.log("🚀 ~ createCharge ~ accessToken", accessToken);
     const axios = require('axios');
 
     try {
@@ -51,7 +49,7 @@ const createCharge = async ({ accessToken, paymentData }) => {
         };
 
         const data = JSON.stringify(paymentConfig);
-        console.log("🚀 ~ createCharge ~ data", data);
+
 
         const config = {
             method: 'post',
@@ -65,7 +63,7 @@ const createCharge = async ({ accessToken, paymentData }) => {
         };
 
         const response = await axios(config);
-        console.log("🚀 ~ createCharge ~ response", response.data);
+
         return response.data;
     } catch (err) {
         console.error(err);
@@ -77,7 +75,6 @@ const verifyPaymentStatus = async ({ idPagamento, accessToken }) => {
     const axios = require('axios')
     const id = idPagamento
     const tokenMercadoPago = accessToken
-    console.log("🚀 ~ verifyPaymentStatus ~ id", tokenMercadoPago)
 
     try {
         if (!id) throw new Error('Id da cobrança vazio')
@@ -106,7 +103,6 @@ router.get('/api/verificapagamento', async (req, res) => {
         if (!accessToken || !idPagamento) {
             return res.status(400).json({ error: 'Dados inválidos.' });
         }
-        console.log("token", accessToken, idPagamento)
         const paymentResponse = await verifyPaymentStatus({ idPagamento, accessToken });
         if (!paymentResponse) {
             return res.status(500).json({ error: 'Erro ao Verificar pagamento.' });
@@ -168,7 +164,6 @@ router.post('/api/criapagamento', async (req, res) => {
 
 router.post('/api/login', async (req, res) => {
     const data = req.body.values; // Ajuste para acessar corretamente os dados do corpo da requisição
-    console.log("🚀 ~ router.post ~ data", data)
 
     try {
         const user = await prisma.usuario.findUnique({
@@ -176,12 +171,12 @@ router.post('/api/login', async (req, res) => {
                 cpf: data.cpf, // Buscar pelo CPF fornecido na requisição
             },
         });
-        console.log("🚀 ~ router.post ~ user", user)
+
         if (!user) {
             return res.status(404).json({ erro: 'Usuário não encontrado' });
         }
         const comparaSenha = await bcrypt.compareSync(data.senha, user.senha)
-        console.log("🚀 ~ router.post ~ comparaSenha", comparaSenha)
+
         if (!comparaSenha) {
             return res.status(401).json({ erro: 'Senha incorreta' });
         }
@@ -215,7 +210,6 @@ router.post('/api/login', async (req, res) => {
 // +++++++++++++++++API DO USUARIO+++++++++++++++++++++++++++++++
 router.post('/api/postusers', async (req, res) => {
     const dadosCadastro = req.body
-    console.log("🚀 ~ router.post ~ dadosCadastro", dadosCadastro)
 
 
     const avaliacaoGratuita = new Date();
@@ -250,7 +244,7 @@ router.post('/api/postusers', async (req, res) => {
                 statusFinanceiro: 1,
             },
         });
-        console.log("🚀 ~ router.post ~ novoUsuario", novoUsuario)
+
 
         const pagamentoCreate = await prisma.UsuarioPagamento.create({
             data: {
@@ -442,16 +436,11 @@ router.get('/api/detalhespatrimoniohome', async (req, res) => {
     try {
         const dados = req.query.id;
 
-        const despesasPatrimonio = await prisma.DespesaDeBens.findMany({
+        const despesasPatrimonio = await prisma.Patrimonio.findMany({
             where: {
-                idPatrimonio: parseInt(dados),
-            },
-            include: {
-                TipoDespesa: true,
-                Patrimonio: true
+                idUser: parseInt(dados),
             }
         });
-
         res.status(200).json(despesasPatrimonio);
     } catch (error) {
         console.error('Erro ao buscar despesas do patrimônio:', error);
@@ -473,9 +462,31 @@ router.get('/api/buscadespesasdetalhesnome', async (req, res) => {
     }
 });
 
-router.delete('/api/deletedespesas', async (req, res) => {
+router.delete('/api/deletapatrimonio', async (req, res) => {
     try {
         const dados = req.query.id;
+
+
+        const deletaDespesa = await prisma.Patrimonio.delete({
+            where: {
+                id: parseInt(dados)
+            }
+        });
+
+
+        res.status(200).json({ message: 'Despesa deletada com sucesso!', deletaDespesa });
+    } catch (error) {
+        if (error.code === 'P2003') {
+            res.status(500).json({ error: 'Patrimônio possui despesas associadas' });
+        } else {
+            res.status(500).json({ error: 'Erro ao deletar patrimônio.' });
+        }
+    }
+});
+router.delete('/api/deletadespesapatrimonio', async (req, res) => {
+    try {
+        const dados = req.query.id;
+
 
         const deletaDespesa = await prisma.DespesaDeBens.delete({
             where: {
@@ -488,7 +499,6 @@ router.delete('/api/deletedespesas', async (req, res) => {
         res.status(500).json({ error: 'Erro ao deletar despesa.' });
     }
 });
-
 
 
 
@@ -1057,13 +1067,47 @@ router.put('/api/vendacotasfii', async (req, res) => {
     res.status(200).json({ message: 'Venda de cotas concluída com sucesso.' });
 });
 
+router.delete('/api/deletaInvestimento', async (req, res) => {
+    try {
+
+        const dados = req.query.id
+        const deletaInvestimento = await prisma.investimento.delete({
+            where: {
+                id: parseInt(dados)
+            }
+        })
+        const nome = deletaInvestimento.nome
+
+
+        const buscaLucratividade = await prisma.investimento.findMany({
+            where: {
+                nome: nome
+            }
+        })
+        const arrayMovimentacao = buscaLucratividade.length
+
+        if (arrayMovimentacao === 0) {
+            const deletaLucratividade = await prisma.GanhosInvestimentos.deleteMany({
+                where: {
+                    nomeInvestimento: nome
+                }
+            })
+        }
+        res.status(200).json({ message: 'Investimento deletado com sucesso' })
+    } catch (error) {
+
+    }
+});
+
+
+
+
 // ==================================================
 
 //====================JUROS FINANCEIROS=====================
 
 router.get('/api/lucratividade', async (req, res) => {
     const id = req.query.id
-    console.log("🚀 ~ router.get ~ id", id)
 
     const buscaLucratividade = await prisma.GanhosInvestimentos.findMany({
         where: { idUser: parseInt(id) }
@@ -1074,7 +1118,7 @@ router.get('/api/lucratividade', async (req, res) => {
 router.post('/api/addjuros', async (req, res) => {
     try {
         const dados = req.body
-        console.log("🚀 ~ router.post ~ dados", dados)
+
         const convertData = formatDate(dados.values.datapagamento)
         const valorConvertido = converteString(dados.values.valorjuros)
         const criaValorTabelaGanhosInvestimentos = await prisma.GanhosInvestimentos.create({
@@ -1106,7 +1150,7 @@ router.post('/api/addjuros', async (req, res) => {
 router.put('/api/esqueceusenha', async (req, res) => {
     try {
         const cpf = req.body
-        console.log("🚀 ~ router.put ~ cpf", cpf)
+
         const buscaUsuario = await prisma.Usuario.findUnique({
             where: {
                 cpf: cpf.cpf
@@ -1136,7 +1180,6 @@ router.put('/api/esqueceusenha', async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error)
         res.status(400).json({ message: 'Erro ao processar a alteração de senha' })
     }
 })
@@ -1489,13 +1532,19 @@ router.post('/api/novaconta', async (req, res) => {
                 const dataVencimentoFormatada = `${anoVenc}/${mesVenc < 10 ? `0${mesVenc}` : mesVenc}/${diaVenc}`;
                 const mes_ano = `${anoVenc}-${mesVenc < 10 ? `0${mesVenc}` : mesVenc}`;
 
+
+                const valor = nome.dados.valor
+
+                const parcelas = nome.dados.qtdparcelas
+
+
                 const novaConta = await prisma.Contas.create({
                     data: {
                         idUser: parseInt(nome.idUsuario),
                         estabelecimento: nome.dados.estabelecimento.toUpperCase().trim(),
                         comprador: nome.dados.comprador,
                         pagador: nome.dados.pagador,
-                        valor: converteString(nome.dados.valor),
+                        valor: converteString(nome.dados.valor) / nome.dados.qtdparcelas,
                         dataVencimento: dataVencimentoFormatada,
                         qtdParcelas: nome.dados.qtdparcelas ? parseInt(nome.dados.qtdparcelas) : null,
                         mesCorrespondente: mes_ano
@@ -1718,7 +1767,7 @@ router.post('/api/banco', async (req, res) => {
 
         const nomeUppercase = dados.values.instituicao.toUpperCase().trim();
         const verificaNome = await prisma.banco.findMany({ where: { nomeBanco: nomeUppercase, idUser: parseInt(dados.token) }, take: 1 });
-        console.log("🚀 ~ router.post ~ verificaNome", verificaNome)
+
 
 
         if (verificaNome.length > 0 && verificaNome[0].idUser === dados.token) {

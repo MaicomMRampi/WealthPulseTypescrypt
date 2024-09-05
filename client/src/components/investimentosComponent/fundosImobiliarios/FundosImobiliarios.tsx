@@ -27,7 +27,6 @@ export default function App({ tipoInvestimento }: any) {
     const [modalOpenBanco, setModalOpenBanco] = useState<boolean>(false);
     const [modalNovoNome, setModalNovoNome] = useState<boolean>(false);
     const [dadosNomeFundo, setDadosNomeFundo] = useState([]);
-
     const buscaBanco = async () => {
         if (!tokenUsuario) return
         try {

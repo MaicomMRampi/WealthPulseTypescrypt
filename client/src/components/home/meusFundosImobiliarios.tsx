@@ -62,11 +62,22 @@ export default function MeusFundosImobiliarios() {
     }, {});
 
     const arrayAgrupado: AgrupadoData[] = Object.values(dadosAgrupados).map(item => ({
-        name: item.nome,
-        value: item.quantidade,
+        name: item.nome.length > 0 ? item.nome : 'Nenhum Fundo Cadastrado',
+        value: item.quantidade > 0 ? item.quantidade : 0,
     }));
 
-    const COLORS = ['#cb3cff', '#0e43fb', '#00c2ff', '#FF8042'];
+    // Verifica se há dados, caso contrário, adiciona um valor padrão
+    const dadosParaExibir = arrayAgrupado.length > 0 ? arrayAgrupado : [{ name: 'Sem dados', value: 1 }];
+
+
+    let COLORS;
+
+    if (arrayAgrupado.length > 0) {
+        COLORS = ['#cb3cff', '#0e43fb', '#00c2ff', '#FF8042'];
+    } else {
+        COLORS = ['#304265', '#0e43fb', '#00c2ff', '#FF8042'];
+    }
+
 
     const renderCustomizedLabel = ({ name }: AgrupadoData) => `${name}`;
 
@@ -76,16 +87,16 @@ export default function MeusFundosImobiliarios() {
                 <h2 className='font-semibold text-center'>Meus Fundos Imobiliários</h2>
                 <PieChart width={400} height={400}>
                     <Pie
-                        data={arrayAgrupado}
+                        data={dadosParaExibir}
                         cx="60%"
                         cy="50%"
                         labelLine={false}
                         label={renderCustomizedLabel}
                         outerRadius={100}
-                        fill="#8884d8"
+                        // fill="#8884d8"
                         dataKey="value"
                     >
-                        {arrayAgrupado.map((entry, index) => (
+                        {dadosParaExibir.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>

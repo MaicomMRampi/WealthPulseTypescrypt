@@ -108,7 +108,7 @@ export default function DetalhesDosGastos({ params }: any) {
 
 
     const deleteDespesa = async () => {
-        const response = await api.delete('/deletedespesas', {
+        const response = await api.delete('/deletadespesapatrimonio', {
             params: {
                 id: modalDelete.objeto.id,
             },
@@ -117,7 +117,7 @@ export default function DetalhesDosGastos({ params }: any) {
             setMessage(response.data.message);
             buscaPatrimonios();
             setTimeout(() => {
-                setModalInfo({ show: false, objeto: null });
+                setModalDelete({ openClose: false, objeto: null }); // Fecha o modal e reseta o objeto
                 setMessage("");
             }, 2000);
         }
@@ -493,6 +493,7 @@ export default function DetalhesDosGastos({ params }: any) {
                 onClose={() => setModalDelete({ ...modalDelete, openClose: false })}
                 objeto={modalDelete.objeto}
                 confirmaEsclusao={deleteDespesa}
+                message={message}
             />
         </div>
     )
