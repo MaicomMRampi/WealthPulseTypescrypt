@@ -1703,7 +1703,7 @@ router.delete('/api/deletaConta', async (req, res) => {
 // controle de orçamento mensal 
 router.post('/api/controleorcamento', async (req, res) => {
     const dados = req.body;
-
+    console.log("🚀 ~ router.post ~ dados", dados)
 
     try {
         const buscaContas = await prisma.Contas.findMany({
@@ -1741,7 +1741,9 @@ router.post('/api/controleorcamento', async (req, res) => {
         const sumValues = (array, key) => array.reduce((acc, item) => acc + item[key], 0);
 
         const totalDespesa = sumValues(buscaDespesas, 'valorGasto');
+        console.log("🚀 ~ router.post ~ totalDespesa", totalDespesa)
         const totalContas = sumValues(buscaContas, 'valor');
+        console.log("🚀 ~ router.post ~ totalContas", totalContas)
         const orcamentoUsuario = buscaControleUsuario?.valorOrcamentoMensal;
         const porcentagem = orcamentoUsuario ? Math.round(((totalDespesa + totalContas) / orcamentoUsuario) * 100) : 0;
         const total = totalDespesa + totalContas;

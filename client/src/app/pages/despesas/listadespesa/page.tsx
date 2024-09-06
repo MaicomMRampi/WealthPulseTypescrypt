@@ -40,7 +40,7 @@ import AlteraVisualizacaoDataYYYYMM from "@/components/funcoes/alteraVisualizaca
 import ButtonVoltar from "@/components/ButtonVoltar";
 import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
 import ModalDelete from "@/components/ModalDelete"
-
+import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
 interface Acumulador {
     [key: string]: {
         data: string;
@@ -66,6 +66,13 @@ interface ModalDelete {
 }
 
 export default function ListaDespesa() {
+    const dataAtual = new Date()
+    const mesVenc = dataAtual.getMonth() + 1;
+    const anoVenc = dataAtual.getFullYear();
+    const dataInicioControle = `${anoVenc}-${mesVenc < 10 ? `0${mesVenc}` : mesVenc}`;
+
+    const [dataControleMensal, setDataControleMensal] = useState<string>(dataInicioControle);
+    console.log("🚀 ~ ListaDespesa ~ dataControleMensal", dataControleMensal)
     const [mesFatura, setMesFatura] = useState<string>();
     const [opemModalFatura, setOpenModalFatura] = useState(false);
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
@@ -78,6 +85,7 @@ export default function ListaDespesa() {
     const [filterValue, setFilterValue] = useState<string>("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(1);
+    const [orcamentoMensal, setOrcamentoMensal] = useState<any>();
     const [sortDescriptor, setSortDescriptor] = useState<any>({
         column: "dataGasto",
         direction: "ascending",
@@ -139,12 +147,30 @@ export default function ListaDespesa() {
 
 
     const handleDataSelect = async (data: string) => {
+        setDataControleMensal(data);
         const response = await api.post(`/buscadespesadata`, {
             data: data,
             emailUser: tokenUsuario?.id,
         });
         setDespesaSelect(response.data);
     };
+
+
+    useEffect(() => {
+        const fetchOrcamento = async () => {
+            try {
+                const resultado = await orcamentoMensalControle(dataControleMensal, tokenUsuario?.id);
+                setOrcamentoMensal(resultado);
+            } catch (error) {
+                console.error("Erro ao buscar o orçamento mensal:", error);
+            }
+        };
+
+        fetchOrcamento();
+    }, [DespesaSelect, Despesa]);
+
+
+
 
     const handleDelete = async () => {
 
@@ -334,7 +360,7 @@ export default function ListaDespesa() {
         setFilterValue("");
         setPage(1);
     }, []);
-
+    const porcentagem = orcamentoMensal?.porcentagem ?? 0;
     const headerTable = useMemo(() => {
         return (
             <div className="flex flex-col gap-4  pb-4 p-4" >
@@ -378,7 +404,7 @@ export default function ListaDespesa() {
                         value: "text-white",
                     }}
                     label="Controle de orçamento"
-                    value={80}
+                    value={parseInt(porcentagem)}
                     showValueLabel={true}
                 />
                 <div className="flex justify-between items-center">
@@ -454,7 +480,7 @@ export default function ListaDespesa() {
             <div key={String(visibility)} className="w-[95%] m-auto" >
                 <TitlePage title="Minhas Despesas" />
                 <div className="w-full grid grid-cols-1 md:grid-cols-12 pt-6">
-                    <div className="col-span-2 ">
+                    <div className="col-span-2 items-center justify-center">
                         <Listbox
                             aria-label="Example with disabled actions"
                         >
