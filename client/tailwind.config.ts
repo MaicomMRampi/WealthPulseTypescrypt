@@ -24,7 +24,7 @@ const config: Config = {
         'buttonAzulEscuro':'rgb(30,58,138)',
         'iconeDeBloquiar':'#eeb70d',
         'bgCards':'#0b1739',
-
+        'backgroundModais':'#333333'
       }
     },
   },

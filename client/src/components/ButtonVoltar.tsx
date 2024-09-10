@@ -4,15 +4,16 @@ import { useRouter } from "next/navigation";
 
 interface ButtonVoltarProps {
     className?: string,
-    size?: "sm" | "md" | "lg"
+    size?: "sm" | "md" | "lg",
+    tamanho: boolean
 }
-const ButtonVoltar = ({ className, size }: ButtonVoltarProps) => {
+const ButtonVoltar = ({ className, size, tamanho }: ButtonVoltarProps) => {
     const router = useRouter()
     const clickToBack = () => {
         router.back();
     }
     return (
-        <Button onClick={clickToBack} size={size} className="bg-primaryTableText text-white" >
+        <Button fullWidth={tamanho ? tamanho : false} onClick={clickToBack} size={size} className="bg-[#f97316] " >
             Voltar
         </Button>
     )

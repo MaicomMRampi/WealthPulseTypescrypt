@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'WealthPulse ',
+    default: 'Fluxo do Dinheiro ',
     template: 'WealthPulse | %s',
   },
   description: 'Sistema de gerenciamento de finanças',

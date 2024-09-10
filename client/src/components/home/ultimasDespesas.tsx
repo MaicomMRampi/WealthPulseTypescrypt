@@ -40,7 +40,6 @@ export default function UltimasDespesas() {
                 {rendaFii.length === 0 ? (
                     <>
                         <p className='text-center text-primaryTableHover text-xl'>Não há despesas inseridas</p>
-                        <Button className="bg-primaryTableText text-white " size="sm" onClick={buscaDespesaMesAtual}>Atualizar</Button>
                     </>
                 ) :
                     <>

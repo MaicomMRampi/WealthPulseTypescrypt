@@ -39,7 +39,7 @@ export default function App({ open, onClose, onSubmit, message, messagemTipo }: 
                 isOpen={open}
                 placement="center"
                 onClose={onClose}
-                className="bg-black rounded-lg p-4" backdrop="opaque"
+                className="bg-backgroundModais rounded-lg p-4" backdrop="opaque"
             >
                 <Formik
                     initialValues={initialValues}

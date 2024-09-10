@@ -332,10 +332,12 @@ export default function NovaDespesa() {
                                 />
 
                             </div>
-                            <div className="w-full grid-cols-12 md:grid-cols-4 flex flex-col gap-4 md:flex-row p-4 ">
+                            <div className="w-full grid-cols-12 md:grid-cols-3 flex flex-col gap-4 md:flex-row p-4 ">
                                 <Button className="bg-buttonCinzaPadrao text-white" fullWidth onClick={() => opemModalCategoria()} >Nova Categoria</Button>
                                 <Button className="bg-buttonAzulClaro text-white" fullWidth onClick={() => opemModalCategoriaForma()} >Nova Forma de Pagamento</Button>
-                                <ButtonVoltar className="md:w-full bg-slate-100" />
+                                <ButtonVoltar tamanho={true} className="md:w-full bg-slate-100" />
+                            </div>
+                            <div className='px-4'>
                                 <Button
                                     type="submit"
                                     fullWidth
