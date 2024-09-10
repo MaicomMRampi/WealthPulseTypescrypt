@@ -56,7 +56,7 @@ export default function UltimasDespesas() {
 
     return (
         <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
-            <h2 className='font-semibold text-center'>Porcentagem Gasto Mês</h2>
+            <h2 className='font-semibold text-center'>Porcentagem gastos no mês</h2>
             <div className='w-full h-full flex flex-col items-center justify-center'>
                 <PieChart width={200} height={200}>
                     <Pie

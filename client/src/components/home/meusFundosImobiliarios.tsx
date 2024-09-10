@@ -84,7 +84,7 @@ export default function MeusFundosImobiliarios() {
     return (
         <Link href='/pages/investimentos/listainvestimento'>
             <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards flex items-center">
-                <h2 className='font-semibold text-center'>Meus Fundos Imobiliários</h2>
+                <h2 className='font-semibold text-center'>Meus fundos Imobiliários</h2>
                 <PieChart width={400} height={400}>
                     <Pie
                         data={dadosParaExibir}

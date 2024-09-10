@@ -37,7 +37,7 @@ export default function TotalDespesas() {
         <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards w-full">
             <Link href="/pages/despesas/listadespesas">
                 <CardHeader className='font-semibold'>
-                    Despesas Mês Atual
+                    Despesas mês atual
                 </CardHeader>
                 <CardBody>
                     <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <GiPayMoney size={40} className='text-orange-500' /></p>

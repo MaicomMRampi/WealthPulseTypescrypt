@@ -33,10 +33,10 @@ export default function TotalContas() {
         DespesaSelect.reduce((acc, despesa) => acc + despesa.valor, 0);
 
     return (
-        <Link href="/pages/contas/listacontas">
+        <Link href="/pages/contas/listaconta">
             <Card fullWidth className="bg-BgCardPadrao p-4 text-textCards">
                 <CardHeader className='font-semibold'>
-                    Contas no Mês
+                    Contas no mês
                 </CardHeader>
                 <CardBody>
                     <p className='font-semibold text-2xl flex justify-between'>{visibility ? currency(somaValores) : '****'} <MdMoneyOff size={40} className='text-red-500 ' /></p>

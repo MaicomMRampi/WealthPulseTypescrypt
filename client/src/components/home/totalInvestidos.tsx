@@ -43,7 +43,7 @@ export default function TotalInvestidos() {
             fullWidth
             className="bg-BgCardPadrao p-4 text-textCards"
         >
-            <Link href="/pages/investimentos/listainvestimentos">
+            <Link href="/pages/investimentos/listainvestimento">
                 <CardHeader className='font-semibold'>
                     Total investidos
                 </CardHeader>
