@@ -494,6 +494,7 @@ export default function DetalhesDosGastos({ params }: any) {
                 objeto={modalDelete.objeto}
                 confirmaEsclusao={deleteDespesa}
                 message={message}
+                messageTipo={''}
             />
         </div>
     )

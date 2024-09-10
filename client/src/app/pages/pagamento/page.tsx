@@ -5,13 +5,36 @@ import { api } from '@/lib/api';
 import { Button, Input } from '@nextui-org/react';
 import { MdContentCopy } from "react-icons/md";
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
     const { tokenUsuario } = useToken();
     const horaAtual = new Date().getHours();
     const [dados, setDados] = useState<any>(null);
+    const [dadosPagamento, setDadosPagamento] = useState<any>(null);
+    const router = useRouter();
     const [respostaPagamento, setRespostaPagamento] = useState<any>();
     const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!tokenUsuario) {
+            setTimeout(() => router.push('/pages/login'), 2000);
+        }
+    }, [tokenUsuario]);
+
+
+    const buscaUltimoPagamento = async () => {
+        try {
+            const response = await api.get('/buscaultimapagamento', {
+                params: {
+                    id: tokenUsuario?.id,
+                },
+            });
+            setDadosPagamento(response.data);
+        } catch (error) {
+            console.error("Erro ao buscar pagamento:", error);
+        }
+    }
 
     const handleCopy = () => {
         const qrCodeValue = dados?.point_of_interaction?.transaction_data?.qr_code;
@@ -31,7 +54,7 @@ export default function Page() {
                     total: 0.01,
                     name: tokenUsuario?.nome,
                     email: tokenUsuario?.email,
-                    id: '2224545',
+                    id: dadosPagamento?.id.toString()
                 }
             });
             setDados(response.data);
@@ -56,9 +79,36 @@ export default function Page() {
         }
     };
 
+    const alteraOsDadosDePagamento = async () => {
+        try {
+            const response = await api.post('/postpagamento', {
+                idPagamento: dadosPagamento
+            });
+
+
+            if (response.status === 200) {
+                setRespostaPagamento('');
+                setTimeout(() => {
+                    localStorage.removeItem('token');
+                    router.replace('/pages/login')
+
+                    // Usar replace ao invés de push
+                }, 3000); // Aumenta o tempo para 3 segundos
+            }
+        } catch (error) {
+            console.error("Erro ao alterar dados de pagamento:", error);
+        }
+    }
+
     useEffect(() => {
-        geraCobrancaPix();
+        buscaUltimoPagamento();
     }, []);
+
+    useEffect(() => {
+        if (dadosPagamento) {
+            geraCobrancaPix();
+        }
+    }, [dadosPagamento]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -66,7 +116,14 @@ export default function Page() {
         }, 10000); // Verifica o pagamento a cada 10 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo quando o componente for desmontado
-    }, [dados?.id]); // Executa o efeito sempre que o ID dos dados mudar
+    }, [dados?.id]);
+
+    // Novo useEffect para monitorar o status do pagamento e alterar os dados
+    useEffect(() => {
+        if (respostaPagamento?.status === 'approved') {
+            alteraOsDadosDePagamento();
+        }
+    }, [respostaPagamento]);
 
     return (
         <div className='w-full flex items-center justify-center flex-col'>
@@ -86,7 +143,7 @@ export default function Page() {
                 <div className='w-full'>
                     <p className='text-center pb-4'>Confira os dados de pagamento</p>
                     <div className='flex flex-col gap-3'>
-                        <Input fullWidth label='Nome' defaultValue='Maicom Mateus Rampi' />
+                        <Input fullWidth label='Nome' defaultValue={tokenUsuario?.nome} />
                         <Input fullWidth label='Instituição' defaultValue='Mercado pago' />
                         {dados && (
                             <Input
@@ -97,17 +154,22 @@ export default function Page() {
                                     </div>
                                 }
                                 label='Pix copia e cola'
-                                value={dados.point_of_interaction.transaction_data.qr_code}
+                                value={dados?.point_of_interaction?.transaction_data?.qr_code}
                             />
                         )}
                         {copied && <p className='text-default-500'>Chave copiada com sucesso!</p>}
-                        <Button onClick={verificaPagamento}>Verifica Pagamento</Button>
                     </div>
-                    <p>{respostaPagamento ? respostaPagamento.status == 'pending' ? 'Pagamento pendente' : 'Pagamento concluído' : null}</p>
-                    <p>{dados?.id ? dados.id : null}</p>
-
                 </div>
             </div>
+            <p className='pt-6'>
+                {respostaPagamento ? (
+                    respostaPagamento.status === 'pending' ? (
+                        <p className='flex gap-2 text-xl text-yellow-500 font-semibold'>Pagamento pendente <Image src={"/icons/98739.svg"} alt='Alerta' width={20} height={20} /></p>
+                    ) : (
+                        <p className='flex gap-2 text-xl text-[#10b981] font-semibold'>Pagamento concluído <Image src={"/icons/positive.svg"} alt='Alerta' width={20} height={20} /></p>
+                    )
+                ) : null}
+            </p>
         </div>
     )
 }

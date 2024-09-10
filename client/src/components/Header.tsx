@@ -190,10 +190,10 @@ export default function App() {
                                 <Avatar
                                     as="button"
                                     className="transition-transform"
-                                    color="secondary"
-                                    name="Jason Hughes"
+                                    color="success"
+                                    name={tokenUsuario?.nome}
                                     size="sm"
-                                    src={`http://localhost:3333/uploads/${tokenUsuario?.imageUrl}`}
+                                    src={tokenUsuario?.imageUrl ? `http://localhost:3333/uploads/${tokenUsuario?.imageUrl}` : ''}
                                 />
                             </DropdownTrigger>
                             <DropdownMenu aria-label="Profile Actions" variant="flat">

@@ -114,6 +114,28 @@ router.get('/api/verificapagamento', async (req, res) => {
     }
 
 });
+
+
+
+
+
+router.put('/api/alterapagamento', async (req, res) => {
+    const id = req.body.id
+    console.log("🚀 ~ router.put ~ id", id)
+    try {
+        const alteraStatusFinanceiro = await prisma.Usuario.update({
+            where: {
+                id: id
+            },
+            data: {
+                statusFinanceiro: 0
+            }
+        })
+    } catch (err) {
+        console.error("Erro em alterar status financeiro", err);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+});
 router.post('/api/geracobranca', async (req, res) => {
     const { accessToken, paymentData } = req.body
 
@@ -132,7 +154,24 @@ router.post('/api/geracobranca', async (req, res) => {
     }
 });
 
+router.get('/api/buscaultimapagamento', async (req, res) => {
+    try {
+        const iDUsuario = req.query.id
+        console.log("🚀 ~ router.get ~ iDUsuario", iDUsuario)
+        const buscaPagamento = await prisma.UsuarioPagamento.findFirst({
+            where: {
+                idUser: parseInt(iDUsuario), // Buscar pelo siDUsuario
+            },
+            orderBy: {
+                id: 'desc',  // Ordena pelo ID em ordem decrescente para pegar o último registro
+            }
+        })
 
+        res.json(buscaPagamento)
+    } catch (error) {
+        res.json(error)
+    }
+});
 
 
 // =============================================
@@ -158,6 +197,74 @@ router.post('/api/criapagamento', async (req, res) => {
 
     }
 });
+router.post('/api/postpagamento', async (req, res) => {
+
+    const chamaFuncao = (data) => {
+        const dataAtual = new Date();
+        const dataVenci = new Date(data);
+        // Se a data atual for maior que a data de vencimento
+        if (dataAtual.getTime() > dataVenci.getTime()) {
+            // Adiciona 30 dias à data atual
+            dataAtual.setDate(dataAtual.getDate() + 30);
+            return dataAtual;
+        } else {
+            // Adiciona 1 mês à data de vencimento
+            dataVenci.setMonth(dataVenci.getMonth() + 1);
+            return dataVenci;
+        }
+    }
+
+    try {
+        const dadosPagamento = req.body;
+        console.log("🚀 ~ router.post ~ idUsuario", dadosPagamento);
+        // ATUALIZA O PAGAMENTO QUE ESTAVA VENCIDO ============
+        const buscaPagamentoPendente = await prisma.UsuarioPagamento.update({
+            where: {
+                id: dadosPagamento.idPagamento.id
+            },
+            data: {
+                valorPago: 0.01,
+                dataPagamento: new Date(),
+                status: 1,
+                idUser: dadosPagamento.idPagamento.idUser
+
+            }
+        });
+        // CRIA UM NOVO PAGAMENTO ============
+        const tipo = typeof dadosPagamento.idPagamento.idUser
+        console.log("🚀 ~ router.post ~ tipo", tipo)
+
+        const criaNovoPagamento = await prisma.UsuarioPagamento.create({
+            data: {
+                valorPago: 0.00,
+                dataPagamento: new Date(),
+                dataExpiracao: chamaFuncao(dadosPagamento.idPagamento.dataExpiracao),
+                status: 0,
+                idUser: dadosPagamento.idPagamento.idUser,
+                metodoPagamento: 'Pix'
+            }
+        });
+
+        // ALTERA DADOS NA TABELA DO USUARIO
+
+        const alteraDadosUsuario = await prisma.Usuario.update({
+            where: {
+                id: dadosPagamento.idPagamento.idUser
+            },
+            data: {
+                dataExpiracao: chamaFuncao(dadosPagamento.idPagamento.dataExpiracao),
+                statusFinanceiro: 1
+            }
+        })
+
+        res.status(200).json({ message: 'Pagamento Executado' });
+
+    } catch (error) {
+        console.log("🚀 ~ router.post ~ error", error);
+        res.status(500).json({ message: 'Erro no processamento do pagamento' });
+    }
+});
+
 
 
 // =====================Login ============
@@ -209,6 +316,7 @@ router.post('/api/login', async (req, res) => {
 
 // +++++++++++++++++API DO USUARIO+++++++++++++++++++++++++++++++
 router.post('/api/postusers', async (req, res) => {
+
     const dadosCadastro = req.body
 
 
@@ -239,7 +347,7 @@ router.post('/api/postusers', async (req, res) => {
                 email: emailFormatado,
                 senha: senhaCripto.toString('hex'),
                 openModal: 1,
-                dataExpiracao: firstPay,
+                dataExpiracao: avaliacaoGratuita,
                 datacadastro: new Date(),
                 statusFinanceiro: 1,
             },
@@ -250,7 +358,7 @@ router.post('/api/postusers', async (req, res) => {
             data: {
                 idUser: novoUsuario.id,
                 metodoPagamento: 'Pix',
-                dataExpiracao: firstPay,
+                dataExpiracao: avaliacaoGratuita,
                 status: 1,
             }
         })
@@ -260,8 +368,6 @@ router.post('/api/postusers', async (req, res) => {
 
     }
 })
-
-
 router.post('/api/atualizacadastro', async (req, res) => {
     const dados = req.body
 

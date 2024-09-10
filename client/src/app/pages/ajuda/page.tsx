@@ -3,7 +3,7 @@ import { Listbox, ListboxItem } from '@nextui-org/react';
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import React, { useState } from 'react';
 
-export default function page() {
+export default function Ajuda() {
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
     return (

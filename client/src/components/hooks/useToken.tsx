@@ -13,7 +13,8 @@ interface User {
     statusPagamento: number,
     dataExpiracaoAcesso: any
     openModal: number,
-    dataExpiracao: any
+    dataExpiracao: any,
+    statusFinanceiro: number
 }
 
 interface BearState {

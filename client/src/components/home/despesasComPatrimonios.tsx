@@ -36,7 +36,7 @@ export default function DespesasComPatrimonios() {
         }
     }, [tokenUsuario]);
 
-    const COLORS = ['#304265', '#0e43fb', '#00c2ff', '#FF8042'];
+    const COLORS = ['#0e43fb', '#00c2ff', '#FF8042'];
 
     return (
         <Card className="bg-BgCardPadrao md:col-span-2 h-[400px] p-4">
@@ -53,7 +53,7 @@ export default function DespesasComPatrimonios() {
                             />
                             <Tooltip
                                 contentStyle={{
-                                    backgroundColor: "#000",
+                                    backgroundColor: "#1f2127",
                                     color: "#fff",
                                 }}
                                 formatter={(value: number) => currency(value)}
