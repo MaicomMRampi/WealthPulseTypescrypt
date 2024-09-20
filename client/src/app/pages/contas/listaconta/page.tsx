@@ -485,7 +485,7 @@ export default function ListaConta() {
                     >
                         Próxima
                     </Button>
-                    <ButtonVoltar size="sm" />
+                    <ButtonVoltar tamanho={false} />
                 </div>
             </div>
         );

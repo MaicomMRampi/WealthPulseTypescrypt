@@ -327,7 +327,7 @@ export default function App() {
                     <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
                         Next
                     </Button>
-                    <ButtonVoltar size='sm' />
+                    <ButtonVoltar tamanho={false} />
                 </div>
             </div>
         );

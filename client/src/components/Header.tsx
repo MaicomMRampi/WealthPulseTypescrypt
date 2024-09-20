@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useRouter, usePathname } from "next/navigation";
 import ModalBoasVindas from "@/components/ModalBoasVindas"
+import ModalPrimeirosPassos from "@/components/ModalPrimeirosPassos"
 import {
     Navbar, NavbarBrand, NavbarContent, NavbarItem, Input,
     DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Switch,
@@ -23,7 +24,13 @@ import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/aceternit
 import { cn } from "@/lib/utils";
 import useVisibilityCampo from "./hooks/useVisibilityCampos";
 import { api } from "@/lib/api";
-
+import { PiContactlessPaymentDuotone } from "react-icons/pi";
+import { FcDataConfiguration } from "react-icons/fc";
+import { FaUserAstronaut } from "react-icons/fa";
+import { BsBank2 } from "react-icons/bs";
+import { BiCategory } from "react-icons/bi";
+import { MdOutlineDriveFileRenameOutline } from "react-icons/md";
+import { TbHomeEdit } from "react-icons/tb";
 interface User {
     id: number;
     nome: string;
@@ -163,11 +170,7 @@ export default function App() {
                                 <HoveredLink href="/pages/despesas/novadespesa">Nova Despesa</HoveredLink>
                             </div>
                         </MenuItem>
-                        <MenuItem setActive={setActive} active={active} item="Rota de ajuste Pagamento">
-                            <div className="flex flex-col space-y-4 text-sm">
-                                <HoveredLink href="/pages/pagamento">Pagamento</HoveredLink>
-                            </div>
-                        </MenuItem>
+                        <Link className="cursor-pointer font-semibold" href={"/pages/pagamentos"}>Controle de Assinatura</Link>
                         <Link className="cursor-pointer font-semibold text-orange-500" href={"/pages/ajuda"}>Ajuda</Link>
 
                     </Menu>
@@ -202,12 +205,12 @@ export default function App() {
                                 </DropdownItem>
                                 <DropdownItem key="configurations">Configurações</DropdownItem>
                                 <DropdownItem key="configurations">  <Divider /></DropdownItem>
-                                <DropdownItem key="settings"><Link href={'/pages/editarcadastro'}>Editar usuário</Link></DropdownItem>
-                                <DropdownItem key="team_settings"><Link href={'/pages/editarinstituicao'}>Editar Instituição</Link></DropdownItem>
-                                <DropdownItem key="team_settings"><Link href={'/pages/editarcategoria'}>Editar Categoria</Link></DropdownItem>
-                                <DropdownItem key="analytics"><Link href={'/pages/editarnomesinvestimentos'}>Editar Nome dos Investimentos</Link></DropdownItem>
-                                <DropdownItem key="analytics"><Link href={'/pages/editarformadepagamento'}>Editar Forma de Pagamento</Link></DropdownItem>
-                                <DropdownItem key="analytics"><Link href={'/pages/editartipodespesa'}>Editar Tipo Depesa Patrimônio</Link></DropdownItem>
+                                <DropdownItem key="settings"><Link className="flex gap-2 flex-row" href={'/pages/editarcadastro'}><FaUserAstronaut className="w-5 h-5 mr-2" /> Editar usuário</Link></DropdownItem>
+                                <DropdownItem key="team_settings"><Link className="flex gap-2 flex-row" href={'/pages/editarinstituicao'}><BsBank2 className="w-5 h-5 mr-2" /> Editar Instituição</Link></DropdownItem>
+                                <DropdownItem key="team_settings"><Link className="flex gap-2 flex-row" href={'/pages/editarcategoria'}><BiCategory className="w-5 h-5 mr-2" />Editar Categoria</Link></DropdownItem>
+                                <DropdownItem key="analytics"><Link className="flex gap-2 flex-row" href={'/pages/editarnomesinvestimentos'}> <MdOutlineDriveFileRenameOutline className="w-5 h-5 mr-2" />Editar Nome dos Investimentos</Link></DropdownItem>
+                                <DropdownItem key="analytics"><Link className="flex gap-2 flex-row" href={'/pages/editarformadepagamento'}> <PiContactlessPaymentDuotone className="w-5 h-5 mr-2" /> Editar Forma de Pagamento</Link></DropdownItem>
+                                <DropdownItem key="analytics"><Link className="flex gap-2 flex-row" href={'/pages/editartipodespesa'}> <TbHomeEdit className="w-5 h-5 mr-2" />Editar Tipo Depesa Patrimônio</Link></DropdownItem>
                                 <DropdownItem key="configurations">  <Divider /></DropdownItem>
                                 <DropdownItem key="logout" color="danger" onClick={() => handleLogout()}>
                                     Sair
@@ -228,6 +231,10 @@ export default function App() {
             </Navbar >
             <ModalBoasVindas
                 isOpen={opemModalBoasVindas}
+                onClose={() => fechaModalBoasVindas()}
+            />
+            <ModalPrimeirosPassos
+                isOpen={false}
                 onClose={() => fechaModalBoasVindas()}
             />
         </>

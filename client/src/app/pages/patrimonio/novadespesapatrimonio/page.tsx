@@ -273,7 +273,7 @@ export default function App() {
                                     <Link href={'/pages/patrimonio/novadespesapatrimonio'}>Novo Patrimônio</Link>
                                 </Button>
                                 <ButtonVoltar
-                                    size="lg"
+                                    tamanho={false}
                                 />
                             </div>
 

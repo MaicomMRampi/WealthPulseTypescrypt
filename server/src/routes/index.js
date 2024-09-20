@@ -172,6 +172,22 @@ router.get('/api/buscaultimapagamento', async (req, res) => {
         res.json(error)
     }
 });
+router.get('/api/usuariopagamento', async (req, res) => {
+
+    const id = req.query.id
+    console.log("🚀 ~ router.get ~ id", id)
+    try {
+        const buscaPagamento = await prisma.UsuarioPagamento.findMany({
+            where: {
+                idUser: parseInt(id)
+            }
+        })
+        res.json(buscaPagamento)
+    } catch (error) {
+        res.json(error)
+    }
+
+})
 
 
 // =============================================
@@ -223,7 +239,7 @@ router.post('/api/postpagamento', async (req, res) => {
                 id: dadosPagamento.idPagamento.id
             },
             data: {
-                valorPago: 0.01,
+                valorPago: 10,
                 dataPagamento: new Date(),
                 status: 1,
                 idUser: dadosPagamento.idPagamento.idUser
@@ -236,8 +252,8 @@ router.post('/api/postpagamento', async (req, res) => {
 
         const criaNovoPagamento = await prisma.UsuarioPagamento.create({
             data: {
-                valorPago: 0.00,
-                dataPagamento: new Date(),
+                valorPago: 10,
+                // dataPagamento: new Date(),
                 dataExpiracao: chamaFuncao(dadosPagamento.idPagamento.dataExpiracao),
                 status: 0,
                 idUser: dadosPagamento.idPagamento.idUser,
@@ -352,14 +368,13 @@ router.post('/api/postusers', async (req, res) => {
                 statusFinanceiro: 1,
             },
         });
-
-
         const pagamentoCreate = await prisma.UsuarioPagamento.create({
             data: {
                 idUser: novoUsuario.id,
                 metodoPagamento: 'Pix',
                 dataExpiracao: avaliacaoGratuita,
-                status: 1,
+                valorPago: 10,
+                status: 0,
             }
         })
         res.status(200).json({ message: 'Usuário Salvo com Sucesso !' });
@@ -382,7 +397,7 @@ router.post('/api/atualizacadastro', async (req, res) => {
                 valorOrcamentoMensal: converteString(dados.values.valorOrcamentoMensal)
             }
         })
-        res.status(200).json({ message: 'Atualizado com sucesso!' });
+        res.status(200).json({ message: 'Atualizado com sucesso!', response: response });
     } catch (error) {
 
     }

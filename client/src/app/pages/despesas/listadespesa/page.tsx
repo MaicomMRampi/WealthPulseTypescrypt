@@ -468,7 +468,7 @@ export default function ListaDespesa() {
                     >
                         Próxima
                     </Button>
-                    <ButtonVoltar size="sm" />
+                    <ButtonVoltar tamanho={false} />
                 </div>
             </div>
         );

@@ -46,7 +46,7 @@ export const MenuItem = ({
                             <motion.div
                                 transition={transition}
                                 layoutId="active" // layoutId ensures smooth animation
-                                className="bg-white dark:bg-black backdrop-blur-sm rounded-2xl overflow-hidden border border-black/[0.2] dark:border-white/[0.2] shadow-xl"
+                                className=" bg-BgCardPadrao backdrop-blur-sm rounded-2xl overflow-hidden border border-black/[0.2] dark:border-white/[0.2] shadow-xl"
                             >
                                 <motion.div
                                     layout // layout ensures smooth animation
@@ -73,7 +73,7 @@ export const Menu = ({
     return (
         <nav
             onMouseLeave={() => setActive(null)} // Resets the state
-            className="relative rounded-full dark:border-white/[0.2] shadow-input px-8 py-6 hidden sm:flex justify-center space-x-4"
+            className="relative rounded-full dark:border-white/[0.2] shadow-input px-8 py-6 hidden sm:flex justify-center space-x-4 "
         >
             {children}
         </nav>
@@ -100,7 +100,7 @@ export const ProductItem = ({
                 width={140}
                 height={70}
                 alt={title}
-                className="flex-shrink-0 rounded-md shadow-2xl"
+                className="flex-shrink-0 rounded-md shadow-2xl "
             />
             <div>
                 <h4 className="text-xl font-bold mb-1 text-black dark:text-white">
@@ -118,7 +118,7 @@ export const HoveredLink = ({ children, ...rest }: any) => {
     return (
         <Link
             {...rest}
-            className="text-neutral-700 dark:text-neutral-200 hover:text-primaryTableText "
+            className="text-neutral-700 dark:text-neutral-200 hover:text-primaryTableText text-base "
         >
             {children}
         </Link >

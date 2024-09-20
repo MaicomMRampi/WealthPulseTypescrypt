@@ -7,13 +7,13 @@ interface ButtonVoltarProps {
     size?: "sm" | "md" | "lg",
     tamanho: boolean
 }
-const ButtonVoltar = ({ className, size, tamanho }: ButtonVoltarProps) => {
+const ButtonVoltar = ({ className, tamanho }: ButtonVoltarProps) => {
     const router = useRouter()
     const clickToBack = () => {
         router.back();
     }
     return (
-        <Button fullWidth={tamanho ? tamanho : false} onClick={clickToBack} size={size} className="bg-[#f97316] " >
+        <Button fullWidth={tamanho ? tamanho : false} onClick={clickToBack} size='sm' className="bg-[#f97316] " >
             Voltar
         </Button>
     )

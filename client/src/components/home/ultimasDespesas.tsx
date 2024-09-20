@@ -1,26 +1,29 @@
 "use client"
-import { Button, Card, Divider, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
+import { Button, Card, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
 import React, { useEffect, useState } from 'react'
+import { FiFileText } from "react-icons/fi"; // Ícone de ilustração
 import useVisibility from '../hooks/useVisibility';
 import useToken from '../hooks/useToken';
 import { api } from '@/lib/api';
 import currency from '../Currency';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type Renda = {
     local: string;
     valorGasto: number;
-    nomeCategoria: string,
-    categoria: any
+    nomeCategoria: string;
+    categoria: any;
 }
 
 export default function UltimasDespesas() {
+    const router = useRouter();
     const { visibility } = useVisibility();
     const { tokenUsuario } = useToken();
     const [rendaFii, setRendaFii] = useState<Renda[]>([]);
 
     const buscaDespesaMesAtual = async () => {
-        if (!tokenUsuario) return
+        if (!tokenUsuario) return;
         const response = await api.get(`/buscadespesamesatual`, {
             params: {
                 email: tokenUsuario?.id,
@@ -33,21 +36,30 @@ export default function UltimasDespesas() {
         buscaDespesaMesAtual();
     }, []);
 
+    const mandaRota = () => {
+        router.push('/pages/despesas/novadespesa');
+    }
+
+
     return (
         <Link href="/pages/despesas/listadespesa">
-            <Card fullWidth className="w-full h-full bg-BgCardPadrao p-4 duration-75 text-textCards">
-
+            <Card fullWidth className="w-full h-full bg-BgCardPadrao rounded-lg shadow-md p-6 duration-75 text-gray-800">
                 {rendaFii.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+                        {/* Ícone ou ilustração */}
+                        <FiFileText className="text-6xl text-gray-400" />
+                        {/* Mensagem de estado vazio */}
+                        <p className='text-gray-500 text-lg font-medium'>
+                            Nenhuma despesa foi inserida ainda.
+                        </p>
+                        <Button color="primary" onClick={() => mandaRota()}>
+                            Adicionar Despesa
+                        </Button>
+                    </div>
+                ) : (
                     <>
-                        <p className='text-center text-primaryTableHover text-xl'>Não há despesas inseridas</p>
-                    </>
-                ) :
-                    <>
-                        <h2 className='font-semibold text-center'>Últimas Despesas Inseridas</h2>
-                        <Table
-                            aria-label="Tabela de últimas despesas"
-                            fullWidth
-                        >
+                        <h2 className='font-semibold text-center text-lg mb-4'>Últimas Despesas Inseridas</h2>
+                        <Table aria-label="Tabela de últimas despesas" fullWidth>
                             <TableHeader>
                                 <TableColumn>Categoria</TableColumn>
                                 <TableColumn>Valor Gasto</TableColumn>
@@ -62,9 +74,7 @@ export default function UltimasDespesas() {
                             </TableBody>
                         </Table>
                     </>
-
-                }
-
+                )}
             </Card>
         </Link>
     );

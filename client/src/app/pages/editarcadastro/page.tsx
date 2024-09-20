@@ -11,7 +11,7 @@ import { api } from '@/lib/api';
 import { Alert } from '@mui/material';
 
 export default function EditarCadastro() {
-    const { tokenUsuario } = useToken();
+    const { tokenUsuario, setTokenUsuario } = useToken();
     const [selectedImage, setSelectedImage] = useState<any>(null);
     const [currentImage, setCurrentImage] = useState(tokenUsuario?.imageUrl ? `http://localhost:3333/uploads/${tokenUsuario.imageUrl}` : selectedImage);
     const [message, setMessage] = useState<string>('');
@@ -38,7 +38,7 @@ export default function EditarCadastro() {
     const initialValues = {
         nome: tokenUsuario?.nome || '',
         email: tokenUsuario?.email || '',
-        valorOrcamentoMensal: '',
+        valorOrcamentoMensal: tokenUsuario?.valorOrcamentoMensal?.toString() || '',
     };
 
     const validationSchema = yup.object().shape({
@@ -52,10 +52,12 @@ export default function EditarCadastro() {
             values,
             id: tokenUsuario?.id,
         });
+        console.log("🚀 ~ handleSubmit ~ response", response)
 
         if (response.status === 200) {
             setMessage(response.data.message);
             setMessageTipo('success');
+            setTokenUsuario(response.data.response);
         } else {
             setMessage(response.data.message);
             setMessageTipo('error');
@@ -121,6 +123,7 @@ export default function EditarCadastro() {
                                         label="Orçamento Mensal"
                                         name="valorOrcamentoMensal"
                                         value={values.valorOrcamentoMensal}
+                                        defaultValue={values.valorOrcamentoMensal}
                                         isInvalid={touched?.valorOrcamentoMensal && !!errors?.valorOrcamentoMensal}
                                         startContent={<span className="text-white text-small">R$</span>}
                                         onChange={(event) => {
@@ -133,7 +136,6 @@ export default function EditarCadastro() {
                             </div>
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} />
                         </div>
-                        {JSON.stringify(errors)}
                         <div className='pt-4'>
                             {
                                 message &&

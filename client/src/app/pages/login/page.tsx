@@ -18,7 +18,7 @@ function Copyright(props: any) {
     return (
         <h1 {...props}>
             {'Copyright © '}
-            <Link href="">Maicom</Link> {new Date().getFullYear()}{'.'}
+            <Link href="https://fluxododinheiro.vercel.app/" target='_blank'>Maicom</Link> {new Date().getFullYear()}{'.'}
         </h1>
     );
 }

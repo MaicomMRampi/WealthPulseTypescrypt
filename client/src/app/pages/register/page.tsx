@@ -46,7 +46,7 @@ export default function SignUp() {
     };
 
     return (
-        <div className="w-full min-h-screen bg-cover bg-[url('/imagens/register2.png')] flex  xs:justify-center items-center  md:justify-end md:items-center md:pr-32">
+        <div className="w-full min-h-screen bg-cover bg-[url('/imagens/rm378-09.jpg')] md:bg-[url('/imagens/register2.png')] flex  xs:justify-center items-center  md:justify-end md:items-center md:pr-32">
             <div className="p-8 rounded-lg shadow-lg w-full max-w-md">
                 <Formik
                     initialValues={initialValues}
@@ -149,7 +149,7 @@ export default function SignUp() {
 
                                 <div className="grid grid-cols-1 gap-2">
                                     <div className="text-left">
-                                        <Link href="/pages/login">Já possui uma conta? Entre aqui</Link>
+                                        <Link href="/pages/login">Já é usuário? Acesse sua conta aqui</Link>
                                     </div>
                                 </div>
                             </div>

@@ -429,7 +429,7 @@ export default function DetalhesDosGastos({ params }: any) {
                         Next
                     </Button>
                     <ButtonVoltar
-                        size='sm'
+                        tamanho={false}
                     />
                 </div>
             </div>
