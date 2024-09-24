@@ -43,7 +43,7 @@ model Banco {
 
 model Categoria {
   id            Int        @id @default(autoincrement())
-  nomeCategoria String     @unique
+  nomeCategoria String
   idUser        Int
   despesas      Despesas[] // Relação com Despesas
 }
@@ -110,7 +110,7 @@ model Dividendo {
 
 model FormaPagamento {
   id                 Int    @id @default(autoincrement())
-  nomeFormaPagamento String @unique
+  nomeFormaPagamento String
   idUser             Int
 
   despesas Despesas[]

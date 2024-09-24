@@ -1,8 +1,5 @@
 const router = require('express').Router()
 const dbConnect = require('../utils/dbConnect')
-const UsuariosSchema = require('../models/usuarios  OK')
-const InvestimentosFiiSchema = require('../models/investimentosfii OK')
-const ControleContasSchema = require('../models/controleContas OK')
 const DividendosSchema = require('../models/dividendos OK')
 const { crypto } = require('../utils/password')
 const { converteString } = require('../utils/converteString')
@@ -25,10 +22,12 @@ const storage = multer.diskStorage({
         // Obtém o nome original do arquivo e sua extensão
         const ext = path.extname(file.originalname);
         const name = path.basename(file.originalname, ext);
-
+        const userId = req.body;
+        console.log("🚀 ~ userId", userId)
         // Define o nome do arquivo a ser salvo (somente nome e extensão)
         cb(null, `${name}${ext}`);
     }
+
 });
 
 const upload = multer({ storage: storage });
@@ -114,10 +113,6 @@ router.get('/api/verificapagamento', async (req, res) => {
     }
 
 });
-
-
-
-
 
 router.put('/api/alterapagamento', async (req, res) => {
     const id = req.body.id
@@ -850,27 +845,7 @@ router.get('/api/dividendos', async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar proventos' });
     }
 });
-router.post('/api/dividendos', async (req, res) => {
-    const dados = req.body
 
-    await dbConnect()
-    try {
-        const novoDividendo = new DividendosSchema({
-            datainserido: new Date(),
-            valordividendo: converteString(dados.valorProvento),
-            idinvestimento: '',
-            nomeinvestimento: dados.investimento.nomeinvestimento,
-            iduser: dados.investimento.iduser,
-            idnomeinvestimento: dados.investimento.idnomeinvestimento
-        })
-        const salvaProvento = await novoDividendo.save();
-        res.status(200).json({ message: 'Provento Salvo com Sucesso !' });
-    } catch {
-        res.status(400).json({ message: 'Erro ao Salvar Provento.' })
-    }
-
-
-})
 
 // ================INVESTIMENTOS======================
 router.post('/api/novoinvestimento', async (req, res) => {
@@ -1114,79 +1089,7 @@ router.put('/api/atualizavalor', async (req, res) => {
         res.status(400).json({ message: 'Erro ao Atualizar Valor' });
     }
 });
-router.put('/api/atualizavalorfii', async (req, res) => {
-    const novoValor = req.body.values.novovalorinvestimento
-    const idInvestimento = req.body.data._id
 
-    try {
-        await dbConnect()
-        // ==============Atualiza o Valor do investimento 
-        const updatedInvestimento = await InvestimentosFiiSchema.findOneAndUpdate({ _id: idInvestimento }, { valoratualfii: novoValor }, { new: true })
-
-
-        if (!updatedInvestimento) {
-            res.status(400).json({ message: 'Erro ao atualizar investimento' })
-        }
-
-
-        res.status(200).json({ message: 'Valor Atualizado com Sucesso' })
-    } catch (error) {
-        res.status(400).json({ message: 'Erro ao Atualizar Valor' })
-    }
-
-
-})
-
-router.put('/api/vendacotasfii', async (req, res) => {
-    await dbConnect();
-    const nome = req.body.nomefii;
-    const qtdCotas = req.body.values.qtdvenda;
-
-    const buscaFundos = await InvestimentosFiiSchema.find({ nomefii: nome });
-
-    const totalCotasArmazenadas = buscaFundos.reduce((total, item) => {
-        return total + item.quantidade;
-    }, 0);
-
-    if (qtdCotas > totalCotasArmazenadas) {
-        return res.status(400).json({ message: 'Quantidade maior que o disponível' })
-    }
-
-
-    let cotasRestantes = qtdCotas;
-
-    for (let i = 0; i < buscaFundos.length; i++) {
-        const investimento = buscaFundos[i];
-        const cotasDisponiveis = investimento.quantidade;
-
-        if (cotasRestantes <= 0) {
-            break;
-        }
-
-        const cotasVendidas = Math.min(cotasDisponiveis, cotasRestantes); // Calcula quantas cotas serão vendidas deste investimento
-
-        const updatedInvestimento = await InvestimentosFiiSchema.findOneAndUpdate(
-            { _id: investimento._id, quantidade: { $gte: cotasVendidas } }, // Garante que a quantidade seja maior ou igual às cotas vendidas
-            { $inc: { quantidade: -cotasVendidas } },
-            { new: true }
-        );
-
-        if (!updatedInvestimento) {
-            // Se a quantidade for menor que as cotas vendidas, continue para o próximo investimento
-            continue;
-        }
-
-        cotasRestantes -= cotasVendidas;
-
-        if (updatedInvestimento.quantidade === 0) {
-            // Se a quantidade for zero, remove o investimento    
-            await InvestimentosFiiSchema.findOneAndDelete({ _id: investimento._id });
-        }
-    }
-
-    // Envie uma resposta adequada
-    res.status(200).json({ message: 'Venda de cotas concluída com sucesso.' });
-});
 
 router.delete('/api/deletaInvestimento', async (req, res) => {
     try {
@@ -1310,12 +1213,18 @@ router.put('/api/esqueceusenha', async (req, res) => {
 // +++++++++++++++++++++++++Categoria+++++++++++++++++++++++++++++++++++++++++
 router.post('/api/novacategoria', async (req, res) => {
     const nome = req.body
+    console.log("🚀 ~ router.post ~ nome", nome.idUser)
 
 
     try {
         const nomeUppercase = nome.categoria.categoria.toUpperCase().trim();
         // Verifica se a categoria já existe
-        const verificaNome = await prisma.categoria.findUnique({ where: { nomeCategoria: nomeUppercase } });
+        const verificaNome = await prisma.categoria.findFirst({
+            where: {
+                nomeCategoria: nomeUppercase,
+                idUser: parseInt(nome.idUser)
+            }
+        });
         if (verificaNome) {
             return res.status(400).json({ message: 'Categoria Já Cadastrada' });
         }
@@ -1370,7 +1279,7 @@ router.post('/api/novaformapagamento', async (req, res) => {
     const nomeUppercase = dados.nome.formapagamento.toUpperCase().trim();
     try {
         // Verifica se a categoria já existe
-        const verificaNome = await prisma.FormaPagamento.findUnique({ where: { nomeFormaPagamento: nomeUppercase } });
+        const verificaNome = await prisma.FormaPagamento.findFirst({ where: { nomeFormaPagamento: nomeUppercase, idUser: parseInt(dados.idUser) } });
 
         if (verificaNome) {
             return res.status(400).json({ message: 'Categoria Já Cadastrada' });
@@ -1458,12 +1367,20 @@ router.post('/api/novadespesa', async (req, res) => {
 });
 
 router.get('/api/buscadespesa', async (req, res) => {
+
+    const anoAtual = new Date().getFullYear().toString();
+
+    const periodoInicial = `${anoAtual}-01/`;
+    const periodoFinal = `${anoAtual}-12`;
     try {
         const idUser = req.query.email
         const buscaDespesa = await prisma.Despesas.findMany({
             where: {
                 idUser: parseInt(idUser),
-
+                mesCorrespondente: {
+                    gte: periodoInicial,
+                    lte: periodoFinal,
+                }
             },
             include: {
                 categoria: true,
@@ -1807,17 +1724,7 @@ router.put('/api/pagaconta', async (req, res) => {
 
 
 });
-router.delete('/api/deletaConta', async (req, res) => {
-    try {
-        const { idConta } = req.body;
-        await dbConnect();
-        const buscaDespesa = await ControleContasSchema.findByIdAndDelete({ _id: idConta });
-        res.status(200).json("deletado")
-    } catch (error) {
-        console.error('Erro ao buscar despesas por data:', error);
-        res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-});
+
 //=========================================================
 
 
@@ -1876,6 +1783,7 @@ router.post('/api/controleorcamento', async (req, res) => {
 
     } catch (error) {
         console.error(error);
+        res.status(500).json({ message: 'Erro ao buscar despesas' });
     }
 
 });
@@ -1937,24 +1845,6 @@ router.delete('/api/deletabanco', async (req, res) => {
         res.status(400).json({ message: 'Erro ao Cadastrar' })
     }
 });
-
-// router.post('/api/anotacoes', async (req, res) => {
-//     await dbConnect
-//     try {
-//         const data = req.body.anotacao
-//         const novoAnotacao = new AnotacoesSchema({
-//             anotacao: data
-//         })
-//         const salvaAnotacao = novoAnotacao.save()
-
-//         // const updateAnotacao = await AnotacoesSchema.updateOne({ _id: salvaAnotacao._id }, { $set: { anotacoes: data.anotacoes } })
-
-//         res.status(200).json({ message: 'Anotacao Cadastrada ' })
-//     } catch (error) {
-//         res.status(400).json({ message: 'Erro ao Cadastrar' })
-//     }
-// })
-
 
 //==========================================
 

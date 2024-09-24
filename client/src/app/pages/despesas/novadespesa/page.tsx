@@ -346,7 +346,7 @@ export default function NovaDespesa() {
                                     Salvar
                                 </Button>
                             </div>
-                            <h1 className='text-center py-5'>{messageDespesa ? <Alert color={messageTipo as "success" | "error" | "warning" | "info"}>{messageDespesa}</Alert> : null} </h1>
+                            <h1 className='text-center py-5'>{messageDespesa ? <Alert color={messageTipo as "success" | "error" | "warning" | "info"} variant="filled">{messageDespesa}</Alert> : null} </h1>
                             <FormadePagamentoNova
                                 messagemTipo={messageTipo}
                                 message={messageForm}

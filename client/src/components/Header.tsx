@@ -205,7 +205,7 @@ export default function App() {
                                 </DropdownItem>
                                 <DropdownItem key="configurations">Configurações</DropdownItem>
                                 <DropdownItem key="configurations">  <Divider /></DropdownItem>
-                                <DropdownItem key="settings"><Link className="flex gap-2 flex-row" href={'/pages/editarcadastro'}><FaUserAstronaut className="w-5 h-5 mr-2" /> Editar usuário</Link></DropdownItem>
+                                <DropdownItem key="settings"><Link className="flex gap-2 flex-row" href={'/pages/editarcadastro'}><FaUserAstronaut className="w-5 h-5 mr-2" /> Editar Usuário</Link></DropdownItem>
                                 <DropdownItem key="team_settings"><Link className="flex gap-2 flex-row" href={'/pages/editarinstituicao'}><BsBank2 className="w-5 h-5 mr-2" /> Editar Instituição</Link></DropdownItem>
                                 <DropdownItem key="team_settings"><Link className="flex gap-2 flex-row" href={'/pages/editarcategoria'}><BiCategory className="w-5 h-5 mr-2" />Editar Categoria</Link></DropdownItem>
                                 <DropdownItem key="analytics"><Link className="flex gap-2 flex-row" href={'/pages/editarnomesinvestimentos'}> <MdOutlineDriveFileRenameOutline className="w-5 h-5 mr-2" />Editar Nome dos Investimentos</Link></DropdownItem>

@@ -83,7 +83,6 @@ export default function ListaConta() {
 
     const [dataControleMensal, setDataControleMensal] = useState<string>(dataInicioControle);
     const [orcamentoMensal, setOrcamentoMensal] = useState<any>();
-    const [message, setMessage] = useState()
     const [mesFatura, setMesFatura] = useState<string>();
     const [opemModalFatura, setOpenModalFatura] = useState(false);
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
@@ -313,11 +312,11 @@ export default function ListaConta() {
                                 <MdOutlinePayments className="text-buttonAzulClaro" />
                             </span>
                         </Tooltip>
-                        <Tooltip className="" content="Editar">
+                        {/* <Tooltip className="" content="Editar">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EditIcon className="text-[#93fad6]" />
                             </span>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip className="" color="danger" content="Deletar">
                             <span onClick={() => setModalInfo({ show: true, objeto: despesa })} className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <DeleteIcon className="text-red-500" />
@@ -453,6 +452,7 @@ export default function ListaConta() {
         hasSearchFilter,
         Despesa,
         dataControleMensal,
+        orcamentoMensal
 
     ]);
 
@@ -536,29 +536,37 @@ export default function ListaConta() {
                             }}
                         >
                             {Object.keys(groupedData).map((year) => (
-                                <AccordionItem classNames={{ title: 'primaryTableText' }} key={year} aria-label={`Acordeão ${year}`} title={year}>
-                                    <div >
-                                        {groupedData[year].map((item: any, index: number) => (
-                                            <div
-                                                key={item.data}
-                                                className={`text-center border-b-orange-100 cursor-pointer ${index === selectedIndex ? 'bg-primaryTableText' : ''}`}
-                                                onClick={() => {
-                                                    handleDataSelect(item.data);
-                                                    setSelectedIndex(index);
-                                                }}
-                                            >
-                                                {(() => {
-                                                    const [ano, mes] = item.data.split('-').map(Number);
-                                                    const data = new Date(ano, mes - 1);
-                                                    return format(data, 'MMMM yyyy', { locale: ptBR }).toUpperCase();
-                                                })()}
-                                            </div>
-                                        ))}
+                                <AccordionItem
+                                    classNames={{
+                                        title: 'text-primaryTableText font-bold text-center border-b-orange-100 bg-BgCardPadrao'
+                                    }}
+                                    key={year}
+                                    aria-label={`Acordeão ${year}`}
+                                    title={year}>
+                                    <div>
+                                        {
+                                            groupedData[year].map((item: any, index: number) => (
+                                                <div
+                                                    key={item.data}
+                                                    className={`text-center border-b-orange-100 cursor-pointer ${index === selectedIndex ? 'bg-primaryTableText' : ''}`}
+                                                    onClick={() => {
+                                                        handleDataSelect(item.data);
+                                                        setSelectedIndex(index);
+                                                    }}
+                                                >
+                                                    {(() => {
+                                                        const [ano, mes] = item.data.split('-').map(Number);
+                                                        const data = new Date(ano, mes - 1);
+                                                        return format(data, 'MMMM yyyy', { locale: ptBR }).toUpperCase();
+                                                    })()}
+                                                </div>
+                                            ))
+                                        }
                                     </div>
                                 </AccordionItem>
                             ))}
                         </Accordion>
-                    </div>
+                    </div >
                     <div className="col-span-10 px-6  rounded-lg">
                         <Card className="bg-BgCardPadrao">
                             {headerTable}

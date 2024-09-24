@@ -16,6 +16,8 @@ export default function EditarCadastro() {
     const [currentImage, setCurrentImage] = useState(tokenUsuario?.imageUrl ? `http://localhost:3333/uploads/${tokenUsuario.imageUrl}` : selectedImage);
     const [message, setMessage] = useState<string>('');
     const [messageTipo, setMessageTipo] = useState<any>('');
+
+
     const handleImageChange = async (e: any) => {
         const file = e.target.files[0];
         if (file) {

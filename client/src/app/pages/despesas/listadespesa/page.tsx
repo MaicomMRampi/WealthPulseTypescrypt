@@ -41,6 +41,8 @@ import ButtonVoltar from "@/components/ButtonVoltar";
 import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
 import ModalDelete from "@/components/ModalDelete"
 import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
+import { BsInfoCircle } from "react-icons/bs";
+import useVisibilityCampo from '@/components/hooks/useVisibilityCampos';
 interface Acumulador {
     [key: string]: {
         data: string;
@@ -70,9 +72,9 @@ export default function ListaDespesa() {
     const mesVenc = dataAtual.getMonth() + 1;
     const anoVenc = dataAtual.getFullYear();
     const dataInicioControle = `${anoVenc}-${mesVenc < 10 ? `0${mesVenc}` : mesVenc}`;
-
+    const { visibilityCampo } = useVisibilityCampo()
+    const [valueInput, setValueInput] = useState<any>()
     const [dataControleMensal, setDataControleMensal] = useState<string>(dataInicioControle);
-    console.log("🚀 ~ ListaDespesa ~ dataControleMensal", dataControleMensal)
     const [mesFatura, setMesFatura] = useState<string>();
     const [opemModalFatura, setOpenModalFatura] = useState(false);
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
@@ -155,19 +157,18 @@ export default function ListaDespesa() {
         setDespesaSelect(response.data);
     };
 
+    const fetchOrcamento = async () => {
+        try {
+            const resultado = await orcamentoMensalControle(dataControleMensal, tokenUsuario?.id);
+            setOrcamentoMensal(resultado);
+        } catch (error) {
+            console.error("Erro ao buscar o orçamento mensal:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchOrcamento = async () => {
-            try {
-                const resultado = await orcamentoMensalControle(dataControleMensal, tokenUsuario?.id);
-                setOrcamentoMensal(resultado);
-            } catch (error) {
-                console.error("Erro ao buscar o orçamento mensal:", error);
-            }
-        };
-
         fetchOrcamento();
-    }, [DespesaSelect, Despesa]);
+    }, [DespesaSelect, Despesa, dataControleMensal]);
 
 
 
@@ -364,49 +365,93 @@ export default function ListaDespesa() {
     const headerTable = useMemo(() => {
         return (
             <div className="flex flex-col gap-4  pb-4 p-4" >
-                <div className="flex justify-between gap-3 items-end py-4">
-                    <Input
-                        size="md"
-                        fullWidth
-                        className="w-full sm:max-w-[44%]  "
-                        placeholder="Pesquisar Despesa..."
-                        startContent={<SearchIcon />}
-                        value={filterValue}
-                        onClear={() => onClear()}
-                        onValueChange={onSearchChange}
-                    />
-
-                    <div className="flex gap-3">
-                        <PDFDownloadLink document={<PdfDespesas despesas={DespesaSelect} totalFatura={currency(somaValores)} usuario={tokenUsuario} />} fileName="Despesas Patrimônio " >
-                            {({ blob, url, loading, error }) =>
-                                loading ? 'Loading document...' : <Button className=" bg-buttonAzulClaro text-white" variant="flat" fullWidth>Imprimir</Button>
-                            }
-                        </PDFDownloadLink>
-                        <Button className=" border-orange-500 text-white bg-orange-500" variant="solid" fullWidth onClick={() => opemModalFechaFatura(DespesaSelect[0].mesCorrespondente)}>Fechar mês</Button>
-                        <Button
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="col-span-1">
+                        <Input
+                            size="md"
                             fullWidth
-                            color="primary"
-                            variant="solid"
-                            endContent={<PlusIcon size={16} width={16} height={16} />}
-                        >
-                            <Link href="/pages/despesas/novadespesa"> Nova Despesa</Link>
-                        </Button>
+                            variant="bordered"
+                            // className="w-full sm:max-w-[44%]  "
+                            placeholder="Pesquisar Despesa..."
+                            startContent={<SearchIcon />}
+                            value={filterValue}
+                            onClear={() => onClear()}
+                            onValueChange={onSearchChange}
+                        />
+                    </div>
+                    <div className="col-span-2">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <input
+                                value={valueInput}
+                                placeholder={"Mês Correspondente da Fatura"}
+                                className={`w-full rounded-xl h-[43px] 
+                ${!visibilityCampo
+                                        ? 'bg-[#27272a]'
+                                        : 'bg-[#f4f4f5]'
+                                    }`}
+                                type="month"
+                                name="mescorrespondente"
+                                onChange={(e) => {
+                                    setValueInput(e.target.value);
+
+                                    const [year, month] = e.target.value.split('-'); // Divide a string no formato YYYY-MM
+                                    let newMonth = parseInt(month) // Subtrai um mês
+
+                                    let newYear = parseInt(year);
+                                    if (newMonth === 0) { // Se o mês for janeiro, precisa ajustar o ano
+                                        newMonth = 12;
+                                        newYear -= 1;
+                                    }
+
+                                    // Formata o mês para dois dígitos
+                                    const formattedMonth = String(newMonth).padStart(2, '0');
+
+                                    // Formata o novo valor de ano e mês
+                                    const previousMonthString = `${newYear}-${formattedMonth}`;
+
+                                    // Chama a função passando o mês anterior
+                                    handleDataSelect(previousMonthString);
+                                }}
+                            />
+
+                            <PDFDownloadLink document={<PdfDespesas despesas={DespesaSelect} totalFatura={currency(somaValores)} usuario={tokenUsuario} />} fileName="Despesas Patrimônio " >
+                                {({ blob, url, loading, error }) =>
+                                    loading ? 'Loading document...' : <Button className=" bg-buttonAzulClaro text-white" variant="flat" fullWidth>Imprimir</Button>
+                                }
+                            </PDFDownloadLink>
+                            <Button className=" border-orange-500 text-white bg-orange-500" variant="solid" fullWidth onClick={() => opemModalFechaFatura(DespesaSelect[0].mesCorrespondente)}>Fechar mês</Button>
+                            <Button
+                                fullWidth
+                                color="primary"
+                                variant="solid"
+                                endContent={<PlusIcon size={16} width={16} height={16} />}
+                            >
+                                <Link href="/pages/despesas/novadespesa"> Nova Despesa</Link>
+                            </Button>
+                        </div>
                     </div>
                 </div>
-                <Progress
-                    size="sm"
-                    radius="sm"
-                    classNames={{
-                        base: "max-w-md",
-                        track: "drop-shadow-md border border-default",
-                        indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
-                        label: "text-white",
-                        value: "text-white",
-                    }}
-                    label="Controle de orçamento"
-                    value={parseInt(porcentagem)}
-                    showValueLabel={true}
-                />
+                <div className="flex gap-4 items-center">
+                    <Progress
+                        size="sm"
+                        radius="sm"
+                        classNames={{
+                            base: "max-w-md",
+                            track: "drop-shadow-md border border-default",
+                            indicator: "bg-gradient-to-r from-pink-500 to-yellow-500",
+                        }}
+                        label="Controle de orçamento"
+                        value={parseInt(porcentagem)}
+                        showValueLabel={true}
+                    />
+                    <Tooltip color="warning" content="Soma entre despesas e contas" placement="right-end">
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <BsInfoCircle />
+                        </span>
+                    </Tooltip>
+
+
+                </div>
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col gap-1">
                         <span className="text-default-400 text-small font-extrabold">
@@ -436,6 +481,10 @@ export default function ListaDespesa() {
         DespesaSelect.length,
         onSearchChange,
         hasSearchFilter,
+        Despesa,
+        dataControleMensal,
+        orcamentoMensal,
+        visibilityCampo
 
     ]);
 

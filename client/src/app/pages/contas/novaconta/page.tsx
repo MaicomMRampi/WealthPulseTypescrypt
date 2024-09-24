@@ -153,8 +153,6 @@ export default function NovaConta() {
                                     Conta parcelada em {values.qtdparcelas} vezes no valor de {formatarParaReais(formatarParaBackend(values.valor) / parseInt(values.qtdparcelas))}
                                 </Alert>
                             )}
-                            {JSON.stringify(errors)}
-
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
                             {message ? (
                                 <Alert severity={messageTipo as 'success' | 'info' | 'warning' | 'error'} variant="filled">

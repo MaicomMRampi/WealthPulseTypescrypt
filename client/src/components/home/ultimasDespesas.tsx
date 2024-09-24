@@ -43,13 +43,13 @@ export default function UltimasDespesas() {
 
     return (
         <Link href="/pages/despesas/listadespesa">
-            <Card fullWidth className="w-full h-full bg-BgCardPadrao rounded-lg shadow-md p-6 duration-75 text-gray-800">
+            <Card fullWidth className="w-full h-full bg-BgCardPadrao rounded-lg shadow-md p-6 duration-75 ">
                 {rendaFii.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
                         {/* Ícone ou ilustração */}
                         <FiFileText className="text-6xl text-gray-400" />
                         {/* Mensagem de estado vazio */}
-                        <p className='text-gray-500 text-lg font-medium'>
+                        <p className=' text-lg font-medium'>
                             Nenhuma despesa foi inserida ainda.
                         </p>
                         <Button color="primary" onClick={() => mandaRota()}>
