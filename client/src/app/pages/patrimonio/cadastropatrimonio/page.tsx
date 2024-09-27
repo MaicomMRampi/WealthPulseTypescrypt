@@ -5,7 +5,7 @@ import { valorMask } from "@/components/Mask";
 import ButtonEnviarDadosPadrao from "@/components/ButtonEnviarDadosPadrao";
 import { api } from "@/lib/api";
 import { initialValues, validationSchema } from "./patrimonioForm";
-import { Input, Select, SelectItem } from "@nextui-org/react";
+import { Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import useToken from "@/components/hooks/useToken";
 import { DatePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone, today, parseZonedDateTime } from "@internationalized/date";
@@ -117,6 +117,15 @@ export default function App() {
                                     </div>
                                 }
                             />
+                            <Input
+                                fullWidth
+                                name="localizacao"
+                                isInvalid={errors.localizacao && touched.localizacao}
+                                label="Localização"
+                                autoComplete="none"
+                                value={values.localizacao}
+                                onChange={handleChange}
+                            />
                             {/* <input type="date" name="dataaquisicao" onChange={e => setFieldValue('dataaquisicao', e.target.value)} /> */}
 
                             {/* <DatePicker label="Birth date" className="max-w-[284px]" name="dataaquisicao" isRequired defaultValue={values.dataaquisicao} onChange={setFieldValue} /> */}
@@ -129,13 +138,19 @@ export default function App() {
                                     label="Data de Aquisição"
                                 />
                             </I18nProvider>
+                            <Textarea
+                                value={values.observacao}
+                                label="observacao"
+                                name="observacao"
+                                fullWidth
+                                onChange={handleChange}
+                            />
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} isSubmiting={isSubmitting} />
                             {message ?
                                 (
                                     <Alert
                                         severity="success"
                                         variant="filled"
-
                                     >
                                         {message}
                                     </Alert>

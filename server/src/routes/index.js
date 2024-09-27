@@ -455,7 +455,10 @@ router.post('/api/postpatrimonio', async (req, res) => {
                 tipoPatrimonio: dados.dados.tipopatrimonio,
                 valorPatrimonio: valorPatr,
                 dataAquisicao: formatDate(dados.dados.dataaquisicao),
-                idUser: dados.token
+                idUser: dados.token,
+                observacao: dados.dados.observacao,
+                localizacao: dados.dados.localizacao
+
             }
         })
 
@@ -1334,8 +1337,10 @@ router.delete('/api/deletaformapagamento', async (req, res) => {
 //======================Despesa===================================
 router.post('/api/novadespesa', async (req, res) => {
     const idUser = req.body.id;
+
     const { datagasto, local, valorgasto, formadepagamento, responsavel, categoria, pagante, observacao, mescorrespondente } = req.body.values;
     const dados = req.body
+    console.log("🚀 ~ router.post ~ dados", dados)
 
 
     try {

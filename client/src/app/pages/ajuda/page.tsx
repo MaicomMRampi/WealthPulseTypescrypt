@@ -110,7 +110,7 @@ export default function Ajuda() {
                                         <iframe
                                             width="100%"
                                             height="315"
-                                            src="https://www.youtube.com/embed/QkwAWe7nOXY?si=409__NXhvBzTCAbo"
+                                            src="https://www.youtube.com/embed/RVmPEBJi7e4?si=JAIx6I4ICuf-HsxW"
                                             title="YouTube video player"
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -135,7 +135,7 @@ export default function Ajuda() {
                                         <iframe
                                             width="100%"
                                             height="315"
-                                            src="https://www.youtube.com/embed/QkwAWe7nOXY?si=409__NXhvBzTCAbo"
+                                            src="https://www.youtube.com/embed/FuS-igSC4EU?si=C1t1E45Ji7lWs6S6"
                                             title="YouTube video player"
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -155,7 +155,27 @@ export default function Ajuda() {
                                         <iframe
                                             width="100%"
                                             height="315"
-                                            src="https://www.youtube.com/embed/QkwAWe7nOXY?si=409__NXhvBzTCAbo"
+                                            src="https://www.youtube.com/embed/h_M3r3K_vRc?si=itSO62_943-5X9ws"
+                                            title="YouTube video player"
+                                            frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            referrerPolicy="strict-origin-when-cross-origin"
+                                            allowFullScreen
+                                        ></iframe>
+                                    </Card>
+                                </div>
+                                <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
+                                    <Card>
+                                        <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
+                                            <p>Na tela de despesas, você poderá verificar todas as despesas ou investimentos que foram alocados para o patrimônio correspondente. Isso permite um acompanhamento detalhado dos custos associados a cada bem, como manutenções, taxas, melhorias e outros gastos. Com essa visão centralizada, fica mais fácil analisar o impacto financeiro de cada patrimônio e tomar decisões mais informadas sobre a gestão dos seus ativos.</p>
+                                        </CardBody>
+                                    </Card>
+                                    <Card>
+                                        <h2 className='text-xl text-center font-semibold'>Inserindo uma despesa no patrimônio</h2>
+                                        <iframe
+                                            width="100%"
+                                            height="315"
+                                            src="https://www.youtube.com/embed/VOANEmS7apQ?si=vydqx32m4l0k9DEX"
                                             title="YouTube video player"
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

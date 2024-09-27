@@ -33,6 +33,8 @@ import ButtonVoltar from "@/components/ButtonVoltar";
 import useToken from "@/components/hooks/useToken";
 import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData";
 import ModalDelete from "@/components/ModalDelete";
+import ModalObservacaoPatrimonios from "@/components/ModalObservacaoPatrimonios";
+import { GiPayMoney } from "react-icons/gi";
 const statusColorMap = {
     active: "success",
     paused: "danger",
@@ -68,7 +70,7 @@ export default function App() {
     const [message, setMessage] = useState("");
     const [modalInfo, setModalInfo] = useState<Modal>({ show: false, objeto: null })
     const { visibility } = useVisibility()
-    const [dados, setDados] = useState([]);
+    const [dados, setDados] = useState<any>([]);
     const [messageTipo, setMessageTipo] = useState<string>()
 
 
@@ -121,7 +123,9 @@ export default function App() {
         }, 2000);
     };
 
-
+    const somaValores =
+        dados &&
+        dados.reduce((acc: number, dados: any) => acc + dados.valorPatrimonio, 0);
 
 
     const [page, setPage] = React.useState(1);
@@ -183,14 +187,14 @@ export default function App() {
             case "actions":
                 return (
                     <div className="relative flex gap-6 items-end justify-center">
-                        <Tooltip className="" content="Despesas com o Patrimônio">
+                        <Tooltip color="success" className="" content="Despesas com o Patrimônio">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <MdRemoveRedEye className="text-[#93fad6]" onClick={() => mandaRota(patrimonio.id)} />
+                                <GiPayMoney className="text-[#93fad6]" onClick={() => mandaRota(patrimonio.id)} />
                             </span>
                         </Tooltip>
-                        <Tooltip className="" content="Editar">
-                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <EditIcon className="text-[#93fad6]" />
+                        <Tooltip className="" content="Mais Informações">
+                            <span onClick={() => setModalInfo({ show: true, objeto: patrimonio })} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                <EditIcon className="text-iconeDeBloquiar" />
                             </span>
                         </Tooltip>
                         <Tooltip className="" color="danger" content="Deletar">
@@ -278,7 +282,10 @@ export default function App() {
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small font-extrabold">Total {dados.length} patrimônios cadastrados</span>
+                    <div className="flex flex-col gap-2">
+                        <span className="text-default-400 text-small font-extrabold">Total de <span className="text-primaryTableHover">{dados.length}</span> patrimônios cadastrados</span>
+                        <span className="text-default-400 text-small font-extrabold">Total em patrimônios <span className="text-primaryTableHover">{somaValores && currency(somaValores)}</span> </span>
+                    </div>
                     <label className="flex items-center text-default-400 text-small">
                         Linhas por páginas
                         <select
@@ -336,7 +343,7 @@ export default function App() {
     return (
 
         <div key={String(visibility)} className="px-4 w-full" >
-            <TitlePage title="Meus patrimônios" />
+            <TitlePage title="Meus Patrimônios" />
             <div className="rounded-lg bg-BgCardPadrao    mt-12 ">
                 <Table
                     aria-label="Example table with custom cells, pagination and sorting"
@@ -380,6 +387,11 @@ export default function App() {
                     confirmaEsclusao={deletaPatrimonio}
                     message={message}
                     messageTipo={messageTipo}
+                />
+                <ModalObservacaoPatrimonios
+                    open={modalInfo.show}
+                    observacao={modalInfo.objeto}
+                    onClose={() => setModalInfo({ ...modalInfo, show: false })}
                 />
             </div>
         </div>

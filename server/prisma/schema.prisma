@@ -164,6 +164,8 @@ model Patrimonio {
   valorPatrimonio Float
   dataAquisicao   String
   idUser          Int
+  localizacao     String?
+  observacao      String?
   DespesaDeBens   DespesaDeBens[]
 }
 

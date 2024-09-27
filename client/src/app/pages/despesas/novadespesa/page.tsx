@@ -323,12 +323,12 @@ export default function NovaDespesa() {
                                     autoComplete="local"
                                     onChange={handleChange}
                                 />
-
-
                                 <Textarea
+                                    value={values.observacao}
                                     label="observacao"
                                     name="observacao"
                                     fullWidth
+                                    onChange={handleChange}
                                 />
 
                             </div>

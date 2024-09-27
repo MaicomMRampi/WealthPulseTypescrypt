@@ -7,9 +7,14 @@ const initialValues = {
     formadepagamento: '',
     valorgasto: '',
     dataaquisicao: today(getLocalTimeZone()),
+    observacao: '',
 }
 
 const validationSchema = yup.object().shape({
+    observacao: yup
+        .string()
+        .optional(),
+
     responsavel: yup
         .string()
         .required('O Nome é Obrigatório'),

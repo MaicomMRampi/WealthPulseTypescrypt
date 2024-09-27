@@ -41,6 +41,10 @@ export default function UltimasDespesas() {
     }
 
 
+    const alteraOsDadosDespesas = rendaFii.sort((a: any, b: any) => b.id - a.id);
+
+
+
     return (
         <Link href="/pages/despesas/listadespesa">
             <Card fullWidth className="w-full h-full bg-BgCardPadrao rounded-lg shadow-md p-6 duration-75 ">
@@ -65,7 +69,7 @@ export default function UltimasDespesas() {
                                 <TableColumn>Valor Gasto</TableColumn>
                             </TableHeader>
                             <TableBody>
-                                {rendaFii && rendaFii.slice(0, 5).map((row, index) => (
+                                {alteraOsDadosDespesas && alteraOsDadosDespesas.slice(0, 5).map((row, index) => (
                                     <TableRow key={index}>
                                         <TableCell>{row.categoria.nomeCategoria?.toUpperCase()}</TableCell>
                                         <TableCell>{visibility ? currency(row.valorGasto) : "****"}</TableCell>

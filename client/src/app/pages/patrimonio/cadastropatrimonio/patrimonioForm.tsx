@@ -6,6 +6,8 @@ const initialValues = {
     tipopatrimonio: '',
     valor: '',
     dataaquisicao: today(getLocalTimeZone()),
+    localizacao: '',
+    observacao: '',
 };
 
 // ... (Função Label - Se necessário) 
@@ -15,6 +17,8 @@ const validationSchema = Yup.object().shape({
     tipopatrimonio: Yup.string().required('Tipo é obrigatório'),
     valor: Yup.string().required('Valor é obrigatório'),
     dataaquisicao: Yup.date().required('Data é obrigatório'),
+    localizacao: Yup.string().optional(),
+    observacao: Yup.string().optional(),
 });
 
 export { initialValues, validationSchema }
