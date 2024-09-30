@@ -339,10 +339,12 @@ export default function DetalhesDosGastos({ params }: any) {
                             value={filterValue}
                             onClear={() => onClear()}
                             onValueChange={onSearchChange}
+                            variant='bordered'
                         />
                         <Select
                             className="max-w-[200px] text-black"
                             size="md"
+                            variant='bordered'
                             placeholder="Todos"
                             value={filtroInativo}
                             onChange={(e: any) => setFiltroInativo(e.target.value)}

@@ -43,6 +43,7 @@ import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData"
 import ButtonVoltar from "@/components/ButtonVoltar";
 import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
 import { CheckIcon } from "../../patrimonio/detalhes/[id]/CheckIcon";
+import { MdBlockFlipped } from "react-icons/md";
 import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
 import { MdOutlinePayments } from "react-icons/md";
 
@@ -276,11 +277,11 @@ export default function ListaConta() {
                         despesa.pago === 0 ?
                             (
                                 <Chip
-                                    startContent={<CheckIcon size={18} width={18} height={18} />}
+                                    startContent={<MdBlockFlipped size={18} width={18} height={18} />}
                                     variant="faded"
                                     color="danger"
                                 >
-                                    À pagar
+                                    Não pago
                                 </Chip>
                             )
                             :

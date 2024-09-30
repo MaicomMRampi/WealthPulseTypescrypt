@@ -167,7 +167,7 @@ export default function Ajuda() {
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
-                                            <p>Na tela de despesas, você poderá verificar todas as despesas ou investimentos que foram alocados para o patrimônio correspondente. Isso permite um acompanhamento detalhado dos custos associados a cada bem, como manutenções, taxas, melhorias e outros gastos. Com essa visão centralizada, fica mais fácil analisar o impacto financeiro de cada patrimônio e tomar decisões mais informadas sobre a gestão dos seus ativos.</p>
+                                            <p>Nos patrimônios, é possível adicionar despesas relacionadas, permitindo um acompanhamento detalhado dos custos associados a cada bem.</p>
                                         </CardBody>
                                     </Card>
                                     <Card>
@@ -195,7 +195,7 @@ export default function Ajuda() {
                                         <iframe
                                             width="100%"
                                             height="315"
-                                            src="https://www.youtube.com/embed/QkwAWe7nOXY?si=409__NXhvBzTCAbo"
+                                            src="https://www.youtube.com/embed/twcEpUZWp78?si=NbQl9pqTZWM-dXBO"
                                             title="YouTube video player"
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -224,7 +224,7 @@ export default function Ajuda() {
                                         <iframe
                                             width="100%"
                                             height="315"
-                                            src="https://www.youtube.com/embed/QkwAWe7nOXY?si=409__NXhvBzTCAbo"
+                                            src="https://www.youtube.com/embed/58_GRE2qvCg?si=wF9oJkgOB4JY6YvK"
                                             title="YouTube video player"
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
