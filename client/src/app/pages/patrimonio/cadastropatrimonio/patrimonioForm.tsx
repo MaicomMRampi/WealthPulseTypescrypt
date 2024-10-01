@@ -8,6 +8,7 @@ const initialValues = {
     dataaquisicao: today(getLocalTimeZone()),
     localizacao: '',
     observacao: '',
+    document: '',
 };
 
 // ... (Função Label - Se necessário) 
@@ -19,6 +20,7 @@ const validationSchema = Yup.object().shape({
     dataaquisicao: Yup.date().required('Data é obrigatório'),
     localizacao: Yup.string().optional(),
     observacao: Yup.string().optional(),
+    document: Yup.string().optional(),
 });
 
 export { initialValues, validationSchema }

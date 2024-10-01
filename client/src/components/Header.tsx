@@ -196,7 +196,7 @@ export default function App() {
                                     color="success"
                                     name={tokenUsuario?.nome}
                                     size="sm"
-                                    src={tokenUsuario?.imageUrl ? `http://localhost:3333/uploads/${tokenUsuario?.imageUrl}` : ''}
+                                    src={tokenUsuario?.imageUrl ? `http://localhost:3333/uploads/images/${tokenUsuario?.imageUrl}` : ''}
                                 />
                             </DropdownTrigger>
                             <DropdownMenu aria-label="Profile Actions" variant="flat">

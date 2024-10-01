@@ -35,6 +35,7 @@ import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData"
 import ModalDelete from "@/components/ModalDelete";
 import ModalObservacaoPatrimonios from "@/components/ModalObservacaoPatrimonios";
 import { GiPayMoney } from "react-icons/gi";
+import { BsFiletypeDoc } from "react-icons/bs";
 const statusColorMap = {
     active: "success",
     paused: "danger",
@@ -123,6 +124,13 @@ export default function App() {
         }, 2000);
     };
 
+    const downloadDocument = (nomeDoc: string) => {
+        window.open(`http://localhost:3333/uploads/document/${tokenUsuario?.id}/${nomeDoc}`, '_blank');
+    }
+
+
+
+
     const somaValores =
         dados &&
         dados.reduce((acc: number, dados: any) => acc + dados.valorPatrimonio, 0);
@@ -186,7 +194,7 @@ export default function App() {
                 );
             case "actions":
                 return (
-                    <div className="relative flex gap-6 items-end justify-center">
+                    <div className="relative flex gap-6 items-end ">
                         <Tooltip color="success" className="" content="Despesas com o Patrimônio">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <GiPayMoney className="text-[#93fad6]" onClick={() => mandaRota(patrimonio.id)} />
@@ -202,6 +210,10 @@ export default function App() {
                                 <DeleteIcon className="text-red-500" />
                             </span>
                         </Tooltip>
+                        <Tooltip className="bg-slate-400" content="Dowload ">
+                            <p>{patrimonio.documentoPath ? <BsFiletypeDoc onClick={() => downloadDocument(patrimonio.documentoPath)} className="text-lg text-white cursor-pointer active:opacity-50" /> : null}</p>
+                        </Tooltip>
+
                     </div>
                 );
             case "valorPatrimonio":
@@ -219,7 +231,11 @@ export default function App() {
                 );
             case "dataAquisicao":
                 return (
-                    <p>{AlteraVisualizacaoData(patrimonio.dataAquisicao)}</p>
+                    <p>{patrimonio.dataAquisicao}</p>
+                );
+            case "documentoPath":
+                return (
+                    <p>{patrimonio.documentoPath}</p>
                 );
             default:
                 return cellValue;
@@ -366,7 +382,7 @@ export default function App() {
                             <TableColumn
                                 className="text-primaryTableText font-bold "
                                 key={column.uid}
-                                align={column.uid === "actions" ? "center" : "start"}
+                                align={column.uid === "actions" ? "start" : "start"}
                             >
                                 {column.name}
                             </TableColumn>

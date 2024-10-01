@@ -19,6 +19,9 @@ export default function EditarCadastro() {
 
 
     const handleImageChange = async (e: any) => {
+        const userId = tokenUsuario?.id.toString() || '0';
+        console.log("🚀 ~ handleImageChange ~ userId", userId)
+
         const file = e.target.files[0];
         if (file) {
             const imageURL = URL.createObjectURL(file);
@@ -28,10 +31,15 @@ export default function EditarCadastro() {
 
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('id', tokenUsuario?.id.toString() || '0');
+        formData.append('id', userId);
+
 
         try {
-            const response = await api.post('/upload', formData);
+            const response = await api.post('/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
         } catch (error) {
             console.error("Erro no upload:", error);
         }
@@ -101,6 +109,7 @@ export default function EditarCadastro() {
                                         onChange={handleImageChange}
                                         className="hidden w-[60px]"
                                         id="upload-button"
+                                        name='image'
                                     />
                                     <label className="w-[100%]" htmlFor="upload-button">
                                         <Button fullWidth className='bg-buttonAzulClaro' as="span">Nova foto</Button>

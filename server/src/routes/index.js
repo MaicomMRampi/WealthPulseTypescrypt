@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const dbConnect = require('../utils/dbConnect')
-const DividendosSchema = require('../models/dividendos OK')
 const { crypto } = require('../utils/password')
 const { converteString } = require('../utils/converteString')
 const bcrypt = require('bcryptjs')
@@ -10,27 +9,96 @@ const jwt = require('jsonwebtoken');
 const ex = require('express')
 const multer = require('multer')
 const path = require('path')
+const fs = require('fs');
 
-
+//=================Multer para a imagem 
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Define o diretório de destino
-        cb(null, 'uploads/');
+        try {
+            const userId = req.body; // Obtendo o ID do usuário
+            const userDirectory = path.resolve(__dirname, '..', '..', 'uploads', 'images');
+            // Verifica se o diretório existe, caso contrário, cria
+            if (!fs.existsSync(userDirectory)) {
+                fs.mkdirSync(userDirectory, { recursive: true });
+            }
+            cb(null, userDirectory);
+
+        } catch (err) {
+            console.log("🚀 ~ err", err)
+        }
     },
+
     filename: function (req, file, cb) {
-        // Obtém o nome original do arquivo e sua extensão
         const ext = path.extname(file.originalname);
         const name = path.basename(file.originalname, ext);
-        const userId = req.body;
-        console.log("🚀 ~ userId", userId)
-        // Define o nome do arquivo a ser salvo (somente nome e extensão)
         cb(null, `${name}${ext}`);
     }
-
 });
 
 const upload = multer({ storage: storage });
+//=============================================================
+
+// ===========SALVA OS DOCUMENTOS========
+
+const storageDoc = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const userId = req.body.idUser;
+        // Caminho absoluto para a pasta de documentos do usuário
+        const userDirectory = path.resolve(__dirname, '..', '..', 'uploads', 'document', userId);
+
+        // Verifica se o diretório existe, caso contrário, cria
+        if (!fs.existsSync(userDirectory)) {
+            fs.mkdirSync(userDirectory, { recursive: true }); // Cria o diretório, incluindo os pais se necessário
+        }
+
+        // Define o diretório de destino
+        cb(null, userDirectory);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const fileExtension = path.extname(file.originalname); // Mantém a extensão original
+        cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
+    }
+});
+
+// Validação de tipo de arquivo e tamanho
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = /pdf|doc|docx|jpg|jpeg|png/;
+
+    // Tipos MIME permitidos para os arquivos
+    const allowedMimeTypes = [
+        'application/pdf',
+        'application/msword', // Para .doc
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // Para .docx
+        'image/jpeg', // Para .jpg e .jpeg
+        'image/png'   // Para .png
+    ];
+
+    const fileExtension = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimeType = allowedMimeTypes.includes(file.mimetype);
+
+    if (fileExtension && mimeType) {
+        cb(null, true); // Aceita o arquivo
+    } else {
+        cb(new Error('Tipo de arquivo inválido. Apenas PDF, DOC, DOCX, JPG e PNG são permitidos.'));
+    }
+};
+
+const uploaddoc = multer({
+    storage: storageDoc,
+    limits: { fileSize: 2 * 1024 * 1024 }, // Limite de 2MB
+    fileFilter: fileFilter
+});
+
+
+
+
+
+
+
+
+
 
 
 //=====================MERCADO PAGO API=====================
@@ -400,6 +468,7 @@ router.post('/api/atualizacadastro', async (req, res) => {
 router.post('/api/upload', upload.single('image'), async (req, res) => {
     const file = req.file;
     const userId = req.body.id;
+    console.log("🚀 ~ router.post ~ userId", userId)
     if (!file) {
         return res.status(400).send('Nenhum arquivo enviado.');
     }
@@ -437,36 +506,76 @@ router.put('/api/fechamodalboasvindas', async (req, res) => {
 
 });
 
+router.get('/api/downloaddoc', (req, res) => {
+    try {
+        const dados = req.query
+        console.log("🚀 ~ router.get ~ dados", dados)
+        const nomeDocumento = dados.nomeDoc
+        console.log("🚀 ~ router.get ~ nomeDocumento", nomeDocumento)
+        const idUser = dados.id
+        const directoryPath = path.join(__dirname, 'uploads/document');
+        const dowload = res.download(directoryPath, `${nomeDocumento}`);
+
+        console.log("🚀 ~ router.get ~ dowload", dowload)
+    } catch (error) {
+        console.log(error)
+    }
+
+
+})
 
 
 // === patrimônio============
 
-router.post('/api/postpatrimonio', async (req, res) => {
+router.post('/api/postpatrimonio', uploaddoc.single('document'), async (req, res) => {
     const dados = req.body;
+    const arquivo = req.file; // O arquivo enviado
+
+    console.log("🚀 ~ router.post ~ dados", dados);
+    console.log("🚀 ~ router.post ~ arquivo", arquivo);
 
     try {
-        const nomeUper = dados.dados.nome.toUpperCase()
+        const nomeUper = dados.nome.toUpperCase();
+        const valorPatr = converteString(dados.valor);
 
-
-        const valorPatr = converteString(dados.dados.valor)
+        // Salva o patrimônio no banco sem o documentoPath por enquanto
         const patrimonio = await prisma.patrimonio.create({
             data: {
                 nomePatrimonio: nomeUper,
-                tipoPatrimonio: dados.dados.tipopatrimonio,
+                tipoPatrimonio: dados.tipopatrimonio,
                 valorPatrimonio: valorPatr,
-                dataAquisicao: formatDate(dados.dados.dataaquisicao),
-                idUser: dados.token,
-                observacao: dados.dados.observacao,
-                localizacao: dados.dados.localizacao
+                dataAquisicao: dados.dataaquisicao,
+                idUser: parseInt(dados.idUser),
+                observacao: dados.observacao,
+                localizacao: dados.localizacao,
+                documentoPath: null, // Adiciona o documento mais tarde
+            },
+        });
 
-            }
-        })
+        // Se houver um arquivo, renomeie-o com o ID do patrimônio, mantendo o diretório original
+        if (arquivo) {
+            const novoNomeArquivo = `${patrimonio.id}-${arquivo.originalname}`;
+            const caminhoOriginal = arquivo.path; // Caminho original do arquivo
+            const novoCaminho = path.join(path.dirname(caminhoOriginal), novoNomeArquivo); // Mesmo diretório, novo nome
 
-        return res.status(200).json({ message: 'Patrimonio Cadastrado com Sucesso' });
+            // Renomeia o arquivo no mesmo diretório
+            fs.renameSync(caminhoOriginal, novoCaminho);
+
+            // Atualiza o patrimônio com o nome do arquivo renomeado
+            await prisma.patrimonio.update({
+                where: { id: patrimonio.id },
+                data: {
+                    documentoPath: novoNomeArquivo, // Nome atualizado do arquivo
+                },
+            });
+        }
+
+        return res.status(200).json({ message: 'Patrimônio Cadastrado com Sucesso' });
     } catch (error) {
-        res.status(500).json({ message: 'Erro ao Cadastrar Patrimonio', error });
+        console.error("🚀 ~ router.post ~ error", error);
+        res.status(500).json({ message: 'Erro ao Cadastrar Patrimônio', error });
     }
-})
+});
 router.get('/api/buscabem', async (req, res) => {
     try {
         const dados = req.query.id;

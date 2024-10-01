@@ -166,6 +166,7 @@ model Patrimonio {
   idUser          Int
   localizacao     String?
   observacao      String?
+  documentoPath   String?
   DespesaDeBens   DespesaDeBens[]
 }
 
