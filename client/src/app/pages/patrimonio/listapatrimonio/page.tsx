@@ -129,7 +129,13 @@ export default function App() {
     }
 
 
-
+    function formatarDataString(dataString: any) {
+        const partesData = dataString.split('-'); // Divide a string pela barra '-'
+        const ano = partesData[0];
+        const mes = partesData[1];
+        const dia = partesData[2];
+        return `${dia}/${mes}/${ano}`;
+    }
 
     const somaValores =
         dados &&
@@ -231,7 +237,7 @@ export default function App() {
                 );
             case "dataAquisicao":
                 return (
-                    <p>{patrimonio.dataAquisicao}</p>
+                    <p>{formatarDataString(patrimonio.dataAquisicao)}</p>
                 );
             case "documentoPath":
                 return (
@@ -350,7 +356,7 @@ export default function App() {
                     <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
                         Next
                     </Button>
-                    <ButtonVoltar tamanho={false} />
+                    <ButtonVoltar tamanho={false} size='sm' />
                 </div>
             </div>
         );

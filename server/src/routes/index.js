@@ -1235,6 +1235,41 @@ router.delete('/api/deletaInvestimento', async (req, res) => {
     }
 });
 
+router.post('/api/sacarvencido', async (req, res) => {
+    try {
+        const dados = req.body;
+        console.log("🚀 ~ router.post ~ dados", dados)
+
+        // insere na tabela de transações
+
+        const valorSalvar = 2500
+        const transacao = await prisma.FechamentoInvestimento.create({
+            data: {
+                idInvestimento: dados.investimento.id,
+                idUser: dados.investimento.idUser,
+                valorInvestido: dados.investimento.valorInvestido,
+                valorResgatado: valorSalvar,
+                dataFechamento: dados.investimento.dataVencimento,
+                retornoObtido: converteString(dados.values.valorjuros) - dados.investimento.valorInvestido,
+                tipoFechamento: 'vencimento',
+                observacao: dados.values.observacao,
+                dataSaque: new Date()
+            }
+        });
+
+        const deletaInvestimento = await prisma.Investimento.delete({
+            where: {
+                id: dados.investimento.id
+            }
+        })
+        res.status(200).json({ message: 'Investimento inserido' })
+    } catch (error) {
+        console.log("🚀 ~ router.post ~ error", error)
+    }
+
+
+
+})
 
 
 

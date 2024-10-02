@@ -156,6 +156,7 @@ export default function App() {
                             <div className="flex flex-col space-y-4 text-sm">
                                 <HoveredLink href="/pages/investimentos/listainvestimento">Meus Investimentos</HoveredLink>
                                 <HoveredLink href="/pages/investimentos/novoinvestimento">Novos Investimentos</HoveredLink>
+                                <HoveredLink href="/pages/investimentos/novoinvestimento">Transações</HoveredLink>
                             </div>
                         </MenuItem>
                         <MenuItem setActive={setActive} active={active} item="Contas">

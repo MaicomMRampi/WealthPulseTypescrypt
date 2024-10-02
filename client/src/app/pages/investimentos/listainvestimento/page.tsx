@@ -34,6 +34,7 @@ import ModalDetalhesFii from "@/components/ModalDetalhesFii";
 import ModalJuros from "@/components/ModalJuros";
 import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 import ModalDelete from "@/components/ModalDelete";
+import ModalSacar from "@/components/ModalSacar";
 
 type Dados = {
     tipo: string
@@ -49,7 +50,17 @@ type ModalDelete = {
     objeto: any
 }
 
+type ModalSacar = {
+    open: boolean
+    objeto: any
+}
+
 export default function App() {
+    const [modalSacar, setModalSacar] = useState<ModalSacar>({
+        open: false,
+        objeto: null
+    })
+    console.log("🚀 ~ App ~ modalSacar", modalSacar)
     const [total, setTotal] = useState(0)
     const [juros, setJuros] = useState<any>()
     const [modalDelete, setModalDelete] = useState<ModalDelete>({ openClose: false, objeto: null });
@@ -66,6 +77,7 @@ export default function App() {
     const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['todos']));
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState<any>({
+
         column: "age",
         direction: "ascending",
     });
@@ -237,7 +249,6 @@ export default function App() {
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
     }, [sortDescriptor, items]);
-
     const renderCell = React.useCallback((investimento: any, columnKey: any) => {
         const cellValue = investimento[columnKey];
 
@@ -273,7 +284,7 @@ export default function App() {
                             </DropdownTrigger>
                             <DropdownMenu>
                                 <DropdownItem onClick={() => setModalDelete({ openClose: true, objeto: investimento.id })}>Deletar</DropdownItem>
-                                <DropdownItem>Detalhes</DropdownItem>
+                                <DropdownItem onClick={() => setModalSacar({ open: true, objeto: investimento })} >Sacar/Vencido</DropdownItem>
                                 <DropdownItem>Editar</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
@@ -518,7 +529,11 @@ export default function App() {
                 messageTipo={messageTipo}
                 objeto={''}
             />
-
+            <ModalSacar
+                open={modalSacar.open}
+                onClose={() => setModalSacar({ open: false, objeto: null })}
+                object={modalSacar.objeto}
+            />
         </div>
 
     );

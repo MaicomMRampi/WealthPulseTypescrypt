@@ -10,7 +10,7 @@ import PrevidenciaPrivada from "@/components/investimentosComponent/previdenciaP
 import Debentures from "@/components/investimentosComponent/debentures/Debentures";
 
 export default function App() {
-    const [tipoInvestimento, setTipoInvestimento] = useState("acao");
+    const [tipoInvestimento, setTipoInvestimento] = useState("");
     return (
         <div className="pt-8 flex flex-col gap-3 md:w-[60%] xs:w-full px-4 mx-auto">
             <Select

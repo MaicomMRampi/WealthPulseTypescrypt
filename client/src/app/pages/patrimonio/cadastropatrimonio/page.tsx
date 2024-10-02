@@ -162,13 +162,23 @@ export default function App() {
                                         label="Data de Aquisição"
                                     />
                                 </I18nProvider>
-                                <input
-                                    type="file"
-                                    className={`w-full rounded-xl h-[43px] ${!visibilityCampo ? 'bg-[#27272a]' : 'bg-[#f4f4f5]'}`}
-                                    name="document"
-                                    accept=".pdf,.doc,.docx,.jpg,.png" // Tipos permitidos
-                                    onChange={(e: any) => setSelectedFile(e.target.files[0])}
-                                />
+                                <div className="w-full">
+                                    <label className={`flex flex-col items-center justify-center px-4 py-2 h-[57px] text-sm text-[#6b7280] rounded-xl border border-dashed cursor-pointer transition-colors
+    ${!visibilityCampo ? 'bg-[#27272a] hover:bg-gray-700' : 'bg-[#f4f4f5] hover:bg-gray-200'}`}>
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                        <span className="mt-1 text-sm leading-normal">Anexar documento</span>
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            name="document"
+                                            accept=".pdf,.doc,.docx,.jpg,.png"
+                                            onChange={(e: any) => setSelectedFile(e.target.files[0])}
+                                        />
+                                    </label>
+                                </div>
+
                                 <Textarea
                                     value={values.observacao}
                                     label="observacao"

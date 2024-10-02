@@ -246,7 +246,7 @@ export default function Ajuda() {
                                         <iframe
                                             width="100%"
                                             height="315"
-                                            src="https://www.youtube.com/embed/QkwAWe7nOXY?si=409__NXhvBzTCAbo"
+                                            src="https://www.youtube.com/embed/8BSu_-Et7gw?si=3ZyJyU06WPMH86im"
                                             title="YouTube video player"
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
