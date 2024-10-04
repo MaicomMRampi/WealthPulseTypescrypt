@@ -4,6 +4,8 @@ import { useTheme } from "next-themes";
 import { useRouter, usePathname } from "next/navigation";
 import ModalBoasVindas from "@/components/ModalBoasVindas"
 import ModalPrimeirosPassos from "@/components/ModalPrimeirosPassos"
+import { FaHome, FaClipboardList, FaMoneyBill, FaFolderPlus, FaWallet, FaChartLine, FaRegClipboard, FaFileInvoiceDollar, FaTags, FaQuestionCircle } from 'react-icons/fa';
+import { MdAccountBalance } from 'react-icons/md';
 import {
     Navbar, NavbarBrand, NavbarContent, NavbarItem, Input,
     DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Switch,
@@ -64,19 +66,20 @@ export default function App() {
 
 
     const menuItems = [
-        { pagina: "Inicio", link: "/" },
-        { pagina: "Cadastro De Patrimônio", link: "/pages/patrimonio/cadastropatrimonio" },
-        { pagina: "Lista De Patrimônios", link: "/pages/patrimonio/listapatrimonio" },
-        { pagina: "Nova Despesa de Patrimônios", link: "/pages/patrimonio/novadespesapatrimonio" },
-        { pagina: "Meus Investimentos", link: "/pages/investimentos/listainvestimento" },
-        { pagina: "Novos Investimentos", link: "/pages/investimentos/novoinvestimento" },
-        { pagina: "Minhas Contas", link: "/pages/contas/listaconta" },
-        { pagina: "Nova Conta", link: "/pages/contas/novaconta" },
-        { pagina: "Minhas Despesas", link: "/pages/despesas/listadespesa" },
-        { pagina: "Nova Despesa", link: "/pages/despesas/novadespesa" },
+        { pagina: "Início", link: "/", icon: <FaHome /> },
+        { pagina: "Cadastro de Patrimônio", link: "/pages/patrimonio/cadastropatrimonio", icon: <MdAccountBalance /> },
+        { pagina: "Lista de Patrimônios", link: "/pages/patrimonio/listapatrimonio", icon: <FaClipboardList /> },
+        { pagina: "Nova Despesa de Patrimônios", link: "/pages/patrimonio/novadespesapatrimonio", icon: <FaTags /> },
+        { pagina: "Meus Investimentos", link: "/pages/investimentos/listainvestimento", icon: <FaWallet /> },
+        { pagina: "Novos Investimentos", link: "/pages/investimentos/novoinvestimento", icon: <FaFolderPlus /> },
+        { pagina: "Transações", link: "/pages/investimentos/transacoes", icon: <FaChartLine /> },
+        { pagina: "Minhas Contas", link: "/pages/contas/listaconta", icon: <FaMoneyBill /> },
+        { pagina: "Nova Conta", link: "/pages/contas/novaconta", icon: <FaFileInvoiceDollar /> },
+        { pagina: "Minhas Despesas", link: "/pages/despesas/listadespesa", icon: <FaRegClipboard /> },
+        { pagina: "Nova Despesa", link: "/pages/despesas/novadespesa", icon: <FaTags /> },
+        { pagina: "Controle de Assinatura", link: "/pages/pagamentos", icon: <FaClipboardList /> },
+        { pagina: "Ajuda", link: "/pages/ajuda", icon: <FaQuestionCircle /> },
     ];
-
-
     const trocaValorVisibilidade = () => {
         toggleVisibilityCampo();
     };
@@ -220,15 +223,27 @@ export default function App() {
                         </Dropdown>
                     </NavbarContent>
                 </div>
-                <NavbarMenu >
-                    {menuItems.map((item, index) => (
-                        <NavbarMenuItem onClick={() => setIsMenuOpen(false)} key={index} isActive={pathname === item.link}>
-                            <Link className="p-4 text-lg text-gray-700 hover:bg-gray-200 transition-colors" href={item.link}>
-                                {item.pagina}
-                            </Link>
-                        </NavbarMenuItem>
-                    ))}
+                <NavbarMenu>
+                    <div className="bg-BgCardPadrao rounded-lg shadow-lg p-4">
+                        {menuItems.map((item: any, index: number) => (
+                            <NavbarMenuItem
+                                onClick={() => setIsMenuOpen(false)}
+                                key={index}
+                                isActive={pathname === item.link}
+                            >
+                                <Link
+                                    className={`flex items-center p-4 text-lg rounded-md transition-colors duration-200 
+                        ${pathname === item.link ? 'bg-primaryTableText text-white' : 'text-gray-300 hover:bg-gray-200'}`}
+                                    href={item.link}
+                                >
+                                    <span className="mr-2">{item.icon}</span> {/* Ícone adicionado aqui */}
+                                    {item.pagina}
+                                </Link>
+                            </NavbarMenuItem>
+                        ))}
+                    </div>
                 </NavbarMenu>
+
             </Navbar >
             <ModalBoasVindas
                 isOpen={opemModalBoasVindas}

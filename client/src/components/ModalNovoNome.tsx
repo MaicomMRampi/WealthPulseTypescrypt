@@ -53,7 +53,7 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: P
                             <ModalContent>
                                 {(onClose) => (
                                     <>
-                                        <ModalHeader className="flex flex-col gap-1 text-center">Nome da Investimento</ModalHeader>
+                                        <ModalHeader className="flex flex-col gap-1 text-center">Nome do Investimento</ModalHeader>
                                         <ModalBody>
                                             <Input
                                                 onChange={handleChange}
@@ -62,7 +62,7 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: P
                                                 type="text"
                                                 variant="bordered"
                                                 name="nomefundo"
-                                                className="border-white text-white"
+                                                className="border-white"
 
                                             />
                                             {errors.nomefundo && touched.nomefundo && <p className="text-red-500 text-xs">{errors.nomefundo}</p>}

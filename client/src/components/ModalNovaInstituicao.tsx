@@ -38,7 +38,7 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: P
                 isOpen={open}
                 placement="center"
                 onClose={onClose}
-                className="bg-black rounded-lg p-4" backdrop="opaque"
+                className="bg-BgCardPadrao rounded-lg p-4" backdrop="opaque"
             >
                 <Formik
                     initialValues={initialValues}
@@ -62,7 +62,7 @@ export default function App({ open, onClose, onSubmit, message, messageTipo }: P
                                                 type="text"
                                                 variant="bordered"
                                                 name="instituicao"
-                                                className="border-white text-white"
+                                                className="border-white"
                                                 isInvalid={errors.instituicao && touched.instituicao ? true : false}
                                             />
                                         </ModalBody>

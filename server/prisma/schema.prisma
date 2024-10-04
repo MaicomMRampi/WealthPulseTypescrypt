@@ -161,6 +161,8 @@ model FechamentoInvestimento {
   tipoFechamento   String? // Tipo de fechamento (ex: "vencimento", "venda antecipada", etc.)
   observacao       String? // Observações adicionais (motivo da venda, detalhes sobre o resgate)
   dataSaque        DateTime @default(now()) // Data de criação do registro
+  quantidadeCotas  Int?
+  precoCota        Float?
 }
 
 model GanhosInvestimentos {

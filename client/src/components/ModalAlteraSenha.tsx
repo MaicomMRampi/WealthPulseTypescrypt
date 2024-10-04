@@ -18,6 +18,7 @@ interface Props {
 
 export default function ModalDele({ isOpen, onClose, onSubmit }: Props) {
     const [valor, setValor] = useState<string>('');
+    console.log("🚀 ~ ModalDele ~ valor", valor.length)
 
 
     const handleConfirmar = () => {
@@ -57,7 +58,7 @@ export default function ModalDele({ isOpen, onClose, onSubmit }: Props) {
                                 >
                                     Cancelar
                                 </Button>
-                                <Button onClick={handleConfirmar} variant="solid" color="success" >
+                                <Button isDisabled={valor.length !== 14} onClick={handleConfirmar} variant="solid" color="success" >
                                     Confirmar
                                 </Button>
                             </ModalFooter>

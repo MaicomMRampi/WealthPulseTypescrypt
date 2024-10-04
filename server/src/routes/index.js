@@ -25,7 +25,6 @@ const storage = multer.diskStorage({
             cb(null, userDirectory);
 
         } catch (err) {
-            console.log("🚀 ~ err", err)
         }
     },
 
@@ -184,7 +183,6 @@ router.get('/api/verificapagamento', async (req, res) => {
 
 router.put('/api/alterapagamento', async (req, res) => {
     const id = req.body.id
-    console.log("🚀 ~ router.put ~ id", id)
     try {
         const alteraStatusFinanceiro = await prisma.Usuario.update({
             where: {
@@ -220,7 +218,6 @@ router.post('/api/geracobranca', async (req, res) => {
 router.get('/api/buscaultimapagamento', async (req, res) => {
     try {
         const iDUsuario = req.query.id
-        console.log("🚀 ~ router.get ~ iDUsuario", iDUsuario)
         const buscaPagamento = await prisma.UsuarioPagamento.findFirst({
             where: {
                 idUser: parseInt(iDUsuario), // Buscar pelo siDUsuario
@@ -238,7 +235,6 @@ router.get('/api/buscaultimapagamento', async (req, res) => {
 router.get('/api/usuariopagamento', async (req, res) => {
 
     const id = req.query.id
-    console.log("🚀 ~ router.get ~ id", id)
     try {
         const buscaPagamento = await prisma.UsuarioPagamento.findMany({
             where: {
@@ -295,7 +291,6 @@ router.post('/api/postpagamento', async (req, res) => {
 
     try {
         const dadosPagamento = req.body;
-        console.log("🚀 ~ router.post ~ idUsuario", dadosPagamento);
         // ATUALIZA O PAGAMENTO QUE ESTAVA VENCIDO ============
         const buscaPagamentoPendente = await prisma.UsuarioPagamento.update({
             where: {
@@ -311,7 +306,6 @@ router.post('/api/postpagamento', async (req, res) => {
         });
         // CRIA UM NOVO PAGAMENTO ============
         const tipo = typeof dadosPagamento.idPagamento.idUser
-        console.log("🚀 ~ router.post ~ tipo", tipo)
 
         const criaNovoPagamento = await prisma.UsuarioPagamento.create({
             data: {
@@ -339,7 +333,6 @@ router.post('/api/postpagamento', async (req, res) => {
         res.status(200).json({ message: 'Pagamento Executado' });
 
     } catch (error) {
-        console.log("🚀 ~ router.post ~ error", error);
         res.status(500).json({ message: 'Erro no processamento do pagamento' });
     }
 });
@@ -468,7 +461,6 @@ router.post('/api/atualizacadastro', async (req, res) => {
 router.post('/api/upload', upload.single('image'), async (req, res) => {
     const file = req.file;
     const userId = req.body.id;
-    console.log("🚀 ~ router.post ~ userId", userId)
     if (!file) {
         return res.status(400).send('Nenhum arquivo enviado.');
     }
@@ -509,14 +501,11 @@ router.put('/api/fechamodalboasvindas', async (req, res) => {
 router.get('/api/downloaddoc', (req, res) => {
     try {
         const dados = req.query
-        console.log("🚀 ~ router.get ~ dados", dados)
         const nomeDocumento = dados.nomeDoc
-        console.log("🚀 ~ router.get ~ nomeDocumento", nomeDocumento)
         const idUser = dados.id
         const directoryPath = path.join(__dirname, 'uploads/document');
         const dowload = res.download(directoryPath, `${nomeDocumento}`);
 
-        console.log("🚀 ~ router.get ~ dowload", dowload)
     } catch (error) {
         console.log(error)
     }
@@ -531,8 +520,6 @@ router.post('/api/postpatrimonio', uploaddoc.single('document'), async (req, res
     const dados = req.body;
     const arquivo = req.file; // O arquivo enviado
 
-    console.log("🚀 ~ router.post ~ dados", dados);
-    console.log("🚀 ~ router.post ~ arquivo", arquivo);
 
     try {
         const nomeUper = dados.nome.toUpperCase();
@@ -1204,8 +1191,6 @@ router.put('/api/atualizavalor', async (req, res) => {
 
 router.put('/api/vendacotasfii', async (req, res) => {
     const dados = req.body;
-    console.log("🚀 ~ router.put ~ dados", dados);
-
     const { qtdvenda, valorcota, observacao } = dados.values;
     const investimentoNome = dados.investimento.nome;
 
@@ -1217,7 +1202,6 @@ router.put('/api/vendacotasfii', async (req, res) => {
             }
         });
 
-        console.log("🚀 ~ router.put ~ buscaFundos", buscaFundos);
 
         if (!buscaFundos || buscaFundos.length === 0) {
             return res.status(404).json({ message: 'Investimento não encontrado' });
@@ -1225,7 +1209,6 @@ router.put('/api/vendacotasfii', async (req, res) => {
 
         // Total de cotas disponíveis
         const totalCotasArmazenadas = buscaFundos.reduce((total, item) => total + item.quantidade, 0);
-        console.log("🚀 ~ router.put ~ totalCotasArmazenadas", totalCotasArmazenadas);
 
         // Verifica se a quantidade de cotas solicitada é maior que a disponível
         if (qtdvenda > totalCotasArmazenadas) {
@@ -1237,7 +1220,6 @@ router.put('/api/vendacotasfii', async (req, res) => {
         // Loop para atualizar a quantidade de cotas e remover fundos se necessário
         for (let i = 0; i < buscaFundos.length; i++) {
             const investimento = buscaFundos[i];
-            console.log("🚀 ~ router.put ~ investimento", investimento);
             const cotasDisponiveis = investimento.quantidade;
 
             if (cotasRestantes <= 0) {
@@ -1273,7 +1255,9 @@ router.put('/api/vendacotasfii', async (req, res) => {
                 retornoObtido: qtdvenda * valorCotaConvertido,
                 tipoFechamento: 'Venda de Cotas',
                 observacao: observacao,
-                dataSaque: new Date()
+                dataSaque: new Date(),
+                quantidadeCotas: qtdvenda,
+                precoCota: converteString(valorcota)
             }
         });
 
@@ -1283,7 +1267,6 @@ router.put('/api/vendacotasfii', async (req, res) => {
             }
         });
 
-        console.log("🚀 ~ router.put ~ buscaFundosDeletaJuros", buscaFundosDeletaJuros);
 
         if (buscaFundosDeletaJuros.length === 0) {
             // Apaga todos os rendimentos/ganhos associados a este nome de investimento
@@ -1343,7 +1326,6 @@ router.delete('/api/deletaInvestimento', async (req, res) => {
 router.post('/api/sacarvencido', async (req, res) => {
     try {
         const dados = req.body;
-        console.log("🚀 ~ router.post ~ dados", dados)
 
         // insere na tabela de transações
 
@@ -1371,7 +1353,6 @@ router.post('/api/sacarvencido', async (req, res) => {
         })
         res.status(200).json({ message: 'Investimento inserido' })
     } catch (error) {
-        console.log("🚀 ~ router.post ~ error", error)
     }
 
 
@@ -1478,7 +1459,6 @@ router.put('/api/esqueceusenha', async (req, res) => {
 // +++++++++++++++++++++++++Categoria+++++++++++++++++++++++++++++++++++++++++
 router.post('/api/novacategoria', async (req, res) => {
     const nome = req.body
-    console.log("🚀 ~ router.post ~ nome", nome.idUser)
 
 
     try {
@@ -1602,7 +1582,6 @@ router.post('/api/novadespesa', async (req, res) => {
 
     const { datagasto, local, valorgasto, formadepagamento, responsavel, categoria, pagante, observacao, mescorrespondente } = req.body.values;
     const dados = req.body
-    console.log("🚀 ~ router.post ~ dados", dados)
 
 
     try {
@@ -1716,7 +1695,6 @@ router.post('/api/buscadespesadata', async (req, res) => {
 router.delete('/api/deletadespesa', async (req, res) => {
     try {
         const id = req.query.id
-        console.log("🚀 ~ router.delete ~ id", id)
 
         await prisma.despesas.delete({
             where: { id: parseInt(id) },
@@ -1998,7 +1976,6 @@ router.put('/api/pagaconta', async (req, res) => {
 // controle de orçamento mensal 
 router.post('/api/controleorcamento', async (req, res) => {
     const dados = req.body;
-    console.log("🚀 ~ router.post ~ dados", dados)
 
     try {
         const buscaContas = await prisma.Contas.findMany({
@@ -2036,9 +2013,7 @@ router.post('/api/controleorcamento', async (req, res) => {
         const sumValues = (array, key) => array.reduce((acc, item) => acc + item[key], 0);
 
         const totalDespesa = sumValues(buscaDespesas, 'valorGasto');
-        console.log("🚀 ~ router.post ~ totalDespesa", totalDespesa)
         const totalContas = sumValues(buscaContas, 'valor');
-        console.log("🚀 ~ router.post ~ totalContas", totalContas)
         const orcamentoUsuario = buscaControleUsuario?.valorOrcamentoMensal;
         const porcentagem = orcamentoUsuario ? Math.round(((totalDespesa + totalContas) / orcamentoUsuario) * 100) : 0;
         const total = totalDespesa + totalContas;

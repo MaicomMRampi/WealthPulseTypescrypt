@@ -2,14 +2,14 @@
 import { Listbox, ListboxItem } from '@nextui-org/react';
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import React, { useState } from 'react';
-
+import TituloBloco from '@/components/tituloAjuda'
 export default function Ajuda() {
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
     return (
         <div className='w-[95%] mx-auto'>
             <div className='grid grid-cols-1 md:grid-cols-12 pt-4 gap-5'>
-                <div className='col-span-2'>
+                <div className='col-span-2 xs:justify-center items-center w-full'>
                     <Listbox aria-label="Example with disabled actions">
                         <ListboxItem
                             key={0}
@@ -54,6 +54,9 @@ export default function Ajuda() {
                             <div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Primeiros Passos'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>Para começar a aproveitar ao máximo o nosso sistema, recomendamos que você siga estes dois passos simples:</p>
                                             <p>Adicionar seu orçamento mensal: Defina seu orçamento mensal para que o sistema possa ajudar a monitorar e gerenciar suas finanças de forma mais eficaz. Com essa informação, você poderá acompanhar seus gastos e economias com maior precisão.</p>
@@ -79,13 +82,15 @@ export default function Ajuda() {
                             <div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Inserindo uma Nova Despesa'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>O módulo de despesas foi desenvolvido para oferecer um controle detalhado dos seus gastos, organizando-os por período específico (mensal). Com ele, você poderá monitorar seus gastos em cada categoria e ajustar seu orçamento conforme necessário.</p>
                                             <p>Além disso, o sistema oferece uma funcionalidade prática para impressão dos dados. Isso facilita a geração de relatórios físicos ou digitais para revisões.</p>
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Inserindo nova despesa</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -100,13 +105,15 @@ export default function Ajuda() {
                                 </div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Listando as despesas'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>Nesta tela, você poderá acessar todas as despesas do mês selecionado, obtendo informações detalhadas como o local da despesa, quem realizou a compra e quem efetuou o pagamento. Além disso, o sistema permite que você acompanhe essas despesas em relação ao orçamento mensal definido no módulo de controle de orçamento, conforme explicado no vídeo dos primeiros passos.</p>
                                             <p>Com esse recurso, você terá um controle mais preciso sobre suas finanças mensais, garantindo que suas despesas estejam dentro dos limites estabelecidos e que o planejamento financeiro seja cumprido de forma eficiente.</p>
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Listando as despesas</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -125,13 +132,15 @@ export default function Ajuda() {
                             <div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Inserindo um novo patrimônio'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>O módulo de patrimônio oferece um controle completo de seus bens e investimentos, permitindo gerenciar cada item de forma individualizada. Você pode adicionar despesas associadas a cada patrimônio, como manutenção, taxas e outros custos, o que proporciona uma visão detalhada dos gastos relacionados ao seu patrimônio ao longo do tempo.</p>
                                             <p>Além disso, o sistema calcula e exibe o tempo de posse de cada bem, ajudando a monitorar sua evolução e a tomar decisões estratégicas sobre venda, manutenção ou investimentos adicionais. Isso facilita o planejamento financeiro a longo prazo e o acompanhamento preciso dos seus ativos.</p>
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Inserindo um novo patrimônio</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -146,12 +155,14 @@ export default function Ajuda() {
                                 </div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Listando patrimônios'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>Nesta tela, você terá uma visão geral de todos os patrimônios que foram inseridos no sistema, juntamente com o valor atual de cada um deles. Isso facilita o monitoramento de seus ativos de forma rápida e organizada. Além de visualizar o valor de cada patrimônio, você poderá acessar informações detalhadas sobre as despesas associadas e o tempo de posse de cada item, proporcionando um controle mais eficaz sobre seus bens.</p>
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Listando patrimônios</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -166,12 +177,14 @@ export default function Ajuda() {
                                 </div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Inserindo uma despesa no patrimônio'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>Nos patrimônios, é possível adicionar despesas relacionadas, permitindo um acompanhamento detalhado dos custos associados a cada bem.</p>
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Inserindo uma despesa no patrimônio</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -186,12 +199,14 @@ export default function Ajuda() {
                                 </div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Acessando as despesas do patrimônio'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>Na tela de despesas, você poderá verificar todas as despesas ou investimentos que foram alocados para o patrimônio correspondente. Isso permite um acompanhamento detalhado dos custos associados a cada bem, como manutenções, taxas, melhorias e outros gastos. Com essa visão centralizada, fica mais fácil analisar o impacto financeiro de cada patrimônio e tomar decisões mais informadas sobre a gestão dos seus ativos.</p>
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Acessando as despesas do patrimônio</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -210,6 +225,9 @@ export default function Ajuda() {
                             <div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Inserindo uma nova conta'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>
                                                 No módulo de contas, você pode inserir contas parceladas ou que estão próximas ao vencimento, oferecendo um controle eficiente das suas obrigações financeiras. O sistema conta com uma função de aviso, que exibe lembretes de contas próximas ao vencimento diretamente na tela inicial, ajudando você a evitar atrasos.
@@ -220,7 +238,6 @@ export default function Ajuda() {
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Inserindo uma nova conta</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -235,6 +252,9 @@ export default function Ajuda() {
                                 </div>
                                 <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                     <Card>
+                                        <TituloBloco
+                                            title='Listando as contas'
+                                        />
                                         <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                             <p>
                                                 Na tela de listagem de contas, você pode selecionar o mês desejado para visualizar tanto as contas atuais quanto as dos meses anteriores. Isso facilita o acompanhamento de seus pagamentos ao longo do tempo, permitindo uma visão clara das despesas passadas e futuras. Além disso, o sistema oferece a opção de imprimir as contas listadas, proporcionando praticidade para gerar relatórios físicos ou digitais conforme necessário.
@@ -242,7 +262,6 @@ export default function Ajuda() {
                                         </CardBody>
                                     </Card>
                                     <Card>
-                                        <h2 className='text-xl text-center font-semibold'>Listando as contas</h2>
                                         <iframe
                                             width="100%"
                                             height="315"
@@ -260,21 +279,23 @@ export default function Ajuda() {
                         {selectedIndex === 4 && (
                             <div className="w-full grid grid-cols-1 md:grid-cols-2 pt-4 gap-5 ">
                                 <Card>
+                                    <TituloBloco
+                                        title='Inserindo um novo investimento'
+                                    />
                                     <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
                                         <p>
                                             O módulo de investimento permite que você gerencie e acompanhe seus investimentos, incluindo ações, fundos imobiliários, renda fixa, criptomoedas e outros ativos financeiros.
                                         </p>
                                         <p>
-                                            Além disso, o sistema oferece a funcionalidade de armazenar os lucros obtidos, especificamente de fundos imobiliários e ações, facilitando o controle dos ganhos e proporcionando uma visão clara sobre os rendimentos acumulados ao longo do tempo.
+                                            Inserindo uma nova despesa                                  Além disso, o sistema oferece a funcionalidade de armazenar os lucros obtidos, especificamente de fundos imobiliários e ações, facilitando o controle dos ganhos e proporcionando uma visão clara sobre os rendimentos acumulados ao longo do tempo.
                                         </p>
                                     </CardBody>
                                 </Card>
                                 <Card>
-                                    <h2 className='text-xl text-center font-semibold'>Inserindo um novo investimento</h2>
                                     <iframe
                                         width="100%"
                                         height="315"
-                                        src="https://www.youtube.com/embed/QkwAWe7nOXY?si=409__NXhvBzTCAbo"
+                                        src="https://www.youtube.com/embed/yjlB5hyjqXQ?si=sS7TFOzwRcxOwakM"
                                         title="YouTube video player"
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
