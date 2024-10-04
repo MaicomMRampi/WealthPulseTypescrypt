@@ -1,109 +1,197 @@
-
-import { api } from '@/lib/api';
+"use client";
+import React, { useState } from "react";
 import {
-  Button,
-  Typography,
-  Modal,
-  Box,
-  Alert,
-  TextField
-} from '@mui/material'
-import axios from 'axios';
-import { Formik } from 'formik';
-import { useEffect, useState } from 'react'
-import * as yup from 'yup'
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    Input,
+    Textarea,
+} from "@nextui-org/react";
 
-interface Props {
-  open: boolean;
-  onclose: any;
-  status: string;
-  nome: string;
-}
+import { api } from "@/lib/api";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { PlusIcon } from "./iconesCompartilhados/PlusIcon";
+import { Alert } from "@mui/material";
+import { valorMask } from "./Mask";
 
-export default function BasicModal({ open, onclose, status, nome }: Props) {
-  const initialValues = {
-    qtdvenda: '',
-  };
+type Props = {
+    open: boolean;
+    onClose: () => void;
+    object: any;
+    funcao: any;
+    dadosInvestmentos: any
+};
 
-  const validationSchema = yup.object().shape({
-    qtdvenda: yup.number().required('Campo Obrigatório'),
+export default function BasicModal({ open, onClose, object, funcao, dadosInvestmentos }: Props) {
+    const [message, setMessage] = useState<string>("");
 
-  });
-  const [message, setMessage] = useState<string>('');
-  const [messageTipo, setmessageTipo] = useState<string>('');
+    const initialValues = {
+        qtdvenda: "",
+        valorcota: "",
+        observacao: ""
+    };
+
+    const validationSchema = yup.object().shape({
+        qtdvenda: yup.number().required("Campo Obrigatório"),
+        valorcota: yup.string().required("Campo Obrigatório"),
+        observacao: yup.string().optional(),
+    });
+
+    const vendaFii = async (values: any) => {
+        try {
+            const response = await api.put(`/vendacotasfii`, {
+                investimento: object,
+                values
+            });
+            if (response.status === 200) {
+                setMessage("Fundo vendido com sucesso");
+                setTimeout(() => {
+                    setMessage("");
+                    funcao();
+                    onClose();
+                }, 3000);
+            }
+        } catch (error) {
+            console.log("Erro ao vender FII:", error);
+            setMessage("Falha ao vender. Tente novamente.");
+            setTimeout(() => {
+                setMessage("");
+                funcao();
+                // onClose();
+            }, 3000);
+        }
+    };
+
+    const fiiInvestimentos = dadosInvestmentos.filter((dadosInvestmentos: any) => dadosInvestmentos.tipo === 'fii');
+    console.log("🚀 ~ BasicModal ~ fiiInvestimentos", fiiInvestimentos)
 
 
+    const dadosAgrupados = fiiInvestimentos && fiiInvestimentos.reduce((acc: any, item: any) => {
+        const { nome, quantidade } = item;
+
+        if (!acc[nome]) {
+            acc[nome] = {
+                nome,
+                quantidade: quantidade,
+            };
+        } else {
+            acc[nome].quantidade += quantidade;
+        }
+
+        return acc;
+    }, {});
+    const arrayAgrupado = Object.values(dadosAgrupados);
+    console.log("🚀 ~ BasicModal ~ arrayAgrupado", arrayAgrupado)
 
 
-  const vendaFii = async (values: any) => {
-    try {
-      const response = await api.put(`/vendacotasfii`, {
-        nomefii: nome,
-        values
-      });
-      if (response.status === 200) {
-        setmessageTipo('success')
-        setMessage('Fundo vendido com sucesso');
-        const timer = setTimeout(() => {
-          setMessage('');
-          onclose(true);
-        }, 3000);
-        return () => clearTimeout(timer);
-      }
-    } catch (error: any) {
-      setmessageTipo('error')
-      console.error('Erro ao vender FII:', error);
-      setMessage(error.response.data.message);
-      setTimeout(() => {
-        setMessage('');
+    const investimentoSelecionado: any = arrayAgrupado && object?.nome
+        ? arrayAgrupado.find((item: any) => item.nome === object.nome)
+        : null;
 
-      }, 2000);
 
-    }
-  };
+    return (
+        <>
+            <Modal
+                backdrop="opaque"
+                hideCloseButton={true}
+                isOpen={open}
+                onClose={onClose}
+                size="md"
+                className="bg-BgCardPadrao"
+                classNames={{
+                    backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
+                }}
+            >
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={vendaFii}
+                >
+                    {({
+                        errors,
+                        setFieldValue,
+                        handleChange,
+                        handleSubmit,
+                        touched,
+                        values
+                    }) => (
+                        <form onSubmit={handleSubmit}>
+                            <ModalContent>
+                                {(onClose) => (
+                                    <>
+                                        <ModalHeader className="flex flex-col gap-1">
+                                            <p>Deseja vender cotas do fundo {object.nome ? object.nome : null}?</p>
+                                            <p>quantidade disponível: <span className="text-primaryTableHover">{investimentoSelecionado.quantidade}</span></p>
 
-  return (
-    <div>
-
-      <Modal
-        open={open}
-        onClose={onclose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={(values) => {
-            vendaFii(values);
-          }}
-        >
-          {({ values, errors, handleChange, handleSubmit, setFieldValue, touched, resetForm }) => (
-            <form onSubmit={handleSubmit}>
-              <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
-                <Typography sx={{ color: 'black' }} id="modal-modal-title" variant="h6" component="h2">
-                  Deseja vender cotas do fundo <br /> <b>{nome && nome}</b>
-                </Typography>
-                <Box>
-                  <TextField
-                    name="qtdvenda"
-                    fullWidth
-                    autoFocus
-                    onChange={handleChange}
-                    error={touched.qtdvenda && Boolean(errors.qtdvenda)}
-                    helperText={touched.qtdvenda && errors.qtdvenda}
-                  />
-                </Box>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                  <Button onClick={onclose}>Cancelar</Button>
-                  <Button type="submit">Confirmar</Button>
-                </Typography>
-                {message ? <Alert color={messageTipo as any}>{message}</Alert> : null}
-              </Box>
-            </form>
-          )}
-        </Formik>
-      </Modal>
-    </div>
-  )
+                                        </ModalHeader>
+                                        <ModalBody>
+                                            <div className="flex flex-col gap-3">
+                                                <Input
+                                                    autoComplete="off"
+                                                    type="number"
+                                                    label="Quantidade de cotas"
+                                                    name="qtdvenda"
+                                                    isInvalid={touched.qtdvenda && Boolean(errors.qtdvenda)}
+                                                    value={values.qtdvenda}
+                                                    fullWidth
+                                                    onChange={handleChange}
+                                                />
+                                                <Input
+                                                    label="Valor por cota"
+                                                    name="valorcota"
+                                                    isInvalid={touched.valorcota && Boolean(errors.valorcota)}
+                                                    value={values.valorcota}
+                                                    fullWidth
+                                                    onChange={(event) => {
+                                                        const { name, value } = event.target;
+                                                        if (name === 'valorcota') {
+                                                            const maskedValue = valorMask(value);
+                                                            setFieldValue(name, maskedValue);
+                                                        } else {
+                                                            setFieldValue(name, value);
+                                                        }
+                                                    }}
+                                                    startContent={<span className="text-white text-small">R$</span>}
+                                                />
+                                                <Textarea
+                                                    label='Observação'
+                                                    name="observacao"
+                                                    value={values.observacao}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                            {values.qtdvenda > investimentoSelecionado.quantidade ? (
+                                                <Alert severity="error">Quantidade maior que a disponível</Alert>
+                                            ) :
+                                                null}
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button color="danger" variant="light" onPress={onClose}>
+                                                Cancelar
+                                            </Button>
+                                            <Button
+                                                isDisabled={values.qtdvenda > investimentoSelecionado.quantidade}
+                                                color="success"
+                                                type="submit"
+                                                endContent={<PlusIcon />}
+                                            >
+                                                Confirmar
+                                            </Button>
+                                        </ModalFooter>
+                                        {message && (
+                                            <Alert severity="success">{message}</Alert>
+                                        )}
+                                    </>
+                                )}
+                            </ModalContent>
+                        </form>
+                    )}
+                </Formik>
+            </Modal>
+        </>
+    );
 }

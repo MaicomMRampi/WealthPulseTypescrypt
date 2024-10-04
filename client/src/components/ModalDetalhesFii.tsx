@@ -16,6 +16,7 @@ export default function BasicModal({ open, onClose, data }: Props) {
     const [fechaModal, setfechaModal] = useState(false)
     const [nomeVendaFii, setnomeVendaFii] = useState('')
     // Crie um objeto para armazenar os dados agrupados
+
     const dadosAgrupados = data && data.reduce((acc: any, item: any) => {
         const { nome, quantidade } = item;
 
@@ -78,7 +79,6 @@ export default function BasicModal({ open, onClose, data }: Props) {
 
                                         <TableColumn><b>Nome Do Fii</b></TableColumn>
                                         <TableColumn align="center"><b>Quantidade de Cotas</b></TableColumn>
-                                        <TableColumn align="center"><b>Vender</b></TableColumn>
                                     </TableHeader>
 
                                     <TableBody className="bg-primaryTable">
@@ -89,7 +89,7 @@ export default function BasicModal({ open, onClose, data }: Props) {
                                                     {row.nome}
                                                 </TableCell>
                                                 <TableCell align="center">{row.quantidade}</TableCell>
-                                                <TableCell align="center"><Button color="success" onPress={onClose} endContent={<HiOutlinePlus />} onClick={() => opemModalEVendafii(row.nome)} >Vender</Button></TableCell>
+                                                {/* <TableCell align="center"><Button color="success" onPress={onClose} endContent={<HiOutlinePlus />} onClick={() => opemModalEVendafii(row.nome)} >Vender</Button></TableCell> */}
                                             </TableRow>
                                         ))}
 

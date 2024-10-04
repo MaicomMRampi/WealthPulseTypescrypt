@@ -35,6 +35,7 @@ import ModalJuros from "@/components/ModalJuros";
 import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 import ModalDelete from "@/components/ModalDelete";
 import ModalSacar from "@/components/ModalSacar";
+import ModalvendaFii from "@/components/ModalVendaFii";
 
 type Dados = {
     tipo: string
@@ -50,15 +51,15 @@ type ModalDelete = {
     objeto: any
 }
 
-type ModalSacar = {
-    open: boolean
-    objeto: any
-}
+
 
 export default function App() {
-    const [modalSacar, setModalSacar] = useState<ModalSacar>({
+    const [modalSacar, setModalSacar] = useState<any>({
         open: false,
-        objeto: null
+        objeto: null,
+        openVenda: false,
+        objetoVenda: null
+
     })
     console.log("🚀 ~ App ~ modalSacar", modalSacar)
     const [total, setTotal] = useState(0)
@@ -284,7 +285,18 @@ export default function App() {
                             </DropdownTrigger>
                             <DropdownMenu>
                                 <DropdownItem onClick={() => setModalDelete({ openClose: true, objeto: investimento.id })}>Deletar</DropdownItem>
-                                <DropdownItem onClick={() => setModalSacar({ open: true, objeto: investimento })} >Sacar/Vencido</DropdownItem>
+                                <DropdownItem>
+                                    {investimento.tipo === 'fii' ? (
+                                        <span onClick={() => setModalSacar({ openVenda: true, objetoVenda: investimento })}>
+                                            Vender Cotas ?
+                                        </span>
+                                    ) : (
+                                        <span onClick={() => setModalSacar({ open: true, objeto: investimento })}>
+                                            Sacar/Vencido
+                                        </span>
+                                    )}
+                                </DropdownItem>
+
                                 <DropdownItem>Editar</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
@@ -319,6 +331,7 @@ export default function App() {
             <div className="w-full flex flex-col gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
+                        variant="bordered"
                         size="md"
                         fullWidth
                         className=" "
@@ -378,7 +391,7 @@ export default function App() {
                                 onClick={() => setModalDetalhes(true)}
                                 variant="solid"
                             >
-                                <h2 className="text-lg">Detalhes</h2>
+                                <p className="text-lg">Detalhes</p>
                             </Button>
                             : null
                         }
@@ -533,6 +546,14 @@ export default function App() {
                 open={modalSacar.open}
                 onClose={() => setModalSacar({ open: false, objeto: null })}
                 object={modalSacar.objeto}
+                funcao={() => buscaInvestimentos()}
+            />
+            <ModalvendaFii
+                open={modalSacar.openVenda}
+                onClose={() => setModalSacar({ openVenda: false, objetoVenda: null })}
+                object={modalSacar.objetoVenda}
+                funcao={() => buscaInvestimentos()}
+                dadosInvestmentos ={dados}
             />
         </div>
 

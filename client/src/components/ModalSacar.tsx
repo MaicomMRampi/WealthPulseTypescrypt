@@ -9,6 +9,9 @@ import {
     Button,
     Input,
     Textarea,
+    Select,
+    SelectItem,
+
 } from "@nextui-org/react";
 import { valorMask } from "./Mask";
 import { api } from "@/lib/api";
@@ -21,19 +24,32 @@ type Props = {
     open: boolean;
     onClose: any;
     object: any;
+    funcao: any
 };
 
-export default function App({ open, onClose, object }: Props) {
+const motivo = [
+    {
+        nome: 'Vencido',
+    },
+
+    {
+        nome: 'Retirada antes do prazo',
+    },
+];
+
+export default function App({ open, onClose, object, funcao }: Props) {
     const [message, setMessage] = useState("");
 
     const initialValues = {
         valorjuros: "",
         observacao: "",
+        motivo: "",
     };
 
     const validationSchema = yup.object().shape({
         valorjuros: yup.string().required("Campo Obrigatório"),
         observacao: yup.string().optional(),
+        motivo: yup.string().required("Campo Obrigatório"),
     });
 
     const handleSubmit = async (values: any) => {
@@ -43,19 +59,19 @@ export default function App({ open, onClose, object }: Props) {
                 values
             })
 
-            setMessage("Provento adicionado com sucesso!");
+            setMessage("Registro adicionado a transações");
             if (response.status === 200) {
-
             }
 
             setTimeout(() => {
+                funcao()
                 setMessage("");
                 onClose();
             }, 3000);
 
         } catch (error) {
-            console.error("Erro ao adicionar proventos", error);
-            setMessage("Falha ao adicionar proventos. Tente novamente.");
+            console.log("Erro ao adicionar ", error);
+            setMessage("Falha ao adicionar. Tente novamente.");
         }
     };
 
@@ -91,6 +107,7 @@ export default function App({ open, onClose, object }: Props) {
                                     <>
                                         <ModalHeader className="flex flex-col gap-1">
                                             Investimento Vencido ou Saque Adiantado
+                                            <p className="text-[15px] text-orange-400">Obs: Ao confirmar, o investimento não contabilizará mais nos investimentos.</p>
                                         </ModalHeader>
                                         <ModalBody>
                                             <div className="flex flex-col gap-3">
@@ -113,6 +130,20 @@ export default function App({ open, onClose, object }: Props) {
                                                         setFieldValue(name, maskedValue);
                                                     }}
                                                 />
+                                                <Select
+                                                    isInvalid={touched.motivo && !!errors.motivo}
+                                                    name="motivo"
+                                                    fullWidth
+                                                    label="Motivo ?"
+                                                    onChange={handleChange}
+                                                >
+                                                    {/* Lista de tipos de títulos */}
+                                                    {motivo.map(item => (
+                                                        <SelectItem value={item.nome} key={item.nome}>
+                                                            {item.nome}
+                                                        </SelectItem>
+                                                    ))}
+                                                </Select>
                                                 <Textarea
                                                     label='Observação'
                                                     name="observacao"

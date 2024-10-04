@@ -149,16 +149,18 @@ model Investimento {
 }
 
 model FechamentoInvestimento {
-  id             Int      @id @default(autoincrement())
-  idInvestimento Int // Referência ao investimento encerrado
-  idUser         Int // Referência ao usuário
-  valorInvestido Float? // Valor investido originalmente
-  valorResgatado Float? // Valor resgatado ao final
-  dataFechamento String? // Data de fechamento ou vencimento do investimento
-  retornoObtido  Float? // Retorno obtido (calculado: valorResgatado - valorInvestido)
-  tipoFechamento String? // Tipo de fechamento (ex: "vencimento", "venda antecipada", etc.)
-  observacao     String? // Observações adicionais (motivo da venda, detalhes sobre o resgate)
-  dataSaque      DateTime @default(now()) // Data de criação do registro
+  id               Int      @id @default(autoincrement())
+  nomeInvestimento String?
+  tipoInvestimento String?
+  idInvestimento   Int // Referência ao investimento encerrado
+  idUser           Int // Referência ao usuário
+  valorInvestido   Float? // Valor investido originalmente
+  valorResgatado   Float? // Valor resgatado ao final
+  dataFechamento   String? // Data de fechamento ou vencimento do investimento
+  retornoObtido    Float? // Retorno obtido (calculado: valorResgatado - valorInvestido)
+  tipoFechamento   String? // Tipo de fechamento (ex: "vencimento", "venda antecipada", etc.)
+  observacao       String? // Observações adicionais (motivo da venda, detalhes sobre o resgate)
+  dataSaque        DateTime @default(now()) // Data de criação do registro
 }
 
 model GanhosInvestimentos {

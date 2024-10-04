@@ -1202,6 +1202,111 @@ router.put('/api/atualizavalor', async (req, res) => {
     }
 });
 
+router.put('/api/vendacotasfii', async (req, res) => {
+    const dados = req.body;
+    console.log("🚀 ~ router.put ~ dados", dados);
+
+    const { qtdvenda, valorcota, observacao } = dados.values;
+    const investimentoNome = dados.investimento.nome;
+
+    try {
+        // Busca todos os fundos pelo nome do investimento
+        const buscaFundos = await prisma.investimento.findMany({
+            where: {
+                nome: investimentoNome
+            }
+        });
+
+        console.log("🚀 ~ router.put ~ buscaFundos", buscaFundos);
+
+        if (!buscaFundos || buscaFundos.length === 0) {
+            return res.status(404).json({ message: 'Investimento não encontrado' });
+        }
+
+        // Total de cotas disponíveis
+        const totalCotasArmazenadas = buscaFundos.reduce((total, item) => total + item.quantidade, 0);
+        console.log("🚀 ~ router.put ~ totalCotasArmazenadas", totalCotasArmazenadas);
+
+        // Verifica se a quantidade de cotas solicitada é maior que a disponível
+        if (qtdvenda > totalCotasArmazenadas) {
+            return res.status(400).json({ message: 'Quantidade de cotas maior que o disponível' });
+        }
+
+        let cotasRestantes = qtdvenda;
+
+        // Loop para atualizar a quantidade de cotas e remover fundos se necessário
+        for (let i = 0; i < buscaFundos.length; i++) {
+            const investimento = buscaFundos[i];
+            console.log("🚀 ~ router.put ~ investimento", investimento);
+            const cotasDisponiveis = investimento.quantidade;
+
+            if (cotasRestantes <= 0) {
+                break;
+            }
+
+            const cotasVendidas = Math.min(cotasDisponiveis, cotasRestantes);
+
+            // Atualiza a quantidade de cotas no banco
+            const updatedInvestimento = await prisma.investimento.update({
+                where: { id: investimento.id },
+                data: { quantidade: investimento.quantidade - cotasVendidas }
+            });
+
+            cotasRestantes -= cotasVendidas;
+
+            if (updatedInvestimento.quantidade === 0) {
+                await prisma.investimento.delete({ where: { id: updatedInvestimento.id } });
+            }
+        }
+
+        // Se todas as cotas foram vendidas com sucesso, registramos a transação
+        const valorCotaConvertido = parseFloat(valorcota.replace(',', '.'));
+
+        const transacao = await prisma.fechamentoInvestimento.create({
+            data: {
+                idInvestimento: dados.investimento.id,
+                nomeInvestimento: dados.investimento.nome,
+                tipoInvestimento: dados.investimento.tipo,
+                idUser: dados.investimento.idUser,
+                valorInvestido: dados.investimento.quantidade * dados.investimento.valorPago,
+                valorResgatado: qtdvenda * valorCotaConvertido,
+                retornoObtido: qtdvenda * valorCotaConvertido,
+                tipoFechamento: 'Venda de Cotas',
+                observacao: observacao,
+                dataSaque: new Date()
+            }
+        });
+
+        const buscaFundosDeletaJuros = await prisma.investimento.findMany({
+            where: {
+                nome: investimentoNome
+            }
+        });
+
+        console.log("🚀 ~ router.put ~ buscaFundosDeletaJuros", buscaFundosDeletaJuros);
+
+        if (buscaFundosDeletaJuros.length === 0) {
+            // Apaga todos os rendimentos/ganhos associados a este nome de investimento
+            await prisma.ganhosInvestimentos.deleteMany({
+                where: {
+                    nomeInvestimento: investimentoNome
+                }
+            });
+
+            console.log(`Rendimentos associados ao investimento ${investimentoNome} foram deletados.`);
+        }
+
+        // Envia a resposta de sucesso
+        return res.status(200).json({ message: 'Venda de cotas concluída com sucesso.', transacao });
+    } catch (error) {
+        console.log("Erro ao vender cotas:", error);
+        return res.status(500).json({ message: 'Erro ao processar a venda de cotas.' });
+    }
+});
+
+
+
+
 
 router.delete('/api/deletaInvestimento', async (req, res) => {
     try {
@@ -1246,12 +1351,14 @@ router.post('/api/sacarvencido', async (req, res) => {
         const transacao = await prisma.FechamentoInvestimento.create({
             data: {
                 idInvestimento: dados.investimento.id,
+                nomeInvestimento: dados.investimento.nome,
+                tipoInvestimento: dados.investimento.tipo,
                 idUser: dados.investimento.idUser,
                 valorInvestido: dados.investimento.valorInvestido,
-                valorResgatado: valorSalvar,
+                valorResgatado: converteString(dados.values.valorjuros),
                 dataFechamento: dados.investimento.dataVencimento,
                 retornoObtido: converteString(dados.values.valorjuros) - dados.investimento.valorInvestido,
-                tipoFechamento: 'vencimento',
+                tipoFechamento: dados.values.motivo,
                 observacao: dados.values.observacao,
                 dataSaque: new Date()
             }
@@ -1268,6 +1375,17 @@ router.post('/api/sacarvencido', async (req, res) => {
     }
 
 
+
+})
+
+router.get('/api/transacoes', async (req, res) => {
+    const id = req.query.id
+    try {
+        const buscaTransacoes = await prisma.FechamentoInvestimento.findMany({ where: { idUser: parseInt(id) } })
+        res.status(200).json(buscaTransacoes)
+    } catch (error) {
+
+    }
 
 })
 
