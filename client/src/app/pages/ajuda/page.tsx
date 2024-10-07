@@ -287,7 +287,7 @@ export default function Ajuda() {
                                             O módulo de investimento permite que você gerencie e acompanhe seus investimentos, incluindo ações, fundos imobiliários, renda fixa, criptomoedas e outros ativos financeiros.
                                         </p>
                                         <p>
-                                            Inserindo uma nova despesa                                  Além disso, o sistema oferece a funcionalidade de armazenar os lucros obtidos, especificamente de fundos imobiliários e ações, facilitando o controle dos ganhos e proporcionando uma visão clara sobre os rendimentos acumulados ao longo do tempo.
+                                            Além disso, o sistema oferece a funcionalidade de armazenar os lucros obtidos, especificamente de fundos imobiliários e ações, facilitando o controle dos ganhos e proporcionando uma visão clara sobre os rendimentos acumulados ao longo do tempo.
                                         </p>
                                     </CardBody>
                                 </Card>
@@ -296,6 +296,53 @@ export default function Ajuda() {
                                         width="100%"
                                         height="315"
                                         src="https://www.youtube.com/embed/yjlB5hyjqXQ?si=sS7TFOzwRcxOwakM"
+                                        title="YouTube video player"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        referrerPolicy="strict-origin-when-cross-origin"
+                                        allowFullScreen
+                                    ></iframe>
+                                </Card>
+                                <Card>
+                                    <TituloBloco
+                                        title='Listando os investimentos'
+                                    />
+                                    <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
+                                        <p>
+                                            A listagem de investimentos no sistema é projetada para proporcionar uma experiência intuitiva e eficiente para o usuário. Cada linha da tabela exibe os investimentos cadastrados, permitindo uma visualização clara e acessível das opções disponíveis. Os usuários podem filtrar os investimentos por tipo, facilitando a localização de categorias específicas que atendem às suas necessidades.
+                                        </p>
+                                        <p>
+                                            Para cada investimento listado, existem botões que possibilitam ações relevantes, como a opção de "Sacar/Vencido" e "Vender Cotas". A escolha de "Sacar/Vencido" permite que o usuário retire o valor do investimento, seja pelo vencimento ou pela opção de saque antecipado, o que resulta na remoção do investimento da lista, enquanto um histórico da transação é mantido.
+                                        </p>
+                                    </CardBody>
+                                </Card>
+                                <Card>
+                                    <iframe
+                                        width="100%"
+                                        height="315"
+                                        src="https://www.youtube.com/embed/RH5CgJxHJCU?si=e-W7Dnt3Zp9ebQck"
+                                        title="YouTube video player"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        referrerPolicy="strict-origin-when-cross-origin"
+                                        allowFullScreen
+                                    ></iframe>
+                                </Card>
+                                <Card>
+                                    <TituloBloco
+                                        title='Histórico de transação'
+                                    />
+                                    <CardBody className='text-justify flex flex-col gap-7 text-default-600'>
+                                        <p>
+                                            O histórico de transações, oferece uma visão abrangente e detalhada de todas as operações realizadas pelo usuário ao longo do tempo. Essa ferramenta é projetada para garantir a transparência e a eficiência na gestão de investimentos.
+                                        </p>
+                                    </CardBody>
+                                </Card>
+                                <Card>
+                                    <iframe
+                                        width="100%"
+                                        height="315"
+                                        src="https://www.youtube.com/embed/DE7f-_2E6tk?si=gEHKrzDRxRwIswQL"
                                         title="YouTube video player"
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

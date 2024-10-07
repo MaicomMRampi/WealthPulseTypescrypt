@@ -10,7 +10,7 @@ interface ObjetoInvestimento {
 }
 
 interface Props {
-    isOpen: boolean
+    isOpen: any
     onClose: any
     objeto: any
     confirmaEsclusao: any

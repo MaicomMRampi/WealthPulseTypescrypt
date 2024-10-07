@@ -233,7 +233,7 @@ export default function App() {
                             >
                                 <Link
                                     className={`flex items-center p-4 text-lg rounded-md transition-colors duration-200 
-                        ${pathname === item.link ? 'bg-primaryTableText text-white' : 'text-gray-300 hover:bg-gray-200'}`}
+                                    ${pathname === item.link ? 'bg-primaryTableText text-white' : 'text-gray-300 hover:bg-gray-200'}`}
                                     href={item.link}
                                 >
                                     <span className="mr-2">{item.icon}</span> {/* Ícone adicionado aqui */}

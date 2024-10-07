@@ -27,7 +27,10 @@ import { ChevronDownIcon } from '@/components/iconesCompartilhados/ChevronDownIc
 import statusOptions from './data'
 import { capitalize } from '../listainvestimento/utils';
 import ModalObservacaoTransacao from "@/components/ModalObservacaoTransacao";
+import ModalDelete from '@/components/ModalDelete';
 export default function Transações() {
+    const [message, setMessage] = useState("");
+    const [messageTipo, setMessageTipo] = useState<string>()
     const [dadosFiltrados, setDadosFiltrados] = useState<any[]>([]);
     console.log("🚀 ~ Transações ~ dadosFiltrados", dadosFiltrados)
     const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['todos']));
@@ -37,7 +40,9 @@ export default function Transações() {
     const [page, setPage] = useState(1);
     const [observacao, setObservacao] = useState<any>({
         open: false,
-        object: null
+        object: null,
+        openDelete: false,
+        objectDelete: null
 
     });
     const rowsPerPage = 5;
@@ -68,7 +73,33 @@ export default function Transações() {
         }
     }, [statusFilter, dados]);
 
+    const deleteTransacao = async () => {
+        const response = await api.delete('/deletatransacao', {
+            params: {
+                id: observacao.objectDelete,
+            }
+        })
+        try {
 
+            if (response.status === 200) {
+                setMessage(response.data.message);
+                setMessageTipo('success');
+                buscaTransacoes();
+            }
+            setTimeout(() => {
+                setMessage('');
+                setObservacao({ openDelete: false, objectDelete: null });
+
+            }, 2000);
+        } catch (error: any) {
+            setMessage(error.response.data.message);
+            setMessageTipo('error');
+            setTimeout(() => {
+                setMessage('');
+                setObservacao({ openClose: false, objeto: null });
+            }, 2000);
+        }
+    }
 
     return (
         <div className='w-[95%] mx-auto'>
@@ -110,7 +141,7 @@ export default function Transações() {
             </div>
             <Table aria-label="Tabela de Investimentos">
                 <TableHeader>
-                    <TableColumn>Nom investimento</TableColumn>
+                    <TableColumn>Nome investimento</TableColumn>
                     <TableColumn>Tipo Investimento</TableColumn>
                     <TableColumn>Valor Investido</TableColumn>
                     <TableColumn>Valor Resgatado</TableColumn>
@@ -136,7 +167,7 @@ export default function Transações() {
                             <TableCell>
                                 <div className='flex flex-row gap-3'>
                                     <TiDocumentText className='cursor-pointer' onClick={() => setObservacao({ open: true, object: item })} />
-                                    <DeleteIcon className='cursor-pointer text-red-500' />
+                                    <DeleteIcon onClick={() => setObservacao({ openDelete: true, objectDelete: item })} className='cursor-pointer text-red-500' />
                                 </div>
                             </TableCell>
                         </TableRow>
@@ -153,6 +184,14 @@ export default function Transações() {
                 initialPage={1}
                 onChange={(page) => setPage(page)}
             /> */}
+            <ModalDelete
+                isOpen={observacao.openDelete}
+                onClose={() => setObservacao({ openDelete: false, objectDelete: null })}
+                confirmaEsclusao={deleteTransacao}
+                message={message}
+                messageTipo={messageTipo}
+                objeto={''}
+            />
         </div>
     )
 }

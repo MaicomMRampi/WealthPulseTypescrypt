@@ -36,7 +36,8 @@ import { DeleteIcon } from "@/components/iconesCompartilhados/DeleteIcon";
 import ModalDelete from "@/components/ModalDelete";
 import ModalSacar from "@/components/ModalSacar";
 import ModalvendaFii from "@/components/ModalVendaFii";
-
+import { MdDeleteForever } from "react-icons/md";
+import { FaArrowTrendDown } from "react-icons/fa6";
 type Dados = {
     tipo: string
 }
@@ -284,20 +285,18 @@ export default function App() {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                                <DropdownItem onClick={() => setModalDelete({ openClose: true, objeto: investimento.id })}>Deletar</DropdownItem>
+                                <DropdownItem onClick={() => setModalDelete({ openClose: true, objeto: investimento.id })}><span className="flex gap-2 text-red-500 items-center"><MdDeleteForever />Deletar</span> </DropdownItem>
                                 <DropdownItem>
                                     {investimento.tipo === 'fii' ? (
-                                        <span onClick={() => setModalSacar({ openVenda: true, objetoVenda: investimento })}>
-                                            Vender Cotas ?
+                                        <span className="flex items-center gap-2 text-orange-500" onClick={() => setModalSacar({ openVenda: true, objetoVenda: investimento })}>
+                                            <FaArrowTrendDown /> Vender Cotas ?
                                         </span>
                                     ) : (
-                                        <span onClick={() => setModalSacar({ open: true, objeto: investimento })}>
-                                            Sacar/Vencido
+                                        <span className="flex items-center gap-2 text-orange-500" onClick={() => setModalSacar({ open: true, objeto: investimento })}>
+                                            <FaArrowTrendDown /> Sacar/Vencido
                                         </span>
                                     )}
                                 </DropdownItem>
-
-                                <DropdownItem>Editar</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </div>
@@ -553,7 +552,7 @@ export default function App() {
                 onClose={() => setModalSacar({ openVenda: false, objetoVenda: null })}
                 object={modalSacar.objetoVenda}
                 funcao={() => buscaInvestimentos()}
-                dadosInvestmentos ={dados}
+                dadosInvestmentos={dados}
             />
         </div>
 

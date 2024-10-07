@@ -90,16 +90,6 @@ const uploaddoc = multer({
     fileFilter: fileFilter
 });
 
-
-
-
-
-
-
-
-
-
-
 //=====================MERCADO PAGO API=====================
 const createCharge = async ({ accessToken, paymentData }) => {
     const axios = require('axios');
@@ -1287,10 +1277,6 @@ router.put('/api/vendacotasfii', async (req, res) => {
     }
 });
 
-
-
-
-
 router.delete('/api/deletaInvestimento', async (req, res) => {
     try {
 
@@ -1369,7 +1355,21 @@ router.get('/api/transacoes', async (req, res) => {
     }
 
 })
+router.delete('/api/deletatransacao', async (req, res) => {
+    try {
 
+        const dados = req.query.id.id
+        console.log("🚀 ~ router.delete ~ dados", dados)
+        const deletaInvestimento = await prisma.FechamentoInvestimento.delete({
+            where: {
+                id: parseInt(dados)
+            }
+        })
+        res.status(200).json({ message: 'Transação deletada com sucesso' })
+    } catch (error) {
+        console.log('erro', error)
+    }
+});
 
 
 // ==================================================
