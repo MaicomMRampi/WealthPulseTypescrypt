@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const dbConnect = require('../utils/dbConnect')
 const { crypto } = require('../utils/password')
 const { converteString } = require('../utils/converteString')
 const bcrypt = require('bcryptjs')
@@ -497,7 +496,6 @@ router.get('/api/downloaddoc', (req, res) => {
         const dowload = res.download(directoryPath, `${nomeDocumento}`);
 
     } catch (error) {
-        console.log(error)
     }
 
 
@@ -1265,14 +1263,11 @@ router.put('/api/vendacotasfii', async (req, res) => {
                     nomeInvestimento: investimentoNome
                 }
             });
-
-            console.log(`Rendimentos associados ao investimento ${investimentoNome} foram deletados.`);
         }
 
         // Envia a resposta de sucesso
         return res.status(200).json({ message: 'Venda de cotas concluída com sucesso.', transacao });
     } catch (error) {
-        console.log("Erro ao vender cotas:", error);
         return res.status(500).json({ message: 'Erro ao processar a venda de cotas.' });
     }
 });
@@ -1357,9 +1352,7 @@ router.get('/api/transacoes', async (req, res) => {
 })
 router.delete('/api/deletatransacao', async (req, res) => {
     try {
-
         const dados = req.query.id.id
-        console.log("🚀 ~ router.delete ~ dados", dados)
         const deletaInvestimento = await prisma.FechamentoInvestimento.delete({
             where: {
                 id: parseInt(dados)
@@ -1367,7 +1360,6 @@ router.delete('/api/deletatransacao', async (req, res) => {
         })
         res.status(200).json({ message: 'Transação deletada com sucesso' })
     } catch (error) {
-        console.log('erro', error)
     }
 });
 
@@ -1940,10 +1932,6 @@ router.post('/api/buscacontadata', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
-
-
-
-
 
 router.put('/api/pagaconta', async (req, res) => {
     try {

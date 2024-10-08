@@ -45,9 +45,15 @@ export default function Pagamentos() {
 
     return (
         <div className='w-[95%] mx-auto pt-3'>
-            <p className="py-6 font-bold text-lg text-center text-gray-800 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg shadow-lg p-2">
-                Sua assinatura vencerá em: <span className="text-white">{ultimoDado && calculaTempoRestante(ultimoDado.dataExpiracao).dias} dias</span>
-            </p>
+            {ultimoDado && calculaTempoRestante(ultimoDado.dataExpiracao).dias < 0 ? (
+                <p className="py-6 font-bold text-lg text-center text-gray-800 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg shadow-lg p-2">
+                    Sua assinatura está vencida
+                </p>
+            ) : (
+                <p className="py-6 font-bold text-lg text-center text-gray-800 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg shadow-lg p-2">
+                    Sua assinatura vencerá em: <span className="text-white">{ultimoDado && calculaTempoRestante(ultimoDado.dataExpiracao).dias} dias</span>
+                </p>
+            )}
 
 
             <Table
