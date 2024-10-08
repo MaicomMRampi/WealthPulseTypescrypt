@@ -94,7 +94,7 @@ export default function App() {
         try {
             const response = await api.delete('/deletapatrimonio', {
                 params: {
-                    id: modalDelete.objeto.id,
+                    id: modalDelete.objeto,
                 },
             });
             if (response.status === 200) {
