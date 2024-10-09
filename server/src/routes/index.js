@@ -85,7 +85,7 @@ const fileFilter = (req, file, cb) => {
 
 const uploaddoc = multer({
     storage: storageDoc,
-    limits: { fileSize: 2 * 1024 * 1024 }, // Limite de 2MB
+    limits: { fileSize: 2 * 2048 * 2048 }, // Limite de 2MB
     fileFilter: fileFilter
 });
 
@@ -430,6 +430,7 @@ router.post('/api/postusers', async (req, res) => {
 })
 router.post('/api/atualizacadastro', async (req, res) => {
     const dados = req.body
+    console.log("🚀 ~ router.post ~ dados", dados)
 
     try {
         const response = await prisma.usuario.update({
@@ -439,11 +440,24 @@ router.post('/api/atualizacadastro', async (req, res) => {
             data: {
                 nome: dados.values.nome,
                 email: dados.values.email,
-                valorOrcamentoMensal: converteString(dados.values.valorOrcamentoMensal)
+                valorOrcamentoMensal: converteString(dados.values.valorOrcamentoMensal),
             }
         })
+        if (dados.values.senha) {
+            const senhaCripto = await crypto(dados.values.senha)
+            await prisma.usuario.update({
+                where: {
+                    id: parseInt(dados.id)
+                },
+                data: {
+                    senha: senhaCripto.toString('hex')
+                }
+            })
+        }
+
         res.status(200).json({ message: 'Atualizado com sucesso!', response: response });
     } catch (error) {
+
 
     }
 });
@@ -667,15 +681,36 @@ router.get('/api/buscadespesasdetalhesnome', async (req, res) => {
 
 router.delete('/api/deletapatrimonio', async (req, res) => {
     try {
-        const dados = req.query.id;
+        const dados = req.query.id.id;
+        const idUser = req.query.id.idUser;
+        const documento = req.query.id.documentoPath;
+        const caminhoArquivo = path.resolve(__dirname, '..', '..', 'uploads', 'document', idUser, documento);
+        console.log("🚀 ~ router.delete ~ caminhoArquivo", caminhoArquivo);
 
+        // Verifique se o documento existe
+        fs.access(caminhoArquivo, fs.constants.F_OK, (err) => {
+            if (err) {
+                console.log("🚀 ~ fs.access ~ err", err)
+                // Se o arquivo não for encontrado, apenas registre o erro e continue
+                console.warn('Arquivo não encontrado, prosseguindo com a exclusão...');
+            } else {
+                // Exclua o arquivo se ele existir
+                fs.unlink(caminhoArquivo, (err) => {
+                    if (err) {
+                        console.error('Erro ao excluir o arquivo:', err);
+                    } else {
+                        console.log('Arquivo excluído com sucesso:', caminhoArquivo);
+                    }
+                });
+            }
+        });
 
+        // Continue com a exclusão do patrimônio no banco de dados
         const deletaDespesa = await prisma.Patrimonio.delete({
             where: {
                 id: parseInt(dados)
             }
         });
-
 
         res.status(200).json({ message: 'Despesa deletada com sucesso!', deletaDespesa });
     } catch (error) {
@@ -686,6 +721,7 @@ router.delete('/api/deletapatrimonio', async (req, res) => {
         }
     }
 });
+
 router.delete('/api/deletadespesapatrimonio', async (req, res) => {
     try {
         const dados = req.query.id;
@@ -1276,6 +1312,7 @@ router.delete('/api/deletaInvestimento', async (req, res) => {
     try {
 
         const dados = req.query.id
+        const documento = req.query.documentoPath
         const deletaInvestimento = await prisma.investimento.delete({
             where: {
                 id: parseInt(dados)

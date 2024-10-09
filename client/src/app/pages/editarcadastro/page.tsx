@@ -9,6 +9,8 @@ import ButtonEnviarDadosPadrao from '@/components/ButtonEnviarDadosPadrao';
 import * as yup from 'yup';
 import { api } from '@/lib/api';
 import { Alert } from '@mui/material';
+import { EyeSlashFilledIcon } from '@/components/iconesCompartilhados/EyeSlashFilledIcon';
+import { EyeFilledIcon } from '@/components/iconesCompartilhados/EyeFilledIcon';
 
 export default function EditarCadastro() {
     const { tokenUsuario, setTokenUsuario } = useToken();
@@ -16,6 +18,8 @@ export default function EditarCadastro() {
     const [currentImage, setCurrentImage] = useState(tokenUsuario?.imageUrl ? `http://localhost:3333/uploads/${tokenUsuario.imageUrl}` : selectedImage);
     const [message, setMessage] = useState<string>('');
     const [messageTipo, setMessageTipo] = useState<any>('');
+    const [isVisible, setIsVisible] = useState(false);
+    const toggleVisibility = () => setIsVisible(!isVisible);
 
 
     const handleImageChange = async (e: any) => {
@@ -49,12 +53,15 @@ export default function EditarCadastro() {
         nome: tokenUsuario?.nome || '',
         email: tokenUsuario?.email || '',
         valorOrcamentoMensal: tokenUsuario?.valorOrcamentoMensal?.toString() || '',
+        senha: ''
     };
 
     const validationSchema = yup.object().shape({
         nome: yup.string().required('O Nome é obrigatório'),
         email: yup.string().email('Email inválido').required('O Email é obrigatório'),
         valorOrcamentoMensal: yup.string().required('O Valor Orçamento Mensal é obrigatório'),
+        senha: yup.string().optional()
+
     });
 
     const handleSubmit = async (values: any) => {
@@ -117,10 +124,11 @@ export default function EditarCadastro() {
                                 </div>
                             </div>
                             <div className='col-span-9 bg-BgCardPadrao rounded-lg p-4'>
-                                <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                                <div className='grid grid-cols-1 md:grid-cols-3 gap-5'>
                                     <Input
                                         label="Nome"
                                         name="nome"
+                                        isInvalid={touched?.nome && !!errors?.nome}
                                         value={values.nome}
                                         onChange={handleChange}
                                     />
@@ -128,13 +136,13 @@ export default function EditarCadastro() {
                                         label="E-mail"
                                         name="email"
                                         value={values.email}
+                                        isInvalid={touched?.email && !!errors?.email}
                                         onChange={handleChange}
                                     />
                                     <Input
                                         label="Orçamento Mensal"
                                         name="valorOrcamentoMensal"
                                         value={values.valorOrcamentoMensal}
-                                        defaultValue={values.valorOrcamentoMensal}
                                         isInvalid={touched?.valorOrcamentoMensal && !!errors?.valorOrcamentoMensal}
                                         startContent={<span className="text-white text-small">R$</span>}
                                         onChange={(event) => {
@@ -143,6 +151,49 @@ export default function EditarCadastro() {
                                             setFieldValue(name, maskedValue);
                                         }}
                                     />
+                                    <Input
+                                        size='lg'
+                                        isInvalid={!!touched.senha && !!errors.senha}
+                                        fullWidth
+                                        // defaultValue={tokenUsuario?.senha}
+                                        onChange={handleChange}
+                                        value={values.senha}
+                                        name='senha'
+                                        className='text-white'
+                                        placeholder="Nova senha"
+                                        endContent={
+                                            <button type="button" onClick={toggleVisibility} className="focus:outline-none">
+                                                {isVisible ? (
+                                                    <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                                ) : (
+                                                    <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                                )}
+                                            </button>
+                                        }
+                                        type={isVisible ? "text" : "password"}
+                                    />
+                                    {/* <Input
+                                        size='lg'
+                                        isInvalid={!!touched.confirmasenha && !!errors.confirmasenha}
+                                        fullWidth
+                                        errorMessage={errors.confirmasenha}
+                                        // defaultValue={tokenUsuario?.senha}
+                                        onChange={handleChange}
+                                        value={values.confirmasenha}
+                                        name='confirmasenha'
+                                        className='text-white'
+                                        placeholder="Confirma sua Senha "
+                                        endContent={
+                                            <button type="button" onClick={toggleVisibility} className="focus:outline-none">
+                                                {isVisible ? (
+                                                    <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                                ) : (
+                                                    <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                                )}
+                                            </button>
+                                        }
+                                        type={isVisible ? "text" : "password"}
+                                    /> */}
                                 </div>
                             </div>
                             <ButtonEnviarDadosPadrao onSubmit={handleSubmit} />

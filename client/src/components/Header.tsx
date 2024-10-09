@@ -136,7 +136,7 @@ export default function App() {
                                         Fluxo do
                                     </div>
                                     <div className="text-primaryTableText">
-                                        Dinheiro
+                                        Capital
                                     </div>
                                 </div>
                             </div>
