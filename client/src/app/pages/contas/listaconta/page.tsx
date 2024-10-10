@@ -42,7 +42,7 @@ import AlteraVisualizacaoDataYYYYMM from "@/components/funcoes/alteraVisualizaca
 import AlteraVisualizacaoData from "@/components/funcoes/alteraVisualizacaoData";
 import ButtonVoltar from "@/components/ButtonVoltar";
 import ModalFechaFatura from "@/components/despesaComponents/ModalFechaFatura"
-import { CheckIcon } from "../../patrimonio/detalhes/[id]/CheckIcon";
+import { CheckIcon } from "@/components/iconesCompartilhados/CheckIcon";
 import { MdBlockFlipped } from "react-icons/md";
 import orcamentoMensalControle from "@/components/funcoes/orcamentoMensalControle";
 import { MdOutlinePayments } from "react-icons/md";

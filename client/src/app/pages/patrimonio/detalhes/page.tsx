@@ -25,7 +25,8 @@ import { ImBlocked } from "react-icons/im";
 import { MdRemoveRedEye } from 'react-icons/md';
 import PdfDespesasDebens from '@/components/pdfDespesasDeBens';
 import AlteraVisualizacaoData from '@/components/funcoes/alteraVisualizacaoData'
-
+import useIdPatrimonio from "@/components/hooks/useIdPatrimonio";
+import dynamic from 'next/dynamic';
 interface Patrimonio {
     id: number;
     nomePatrimonio: string;
@@ -65,7 +66,7 @@ interface ModalDeleteProps {
 }
 
 export default function DetalhesDosGastos({ params }: any) {
-
+    const { idPatrimonio } = useIdPatrimonio()
     const INITIAL_VISIBLE_COLUMNS = ["nomePatrimonio", "nomeDespesa", "tipoPatrimonio", "valor", "dataAquisicao", "actions"];
     const [openModalObservacao, setOpenModalObservacao] = useState(false);
     const { visibility } = useVisibility()
@@ -94,10 +95,17 @@ export default function DetalhesDosGastos({ params }: any) {
         dias: 0,
     });
 
+    const PDFDownloadLink = dynamic(
+        () => import('@react-pdf/renderer').then((module) => module.PDFDownloadLink),
+        { ssr: false }
+    );
+
 
     const buscaPatrimonios = async () => {
         const response = await api.get('/detalhespatrimonio', {
-            params,
+            params: {
+                id: idPatrimonio,
+            }
         });
         setDados(response.data);
     };
@@ -432,6 +440,7 @@ export default function DetalhesDosGastos({ params }: any) {
                     </Button>
                     <ButtonVoltar
                         tamanho={false}
+                        size='sm'
                     />
                 </div>
             </div>
@@ -440,6 +449,7 @@ export default function DetalhesDosGastos({ params }: any) {
 
     return (
         <div key={visibility.toString()} className="w-full px-4 py-12 ">
+            {/* <p className='text-red-500'>{idPatrimonio}</p> */}
             <Card className={`p-4 bg-BgCardPadrao`} >
                 <p className="pt-2 text-center font-bold">Detalhes do Patrimômio: <span className='text-buttonAzulClaro'>{dados.length > 0 && dados && dados[0].Patrimonio.nomePatrimonio}</span></p>
                 <Table

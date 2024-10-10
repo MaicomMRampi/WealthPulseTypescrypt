@@ -4,7 +4,7 @@ import { Button, Card, Chip, Divider, Table, TableBody, TableCell, TableColumn, 
 import { api } from '@/lib/api'
 import useToken from '@/components/hooks/useToken'
 import currency from '@/components/Currency'
-import { CheckIcon } from '../patrimonio/detalhes/[id]/CheckIcon'
+import { CheckIcon } from "@/components/iconesCompartilhados/CheckIcon";
 import { GoAlertFill } from "react-icons/go";
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'

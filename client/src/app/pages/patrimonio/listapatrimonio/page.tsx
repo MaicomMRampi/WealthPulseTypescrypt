@@ -36,6 +36,8 @@ import ModalDelete from "@/components/ModalDelete";
 import ModalObservacaoPatrimonios from "@/components/ModalObservacaoPatrimonios";
 import { GiPayMoney } from "react-icons/gi";
 import { BsFiletypeDoc } from "react-icons/bs";
+
+import useIdPtrimonio from "@/components/hooks/useIdPatrimonio";
 const statusColorMap = {
     active: "success",
     paused: "danger",
@@ -55,6 +57,8 @@ interface ModalDelete {
 
 
 export default function App() {
+    const { idPatrimonio, setIdPtrimonio } = useIdPtrimonio()
+    console.log("🚀 ~ App ~ idPatrimonio", idPatrimonio)
     const { tokenUsuario } = useToken()
     const Router = useRouter()
     const [filterValue, setFilterValue] = useState("");
@@ -187,10 +191,12 @@ export default function App() {
         });
     }, [sortDescriptor, items]);
 
+    const mandaRota = (id: number) => {
+        console.log("🚀 ~ mandaRota ~ id", id)
+        Router.push(`/pages/patrimonio/detalhes`)
+        setIdPtrimonio(id)
+    }
     const renderCell = React.useCallback((patrimonio: any, columnKey: string) => {
-        const mandaRota = (id: number) => {
-            Router.push(`/pages/patrimonio/detalhes/${id}`)
-        }
         const cellValue = patrimonio[columnKey];
 
         switch (columnKey) {
