@@ -10,7 +10,7 @@ app.use(cors()); // Permite todas as origens
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/', routes);
-const port = 3333;
+const port = 28041;
 app.listen(port, () => {
     console.log("Servidor rodando na porta", port);
 });
