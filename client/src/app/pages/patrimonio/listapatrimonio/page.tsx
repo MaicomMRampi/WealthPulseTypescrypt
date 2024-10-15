@@ -129,7 +129,7 @@ export default function App() {
     };
 
     const downloadDocument = (nomeDoc: string) => {
-        window.open(`http://localhost:3333/uploads/document/${tokenUsuario?.id}/${nomeDoc}`, '_blank');
+        window.open(`https://fluxodocapital.com.br/api/uploads/document/${tokenUsuario?.id}/${nomeDoc}`, '_blank');
     }
 
 
