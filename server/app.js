@@ -7,7 +7,11 @@ const prisma = require('./src/utils/dbConnect');
 const path = require('path');
 
 app.use(express.json());
-app.use(cors()); // Permite todas as origens
+app.use(cors({
+    origin: 'https://app.fluxodocapital.com.br', // Permitir apenas essa origem
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+    credentials: true // Se você precisar enviar cookies
+}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/', routes);

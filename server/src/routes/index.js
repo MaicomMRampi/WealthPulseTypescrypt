@@ -379,6 +379,7 @@ router.post('/api/login', async (req, res) => {
 router.post('/api/postusers', async (req, res) => {
 
     const dadosCadastro = req.body
+    console.log("🚀 ~ router.post ~ dadosCadastro", dadosCadastro)
 
 
     const avaliacaoGratuita = new Date();
