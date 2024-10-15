@@ -32,7 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/', routes);
 
 // Corrigindo a porta para 3000 (ou uma diferente de 3306)
-const port = process.env.PORT || 3000; // Alterando a porta
+const port = process.env.PORT || 3306; // Alterando a porta
 app.listen(port, () => {
     console.log("Servidor rodando na porta", port);
 });
