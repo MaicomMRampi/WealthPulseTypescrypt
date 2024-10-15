@@ -18,12 +18,14 @@ app.use(cors({
 }));
 
 // Adicionando manualmente o header 'Access-Control-Allow-Origin'
+// Exemplo usando Express.js
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://app.fluxodocapital.com.br');
+    res.header('Access-Control-Allow-Origin', '*'); // ou especificar o domínio
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
+
 
 // Middleware para servir arquivos estáticos (como uploads)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
