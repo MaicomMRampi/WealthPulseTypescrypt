@@ -8,6 +8,7 @@ const path = require('path');
 
 app.use(express.json());
 app.use(cors({
+    accessControlAllowOrigin: '*',
     origin: 'https://app.fluxodocapital.com.br', // Permitir apenas essa origem
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
     credentials: true // Se você precisar enviar cookies

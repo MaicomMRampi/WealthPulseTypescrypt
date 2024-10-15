@@ -24,7 +24,7 @@ export default function SignUp() {
 
     const handleSubmit = async (values: FormValues) => {
         try {
-            const response = await api.post(`/postusers`, values);
+            const response = await api.post(`https://fluxodocapital.com.br/api/postusers`, values);
             setMessage(response.data.message);
             if (response.status === 200) {
                 setMessageTipo("success");
