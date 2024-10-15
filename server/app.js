@@ -11,10 +11,11 @@ app.use(express.json());
 
 // Configuração de CORS
 app.use(cors({
-    origin: 'https://app.fluxodocapital.com.br', // Domínio permitido
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
-    allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
-    credentials: true // Habilitar cookies
+    origin: 'https://app.fluxodocapital.com.br',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    exposedHeaders: ['Content-Type', 'X-Custom-Header']
 }));
 
 // Adicionando manualmente o header 'Access-Control-Allow-Origin'
