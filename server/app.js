@@ -14,6 +14,13 @@ app.use(cors({
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://app.fluxodocapital.com.br'); // Substitua pela sua origem
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    next();
+});
 app.use('/', routes);
 const port = process.env.PORT || 3306; // Escolher uma porta apropriada
 app.listen(port, () => {
