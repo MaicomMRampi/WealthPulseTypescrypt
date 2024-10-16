@@ -378,18 +378,18 @@ router.post('/api/login', async (req, res) => {
 // +++++++++++++++++API DO USUARIO+++++++++++++++++++++++++++++++
 router.post('/api/postusers', async (req, res) => {
 
-    const dadosCadastro = req.body
-    console.log("🚀 ~ router.post ~ dadosCadastro", dadosCadastro)
-
-
-    const avaliacaoGratuita = new Date();
-    avaliacaoGratuita.setDate(avaliacaoGratuita.getDate() + 15);
-    const firstPay = new Date();
-    firstPay.setMonth(firstPay.getMonth() + 1);
-
-    // INSERE DADOS NA TABELA DE PAGAMENTO USUARIOS//
-
     try {
+        const dadosCadastro = req.body
+        console.log("🚀 ~ router.post ~ dadosCadastro", dadosCadastro)
+
+
+        const avaliacaoGratuita = new Date();
+        avaliacaoGratuita.setDate(avaliacaoGratuita.getDate() + 15);
+        const firstPay = new Date();
+        firstPay.setMonth(firstPay.getMonth() + 1);
+
+        // INSERE DADOS NA TABELA DE PAGAMENTO USUARIOS//
+
         const { nome, cpf, email, senha } = req.body
         const nomeFormatado = nome.toUpperCase().trim()
         const emailFormatado = email.trim()
