@@ -7,9 +7,13 @@ const prisma = require('./src/utils/dbConnect');
 const path = require('path');
 
 
-app.use(cors());
-
+app.use(cors({
+    origin: 'https://app.fluxodocapital.com.br/',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+    credentials: true, // Permite envio de cookies, se necessário
+}));
 app.use(express.json());
+
 app.use(express.urlencoded());
 
 
