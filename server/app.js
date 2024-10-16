@@ -9,7 +9,7 @@ const path = require('path');
 app.use(express.json());
 
 app.use(cors({
-    origin: 'https://app.fluxodocapital.com.br'
+    origin: 'https://app.fluxodocapital.com.br/pages/register'
 }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
