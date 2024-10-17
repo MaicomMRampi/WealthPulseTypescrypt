@@ -7,6 +7,11 @@ import { api } from '@/lib/api';
 
 
 const LayoutAdmin = ({ children }: any) => {
+    return (
+        <>
+            {children}
+        </>
+    )
     // const { tokenUsuario } = useToken();
     // const router = useRouter();
     // const pathname = usePathname();
