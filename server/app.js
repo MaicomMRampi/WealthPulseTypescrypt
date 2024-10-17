@@ -17,12 +17,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Trusted Types Policy
-escapeHTMLPolicy = trustedTypes.createPolicy('default', {
-    createHTML: (string) => string,
-    createScriptURL: (string) => string,
-    createScript: (string) => string,
-});
 
 // Rotas
 app.use('/', routes);
