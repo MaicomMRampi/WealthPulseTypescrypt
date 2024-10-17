@@ -6,7 +6,7 @@ const app = express();
 
 // Configuração de CORS
 app.use(cors({
-    origin: 'https://app.fluxodocapital.com.br',
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }));
