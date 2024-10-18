@@ -401,7 +401,7 @@ router.post('/api/postusers', async (req, res) => {
         if (cpfExists) {
             return res.status(401).json({ message: 'CPF Já Cadastrado' })
         }
-        const novoUsuario = await prisma.usuario.create({
+        const novoUsuario = await prisma.Usuario.create({
             data: {
                 nome: nomeFormatado,
                 cpf,
