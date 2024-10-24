@@ -13,7 +13,7 @@ app.use(cors());
 // Middleware para interpretar o corpo das requisições como JSON
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.send('Olá, mundo!, acessou caraio');
 });
 
