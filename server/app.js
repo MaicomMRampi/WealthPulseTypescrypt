@@ -1,30 +1,26 @@
+require('dotenv/config');
+
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-
-const userRoutes = require('./src/routes/userRoutes')
-
-// Configurando dotenv
-dotenv.config();
+const routes = require("../server/routes/userRoutes");
 
 const app = express();
 
-// Configurando o CORS
-app.use(cors());
+// Configuração do CORS
+app.use(cors({
+    origin: '*', // Permite qualquer origem
+    methods: ['*'], // Permite qualquer método
+    allowedHeaders: ['Content-Type', 'Authorization'], // Permite cabeçalhos específicos
+}));
 
-// Middleware para interpretar o corpo das requisições como JSON
+// Middleware para analisar requisições JSON e URL-encoded
 app.use(express.json());
-app.use(userRoutes)
 
+// Rotas
+app.use(routes);
 
-app.get('/api', (req, res) => {
-    res.send('Olá, mundo!, acessou caraio');
+const port = process.env.PORT ?? 3333;
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
-
-// Iniciando o servidor
-const PORT = process.env.PORT || 3333;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
-
-module.exports = app
