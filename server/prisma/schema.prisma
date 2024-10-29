@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id                   Int      @id @default(autoincrement())
+  nome                 String
+  cpf                  String   @unique
+  email                String   @unique
+  senha                String
+  datacadastro         DateTime @default(now())
+  valorOrcamentoMensal Float?
+  imageUrl             String?
+  openModal            Int?
+  dataExpiracao        DateTime
+  statusFinanceiro     Int?     @default(1) // em dia 1 ou vencido 0
+
+  UsuarioPagamento UsuarioPagamento[]
+}
+
+model UsuarioPagamento {
+  id              Int       @id @default(autoincrement())
+  idUser          Int
+  valorPago       Float?
+  metodoPagamento String    @default("pix")
+  dataPagamento   DateTime?
+  dataExpiracao   DateTime
+  status          Int?      @default(1) //1 pago  ou 0 não pago
+  Usuario         Usuario   @relation(fields: [idUser], references: [id])
+}
